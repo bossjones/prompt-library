@@ -16,6 +16,7 @@ dependencies = [
     "llm-python>=0.1",
     "loguru>=0.7.3",
     "better-exceptions>=0.3.3",
+    "promptim>=0.0.7",
 ]
 
 [dependency-groups]

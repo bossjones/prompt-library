@@ -174,3 +174,37 @@ Remember to ensure that both the XSD file and the XML file are in the same direc
 
 Citations:
 [1] https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/39473573/5da19758-6a8e-42fa-9a2e-5dc9e6ccaf67/paste.txt
+
+
+# Inspiration
+
+## IndyDevDan's Youtube Video: OpenAI's o1 Reasoning Models: A Deep Dive
+
+### Introduction
+
+OpenAI has released new reasoning models, o1-preview and o1-mini, which incorporate prompt chaining and chain of thought techniques. These models offer advanced capabilities but require a different approach to prompt engineering[1][2].
+
+### Key Points
+
+#### Model Comparison
+- The video demonstrates o1-preview vs Claude 3.5 in generating YouTube chapters[1][2].
+
+#### Setup and Tools
+- Simon Willison's CLI LLM library is used to set up and work with o1-mini[1][2].
+
+#### Practical Applications
+1. **AI Coding Meta Review**: Showcases o1-preview's capabilities in code analysis[1][2].
+2. **Hacker News Sentiment Analysis**: Demonstrates o1-preview's ability to analyze sentiment on the platform[1][2].
+
+#### Challenges and Considerations
+- The o1 models are described as "NOT easy to use," indicating a learning curve for effective implementation[1][2].
+
+#### Future Implications
+- The video concludes with a discussion on the future of reasoning models and their potential impact[1][2].
+
+#### Resources
+The video description provides a comprehensive list of resources for further exploration, including Simon Willison's articles and tools, OpenAI documentation, and related discussions[1][2].
+
+Citations:
+[1] https://www.youtube.com/watch?v=GUVrOa4V8iE
+[2] https://www.youtube.com/watch?v=GUVrOa4V8iE
