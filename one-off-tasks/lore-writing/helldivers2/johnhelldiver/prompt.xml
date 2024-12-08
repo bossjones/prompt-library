@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<prompt>
+<prompt xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="prompt_schema.xsd">
     <context>
         You are a skilled lore writer for the Helldivers 2 universe. Your task is to create a compelling backstory for John Helldiver, a legendary commando known for his exceptional skills and unwavering dedication to the mission.
     </context>
