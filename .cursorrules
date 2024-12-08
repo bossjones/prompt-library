@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cursorrules>
+  <purpose>
+    You are an AI assistant responsible for helping a developer create a LLM prompt library.
+  </purpose>
+
+  <instructions>
+    <instruction>Create a main folder called `prompt-library` to house all prompts.</instruction>
+    <instruction>Divide the library into two main categories: `agents` and `one-off-tasks`.</instruction>
+    <instruction>Within the `agents` folder, create subcategories for `creative` and `engineering` tasks.</instruction>
+    <instruction>Under `creative`, include subfolders for image-generation, fabrication, story-generation, and quote-generation.</instruction>
+    <instruction>Under `engineering`, create subfolders for code-generation, code-review, bug-finding, and style-enforcement.</instruction>
+    <instruction>In `one-off-tasks`, include subfolders for image-generation, lore-writing, code-generation, and code-review.</instruction>
+    <instruction>Create a `templates` folder to store reusable prompt structures.</instruction>
+    <instruction>Include a comprehensive README.md file at the root level.</instruction>
+  </instructions>
+
+  <examples>
+    <example>
+      <![CDATA[
+      Example folder structure:
+prompt-library/
+│
+├── agents/
+│   ├── creative/
+│   │   ├── image-generation/
+│   │   ├── fabrication/
+│   │   ├── story-generation/
+│   │   └── quote-generation/
+│   │
+│   └── engineering/
+│       ├── code-generation/
+│       ├── code-review/
+│       ├── bug-finding/
+│       └── style-enforcement/
+│
+├── one-off-tasks/
+│   ├── image-generation/
+│   ├── lore-writing/
+│   │   └── helldivers2/
+│   │       └── johnhelldiver/
+│   │           ├── prompt.xml
+│   │           ├── README.md
+│   │           ├── metadata.json
+│   │           └── examples/
+│   │               ├── example1.md
+│   │               └── example2.md
+│   ├── code-generation/
+│   └── code-review/
+│
+├── templates/
+│   ├── prompt_template.xml
+│   ├── readme_template.md
+│   └── metadata_template.json
+│
+└── README.md
+      ]]>
+    </example>
+    <example>
+      <![CDATA[
+      Example README.md content:
+      # Prompt Library
+
+      This repository contains a structured collection of prompts for various AI tasks.
+
+      ## Structure
+      - `agents/`: Prompts for continuous use in agentic systems
+      - `one-off-tasks/`: Prompts for single-use scenarios
+      - `templates/`: Reusable prompt structures
+
+      ## Usage
+      [Include guidelines on how to use and contribute to the library]
+      ]]>
+    </example>
+  </examples>
+
+  <reasoning>
+    <point>Hierarchical structure allows for easy navigation and scalability.</point>
+    <point>Separation of agents and one-off tasks ensures quick access to appropriate prompts.</point>
+    <point>Detailed subcategories simplify locating prompts for specific tasks.</point>
+    <point>Structure accommodates both general categories and specific use cases.</point>
+    <point>Templates folder promotes consistency in prompt creation.</point>
+    <point>README file provides clear documentation for all users.</point>
+  </reasoning>
+</cursorrules>
