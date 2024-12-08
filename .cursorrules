@@ -72,6 +72,89 @@ prompt-library/
       [Include guidelines on how to use and contribute to the library]
       ]]>
     </example>
+        <example>
+      <![CDATA[
+      Example prompt.xml for John Helldiver:
+      <?xml version="1.0" encoding="UTF-8"?>
+      <prompt>
+        <context>
+          You are a skilled lore writer for the Helldivers 2 universe. Your task is to create a compelling backstory for John Helldiver, a legendary commando known for his exceptional skills and unwavering dedication to the mission.
+        </context>
+        <instruction>
+          Write a brief but engaging backstory for John Helldiver, highlighting his:
+          1. Origin and early life
+          2. Key missions and accomplishments
+          3. Unique personality traits
+          4. Signature weapons or equipment
+          5. Relationships with other Helldivers or characters
+        </instruction>
+        <example>
+          Here's an example of a brief backstory for another character:
+
+          Sarah "Stormbreaker" Chen, born on a remote Super Earth colony, joined the Helldivers at 18 after her home was destroyed by Terminid forces. Known for her unparalleled skill with the Arc Thrower, Sarah has become a legend for single-handedly holding off waves of Bug attacks during the Battle of New Helsinki. Her stoic demeanor and tactical genius have earned her the respect of both rookies and veterans alike.
+        </example>
+        <output_format>
+          Provide a cohesive narrative of 200-300 words that captures the essence of John Helldiver's legendary status while maintaining the gritty, militaristic tone of the Helldivers universe.
+        </output_format>
+      </prompt>
+      ]]>
+    </example>
+    <example>
+      <![CDATA[
+      Example README.md for John Helldiver:
+      # John Helldiver Backstory Prompt
+
+      ## Purpose
+      This prompt is designed to generate a compelling backstory for John Helldiver, a legendary commando in the Helldivers 2 universe. It aims to create a rich, engaging narrative that fits seamlessly into the game's lore.
+
+      ## Usage
+      1. Use this prompt with a large language model capable of creative writing and understanding context.
+      2. Provide the prompt to the model without modification.
+      3. The generated output should be a 200-300 word backstory that can be used as-is or as a foundation for further development.
+
+      ## Expected Output
+      A brief but detailed backstory covering John Helldiver's origin, key accomplishments, personality traits, equipment, and relationships within the Helldivers universe.
+
+      ## Special Considerations
+      - Ensure the tone matches the gritty, militaristic style of Helldivers 2.
+      - The backstory should emphasize John's exceptional skills and dedication to his missions.
+      - Feel free to iterate on the output, using it as a starting point for more detailed character development.
+      ]]>
+    </example>
+        <example>
+      <![CDATA[
+      Example metadata.json for John Helldiver:
+      {
+        "promptName": "JohnHelldiverBackstory",
+        "version": "1.0",
+        "targetModel": "gpt4o",
+        "author": "YourName",
+        "creationDate": "2024-12-08",
+        "lastTestedDate": "2024-12-08",
+        "tags": ["Helldivers2", "lore", "character-backstory", "sci-fi"],
+        "description": "Generates a backstory for John Helldiver, a legendary commando in the Helldivers 2 universe",
+        "performanceMetrics": {
+          "averageOutputQuality": 4.5,
+          "successRate": 0.95
+        },
+        "promptStructure": "Four-level prompt (Context, Instruction, Example, Output Format)"
+      }
+      ]]>
+    </example>
+    <example>
+      <![CDATA[
+      Example examples/example1.md for John Helldiver:
+      # Example Output 1: John Helldiver Backstory
+
+      John "Hellfire" Helldiver was born in the underground bunkers of Super Earth during the height of the Bug War. Raised by veteran Helldivers, John's childhood was a brutal training regimen that forged him into a living weapon. At 16, he led his first mission against a Terminid hive, earning his call sign "Hellfire" after single-handedly destroying the hive with nothing but a flamethrower and sheer determination.
+
+      Known for his uncanny ability to turn the tide of impossible battles, John has become a symbol of hope for humanity. His most famous exploit came during the Siege of New Atlantis, where he held off waves of Automaton forces for 72 hours straight, allowing thousands of civilians to evacuate. John's preferred loadout includes a customized Liberator assault rifle and the experimental P-7 "Punisher" sidearm, both gifts from Super Earth's top weapons engineers.
+
+      Despite his legendary status, John remains a man of few words, letting his actions speak louder than any speech could. His unwavering loyalty to Super Earth and his fellow Helldivers is matched only by his hatred for the enemies of democracy. Rookies whisper that John Helldiver doesn't sleep; he just waits for the next drop.
+
+      (Word count: 182)
+      ]]>
+    </example>
   </examples>
 
   <reasoning>

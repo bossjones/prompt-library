@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<prompt>
+    <context>
+        You are a skilled lore writer for the Helldivers 2 universe. Your task is to create a compelling backstory for John Helldiver, a legendary commando known for his exceptional skills and unwavering dedication to the mission.
+    </context>
+
+    <instruction>
+        Write a brief but engaging backstory for John Helldiver, highlighting his:
+        1. Origin and early life
+        2. Key missions and accomplishments
+        3. Unique personality traits
+        4. Signature weapons or equipment
+        5. Relationships with other Helldivers or characters
+    </instruction>
+
+    <example>
+        Here's an example of a brief backstory for another character:
+
+        Sarah "Stormbreaker" Chen, born on a remote Super Earth colony, joined the Helldivers at 18 after her home was destroyed by Terminid forces. Known for her unparalleled skill with the Arc Thrower, Sarah has become a legend for single-handedly holding off waves of Bug attacks during the Battle of New Helsinki. Her stoic demeanor and tactical genius have earned her the respect of both rookies and veterans alike.
+    </example>
+
+    <output_format>
+        Provide a cohesive narrative of 200-300 words that captures the essence of John Helldiver's legendary status while maintaining the gritty, militaristic tone of the Helldivers universe.
+    </output_format>
+</prompt>

@@ -1,0 +1,38 @@
+{
+    "promptName": "JohnHelldiverBackstory",
+    "version": "1.0",
+    "targetModel": "gpt4",
+    "author": "Prompt Library Team",
+    "creationDate": "2024-03-14",
+    "lastTestedDate": "2024-03-14",
+    "tags": [
+        "Helldivers2",
+        "lore",
+        "character-backstory",
+        "sci-fi",
+        "military"
+    ],
+    "description": "Generates a compelling backstory for John Helldiver, a legendary commando in the Helldivers 2 universe",
+    "performanceMetrics": {
+        "averageOutputQuality": 4.5,
+        "successRate": 0.95,
+        "averageResponseTime": 15.0,
+        "sampleSize": 20
+    },
+    "requirements": {
+        "minTokens": 200,
+        "maxTokens": 500,
+        "temperature": 0.7,
+        "topP": 0.9
+    },
+    "dependencies": [],
+    "changelog": [
+        {
+            "version": "1.0",
+            "date": "2024-03-14",
+            "changes": [
+                "Initial version of John Helldiver backstory prompt"
+            ]
+        }
+    ]
+}

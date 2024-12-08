@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<prompt>
+    <metadata>
+        <name>[Prompt Name]</name>
+        <version>1.0</version>
+        <author>[Author Name]</author>
+        <date>[Creation Date]</date>
+        <category>[Category]</category>
+        <tags>[Tag1, Tag2, ...]</tags>
+    </metadata>
+
+    <context>
+        [Describe the context and background information necessary for the AI to understand the task]
+    </context>
+
+    <instruction>
+        [Provide clear, step-by-step instructions for what the AI should do]
+    </instruction>
+
+    <constraints>
+        [List any constraints or limitations that should be considered]
+    </constraints>
+
+    <examples>
+        <input>[Example input]</input>
+        <output>[Example output]</output>
+    </examples>
+
+    <output_format>
+        [Describe the expected format of the output]
+    </output_format>
+
+    <evaluation_criteria>
+        [List criteria for evaluating the success of the output]
+    </evaluation_criteria>
+</prompt>

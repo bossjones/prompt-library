@@ -1,0 +1,19 @@
+---
+extends: default
+locale: en_US.UTF-8
+ignore-from-file:
+  - .gitignore
+  - .yamlignore
+  - .cursorignore
+  - .aiderignore
+  - .dockerignore
+rules:
+  comments:
+    min-spaces-from-content: 1
+  indentation:
+    spaces: 4
+  line-length:
+    max: 120
+    # Use this rule to forbid non-explictly typed truthy values other than allowed ones (by default: true and false), for example YES or off.
+  truthy:
+    check-keys: false

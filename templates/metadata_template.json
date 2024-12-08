@@ -1,0 +1,38 @@
+{
+    "promptName": "[Name of the prompt]",
+    "version": "1.0",
+    "targetModel": "[Target LLM model]",
+    "author": "[Author name]",
+    "creationDate": "[YYYY-MM-DD]",
+    "lastTestedDate": "[YYYY-MM-DD]",
+    "tags": [
+        "tag1",
+        "tag2",
+        "tag3"
+    ],
+    "description": "[Brief description of the prompt's purpose]",
+    "performanceMetrics": {
+        "averageOutputQuality": 0.0,
+        "successRate": 0.0,
+        "averageResponseTime": 0.0,
+        "sampleSize": 0
+    },
+    "requirements": {
+        "minTokens": 0,
+        "maxTokens": 0,
+        "temperature": 0.0,
+        "topP": 0.0
+    },
+    "dependencies": [
+        "[Any dependent prompts or resources]"
+    ],
+    "changelog": [
+        {
+            "version": "1.0",
+            "date": "[YYYY-MM-DD]",
+            "changes": [
+                "Initial version"
+            ]
+        }
+    ]
+}
