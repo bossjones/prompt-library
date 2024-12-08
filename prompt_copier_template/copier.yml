@@ -1,0 +1,42 @@
+# Template settings
+_min_copier_version: "9.4.1"
+_templates_suffix: .jinja
+
+# Basic project information
+project_name:
+    type: str
+    help: What is your prompt library project name?
+    default: prompt-library
+    validator: >-
+        {% if not (project_name | regex_search('^[a-z][a-z0-9\-]+$')) %}
+        project_name must start with a letter, followed by letters, digits or dashes, all lowercase.
+        {% endif %}
+
+author_name:
+    type: str
+    help: What is your name?
+
+author_email:
+    type: str
+    help: What is your email?
+
+project_description:
+    type: str
+    help: Provide a brief description of your prompt library
+    multiline: true
+    default: A structured collection of prompts for various AI tasks.
+
+github_username:
+    type: str
+    help: What is your GitHub username?
+
+_tasks:
+    - "git init"
+    - "git add ."
+    - "git commit -m 'Initial commit from Copier template'"
+
+_message_before_copy: |
+    Thanks for using the Prompt Library template!
+
+    This template will help you create a structured prompt library
+    following best practices for organizing AI prompts.

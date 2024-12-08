@@ -1,0 +1,11 @@
+{% raw %}# Validate XML files against schema
+lint:
+    xmllint --schema prompt_schema.xsd prompt.xml --noout
+
+# List all prompts
+list:
+    find . -name "prompt.xml" -type f
+
+# Validate all prompts
+validate-all:
+    find . -name "prompt.xml" -type f -exec xmllint --schema prompt_schema.xsd {} --noout \;{% endraw %}
