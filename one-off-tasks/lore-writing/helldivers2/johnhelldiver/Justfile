@@ -1,0 +1,2 @@
+lint:
+	xmllint --schema prompt_schema.xsd prompt.xml --noout
