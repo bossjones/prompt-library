@@ -4,4 +4,21 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "copier>=9.4.1",
+    "llm-cmd>=0.2a0",
+    "llm>=0.19.1",
+    "llm-clip>=0.1",
+    "llm-sentence-transformers>=0.2",
+    "llm-replicate>=0.3.1",
+    "llm-perplexity>=2024.11.0",
+    "llm-claude-3>=0.10",
+    "llm-python>=0.1",
+    "loguru>=0.7.3",
+    "better-exceptions>=0.3.3",
+]
+
+[dependency-groups]
+dev = [
+    "bpython>=0.24",
+]
