@@ -40,6 +40,8 @@ prompt-library/
 │   │   └── helldivers2/
 │   │       └── johnhelldiver/
 │   │           ├── prompt.xml
+│   │           ├── prompt_schema.xsd
+│   │           ├── Justfile
 │   │           ├── README.md
 │   │           ├── metadata.json
 │   │           └── examples/
@@ -153,6 +155,31 @@ prompt-library/
       Despite his legendary status, John remains a man of few words, letting his actions speak louder than any speech could. His unwavering loyalty to Super Earth and his fellow Helldivers is matched only by his hatred for the enemies of democracy. Rookies whisper that John Helldiver doesn't sleep; he just waits for the next drop.
 
       (Word count: 182)
+      ]]>
+    </example>
+    <example>
+      <![CDATA[
+      Example prompt_schema.xsd:
+      <?xml version="1.0" encoding="UTF-8"?>
+      <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+        <xs:element name="prompt">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="context" type="xs:string"/>
+              <xs:element name="instruction" type="xs:string"/>
+              <xs:element name="example" type="xs:string"/>
+              <xs:element name="output_format" type="xs:string"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:schema>
+      ]]>
+    </example>
+    <example>
+      <![CDATA[
+      Example Justfile:
+      lint:
+        xmllint --schema prompt_schema.xsd prompt.xml --noout
       ]]>
     </example>
   </examples>
