@@ -1,11 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <!-- Define the instruction type -->
+  <xs:complexType name="instructionType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <!-- Add any attributes for instruction if needed -->
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <!-- Define the instructions type -->
+  <xs:complexType name="instructionsType">
+    <xs:sequence>
+      <xs:element name="instruction" type="instructionType" minOccurs="1" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Define the example type -->
+  <xs:complexType name="exampleType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <!-- Add any attributes for example if needed -->
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <!-- Define the examples type -->
+  <xs:complexType name="examplesType">
+    <xs:sequence>
+      <xs:element name="example" type="exampleType" minOccurs="1" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <!-- Define thinking type for the thinking tags -->
+  <xs:complexType name="thinkingType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string"/>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <!-- Main prompt element -->
   <xs:element name="prompt">
     <xs:complexType>
       <xs:sequence>
-        <xs:element name="context" type="xs:string"/>
-        <xs:element name="instruction" type="xs:string"/>
-        <xs:element name="example" type="xs:string"/>
+        <xs:element name="purpose" type="xs:string"/>
+        <xs:element name="instructions" type="instructionsType"/>
+        <xs:element name="examples" type="examplesType"/>
         <xs:element name="output_format" type="xs:string"/>
       </xs:sequence>
     </xs:complexType>
