@@ -180,6 +180,10 @@ Citations:
 
 ## IndyDevDan's Youtube Video: OpenAI's o1 Reasoning Models: A Deep Dive
 
+Video Link: https://www.youtube.com/watch?v=GUVrOa4V8iE
+
+Also see: https://www.youtube.com/watch?v=ujnLJru2LIs
+
 ### Introduction
 
 OpenAI has released new reasoning models, o1-preview and o1-mini, which incorporate prompt chaining and chain of thought techniques. These models offer advanced capabilities but require a different approach to prompt engineering[1][2].
