@@ -42,12 +42,14 @@
   <!-- Main prompt element -->
   <xs:element name="prompt">
     <xs:complexType>
-      <xs:sequence>
+      <xs:all>
         <xs:element name="purpose" type="xs:string"/>
         <xs:element name="instructions" type="instructionsType"/>
         <xs:element name="examples" type="examplesType"/>
         <xs:element name="output_format" type="xs:string"/>
-      </xs:sequence>
+        <xs:element name="thinking" type="thinkingType" minOccurs="0"/>
+        <xs:element name="answer" type="xs:string" minOccurs="0"/>
+      </xs:all>
     </xs:complexType>
   </xs:element>
 </xs:schema>

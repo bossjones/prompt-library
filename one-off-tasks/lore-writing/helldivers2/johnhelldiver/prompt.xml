@@ -10,12 +10,13 @@
         <instruction>3. Unique personality traits</instruction>
         <instruction>4. Signature weapons or equipment</instruction>
         <instruction>5. Relationships with other Helldivers or characters</instruction>
-        <instruction><![CDATA[6. Think before you write the backstory in <thinking></thinking> tags. Think through what you already know about the Helldivers universe.]]></instruction>
     </instructions>
 
     <examples>
-        <example>Here's an example of a brief backstory for another character:</example>
-        <example>Sarah "Stormbreaker" Chen, born on a remote Super Earth colony, joined the Helldivers at 18 after her home was destroyed by Terminid forces. Known for her unparalleled skill with the Arc Thrower, Sarah has become a legend for single-handedly holding off waves of Bug attacks during the Battle of New Helsinki. Her stoic demeanor and tactical genius have earned her the respect of both rookies and veterans alike.</example>
+        <example>
+          Here's an example of a brief backstory for another character:
+          Sarah "Stormbreaker" Chen, born on a remote Super Earth colony, joined the Helldivers at 18 after her home was destroyed by Terminid forces. Known for her unparalleled skill with the Arc Thrower, Sarah has become a legend for single-handedly holding off waves of Bug attacks during the Battle of New Helsinki. Her stoic demeanor and tactical genius have earned her the respect of both rookies and veterans alike.
+        </example>
     </examples>
 
     <output_format>Provide a cohesive narrative of 200-300 words that captures the essence of John Helldiver's legendary status while maintaining the gritty, militaristic tone of the Helldivers universe.</output_format>

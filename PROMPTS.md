@@ -172,3 +172,35 @@ Summarize the content with 3 hot takes biased toward the author and 3 hot takes 
 ```
 
 https://gist.github.com/disler/308edf5cc5df664e72fe9a490836d62e
+
+
+
+```
+<?xml version="1.0" encoding="UTF-8"?>
+<prompt xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="prompt_schema.xsd">
+    <purpose>You are a skilled lore writer for the Helldivers 2 universe. Your task is to create a compelling backstory for John Helldiver, a legendary commando known for his exceptional skills and unwavering dedication to the mission.</purpose>
+
+    <instructions>
+        <instruction>Write a brief but engaging backstory for John Helldiver, highlighting his:</instruction>
+        <instruction>1. Origin and early life</instruction>
+        <instruction>2. Key missions and accomplishments</instruction>
+        <instruction>3. Unique personality traits</instruction>
+        <instruction>4. Signature weapons or equipment</instruction>
+        <instruction>5. Relationships with other Helldivers or characters</instruction>
+        <instruction><![CDATA[6. Think before you write the backstory in <thinking></thinking> tags. Think through what you already know about the Helldivers universe.]]></instruction>
+        <instruction><![CDATA[7. Provide your answer in <answer></answer> tags.]]></instruction>
+    </instructions>
+
+    <examples>
+        <example>
+          <answer>
+          Here's an example of a brief backstory for another character:
+          Sarah "Stormbreaker" Chen, born on a remote Super Earth colony, joined the Helldivers at 18 after her home was destroyed by Terminid forces. Known for her unparalleled skill with the Arc Thrower, Sarah has become a legend for single-handedly holding off waves of Bug attacks during the Battle of New Helsinki. Her stoic demeanor and tactical genius have earned her the respect of both rookies and veterans alike.
+          </answer>
+        </example>
+    </examples>
+
+    <output_format>Provide a cohesive narrative of 200-300 words that captures the essence of John Helldiver's legendary status while maintaining the gritty, militaristic tone of the Helldivers universe.</output_format>
+</prompt>
+```

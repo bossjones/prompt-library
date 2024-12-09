@@ -3,3 +3,6 @@ lint:
 
 ping:
   uv run llm "ping"
+
+run:
+  uv run llm -m gpt-4o < prompt.xml
