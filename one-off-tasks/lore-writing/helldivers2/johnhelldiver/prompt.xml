@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <prompt xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="prompt_schema.xsd">
-    <purpose>You are a skilled lore writer for the Helldivers 2 universe. Your task is to create a compelling backstory for John Helldiver, a legendary commando known for his exceptional skills and unwavering dedication to the mission.</purpose>
+
+    <purpose>
+        You are a skilled lore writer for the Helldivers 2 universe. Your task is to create a compelling fan fiction story about John Helldiver, a figure steeped in mystery and legend. Known as the possible first Helldiver and a hero of Super Earth, John Helldiver is a symbol of resilience, courage, and unwavering commitment to democracy. Whether he is a real individual or a myth, his legacy includes the five D's of diving, tales of superhuman feats, and the inspiration he provides to citizens and recruits alike. Use your creativity to delve into his exploits, his enigmatic identity, and his role as a paragon of what every Helldiver aspires to be.
+    </purpose>
+
 
     <instructions>
         <instruction>Write a brief but engaging backstory for John Helldiver, highlighting his:</instruction>

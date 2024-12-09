@@ -764,3 +764,9 @@ ai-commit:
 # Run the bot
 run:
 	{{UV_RUN}} democracyctl run-bot
+
+# https://github.com/langchain-ai/langchain/blob/fbf0704e48273d40a9068ee2078ffe4374185338/docs/docs/integrations/document_loaders/readthedocs_documentation.ipynb#L36
+
+# Download the read the docs
+download-read-the-docs:
+	wget -r -A.html -P rtdocs https://python.langchain.com/en/latest/
