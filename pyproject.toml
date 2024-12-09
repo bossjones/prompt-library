@@ -17,6 +17,14 @@ dependencies = [
     "loguru>=0.7.3",
     "better-exceptions>=0.3.3",
     "promptim>=0.0.7",
+    "marimo>=0.9.32",
+    "rich>=13.9.4",
+    "datachain>=0.7.9",
+    "transformers>=4.47.0",
+    "imutils>=0.5.4",
+    "imageio>=2.36.1",
+    "logging-tree>=1.10",
+    "typer>=0.15.1",
 ]
 
 [dependency-groups]
