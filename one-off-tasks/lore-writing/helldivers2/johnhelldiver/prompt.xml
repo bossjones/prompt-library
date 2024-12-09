@@ -23,5 +23,68 @@
         </example>
     </examples>
 
-    <output_format>Provide a cohesive narrative of 200-300 words that captures the essence of John Helldiver's legendary status while maintaining the gritty, militaristic tone of the Helldivers universe.</output_format>
+
+
+
+
+    <characterization>
+    <trait>
+        <name>Stoic yet Self-Aware</name>
+        <description>John embodies the ideal Helldiver but secretly questions the meaning of his unending missions. His outward demeanor is calm and unflinching, masking a deep internal struggle.</description>
+    </trait>
+    <trait>
+        <name>Larger-than-Life Humor</name>
+        <description>John delivers exaggerated one-liners and performs comically impossible feats, reflecting the legend surrounding him.</description>
+    </trait>
+    <trait>
+        <name>Unrelenting Duty</name>
+        <description>John is driven by an unshakable sense of duty, even as the war grinds down his humanity.</description>
+    </trait>
+    <trait>
+        <name>Reluctant Legend</name>
+        <description>Haunted by the impossible expectations placed on him, John struggles to live up to a myth that has become larger than the man.</description>
+    </trait>
+</characterization>
+
+<tone>
+    <aspect>
+        <name>Juxtaposition of Propaganda and Reality</name>
+        <description>Combine overly dramatic, idealized propaganda descriptions with brutal, gritty depictions of battlefield reality.</description>
+    </aspect>
+    <aspect>
+        <name>Absurd yet Meaningful Sacrifices</name>
+        <description>Highlight sacrifices that are both darkly humorous and deeply impactful, reflecting the grim nature of endless war.</description>
+    </aspect>
+    <aspect>
+        <name>Dark Humor in Dialogue</name>
+        <description>Use gallows humor and witty one-liners to provide levity amidst the grim backdrop of constant warfare.</description>
+    </aspect>
+    <aspect>
+        <name>Over-the-Top Combat</name>
+        <description>Include scenes of gory, brutal combat mixed with ludicrously heroic feats that mock the glorification of war.</description>
+    </aspect>
+</tone>
+
+<story_structure>
+    <stage>
+        <name>Introduction</name>
+        <description>Open with an over-the-top propaganda reel or a soldier recounting a wildly exaggerated story of John Helldiver's heroics.</description>
+    </stage>
+    <stage>
+        <name>Battlefield Reality</name>
+        <description>Transition to John in the midst of a desperate, brutal battle, showcasing the chaos and futility of his mission.</description>
+    </stage>
+    <stage>
+        <name>Moments of Humanity</name>
+        <description>Show John reflecting on his role or connecting with another soldier, revealing his inner conflict and vulnerability.</description>
+    </stage>
+    <stage>
+        <name>Legendary Feat</name>
+        <description>Conclude with John performing an impossible, larger-than-life act, cementing his mythical status despite immense personal cost.</description>
+    </stage>
+</story_structure>
+
+<output_format>Provide a cohesive narrative of 200-300 words that captures the essence of John Helldiver's legendary status while maintaining the gritty, militaristic tone of the Helldivers universe.</output_format>
+
+
 </prompt>

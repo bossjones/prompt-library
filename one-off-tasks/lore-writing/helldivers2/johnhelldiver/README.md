@@ -18,3 +18,22 @@ A brief but detailed backstory covering John Helldiver's origin, key accomplishm
 
 ## Examples
 See the `examples` directory for sample outputs that demonstrate the expected quality and style of the generated content.
+
+
+## Some future things to consider:
+
+via: https://www.youtube.com/watch?v=gj8oM8Z4FI8
+
+More prompt requirements:
+
+Profession/Role:
+
+Objective:
+
+Personality Traits (Tone):
+
+Communication Style:
+
+Output Format( Use this special output formatting for each response):
+
+Special formatting instructions:
