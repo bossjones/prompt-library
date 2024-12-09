@@ -204,3 +204,33 @@ https://gist.github.com/disler/308edf5cc5df664e72fe9a490836d62e
     <output_format>Provide a cohesive narrative of 200-300 words that captures the essence of John Helldiver's legendary status while maintaining the gritty, militaristic tone of the Helldivers universe.</output_format>
 </prompt>
 ```
+
+
+
+### helldiver-weapons
+
+
+```xml
+<helldiver-weapons>
+  <helldiver-weapon>Arc Thrower</helldiver-weapon>
+  <helldiver-weapon>Plasma Rifle</helldiver-weapon>
+  <helldiver-weapon>Grenade Launcher</helldiver-weapon>
+  <helldiver-weapon>Liberator Assault Rifle</helldiver-weapon>
+  <helldiver-weapon>Breaker Shotgun</helldiver-weapon>
+  <helldiver-weapon>Railgun</helldiver-weapon>
+  <helldiver-weapon>Flamethrower</helldiver-weapon>
+  <helldiver-weapon>Sickle Autocannon</helldiver-weapon>
+  <helldiver-weapon>Stalwart Machine Gun</helldiver-weapon>
+  <helldiver-weapon>P-7 "Punisher" Sidearm</helldiver-weapon>
+  <helldiver-stratagem>Orbital Strike</helldiver-stratagem>
+  <helldiver-stratagem>Supply Drop</helldiver-stratagem>
+  <helldiver-stratagem>Reinforce</helldiver-stratagem>
+  <helldiver-stratagem>Hellbomb</helldiver-stratagem>
+  <helldiver-stratagem>Orbital Laser</helldiver-stratagem>
+  <helldiver-stratagem>Strafing Run</helldiver-stratagem>
+  <helldiver-stratagem>Airstrike</helldiver-stratagem>
+  <helldiver-stratagem>Defensive Barrier</helldiver-stratagem>
+  <helldiver-stratagem>Sentry Gun</helldiver-stratagem>
+  <helldiver-stratagem>Jump Pack</helldiver-stratagem>
+</helldiver-weapons>
+```
