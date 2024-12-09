@@ -25,7 +25,7 @@
     </xs:sequence>
   </xs:complexType>
 
-  <!-- New types for characterization -->
+  <!-- Types for character characterization -->
   <xs:complexType name="traitType">
     <xs:sequence>
       <xs:element name="name" type="xs:string"/>
@@ -33,13 +33,13 @@
     </xs:sequence>
   </xs:complexType>
 
-  <xs:complexType name="characterizationType">
+  <xs:complexType name="characterCharacterizationType">
     <xs:sequence>
       <xs:element name="trait" type="traitType" minOccurs="1" maxOccurs="unbounded"/>
     </xs:sequence>
   </xs:complexType>
 
-  <!-- New types for tone -->
+  <!-- Types for character tone -->
   <xs:complexType name="aspectType">
     <xs:sequence>
       <xs:element name="name" type="xs:string"/>
@@ -47,13 +47,13 @@
     </xs:sequence>
   </xs:complexType>
 
-  <xs:complexType name="toneType">
+  <xs:complexType name="characterToneType">
     <xs:sequence>
       <xs:element name="aspect" type="aspectType" minOccurs="1" maxOccurs="unbounded"/>
     </xs:sequence>
   </xs:complexType>
 
-  <!-- New types for story structure -->
+  <!-- Types for character story structure -->
   <xs:complexType name="stageType">
     <xs:sequence>
       <xs:element name="name" type="xs:string"/>
@@ -61,7 +61,7 @@
     </xs:sequence>
   </xs:complexType>
 
-  <xs:complexType name="storyStructureType">
+  <xs:complexType name="characterStoryStructureType">
     <xs:sequence>
       <xs:element name="stage" type="stageType" minOccurs="1" maxOccurs="unbounded"/>
     </xs:sequence>
@@ -81,10 +81,10 @@
         <xs:element name="purpose" type="xs:string"/>
         <xs:element name="instructions" type="instructionsType"/>
         <xs:element name="examples" type="examplesType"/>
+        <xs:element name="character-characterization" type="characterCharacterizationType" minOccurs="0"/>
+        <xs:element name="character-tone" type="characterToneType" minOccurs="0"/>
+        <xs:element name="character-story-structure" type="characterStoryStructureType" minOccurs="0"/>
         <xs:element name="output_format" type="xs:string"/>
-        <xs:element name="characterization" type="characterizationType" minOccurs="0"/>
-        <xs:element name="tone" type="toneType" minOccurs="0"/>
-        <xs:element name="story_structure" type="storyStructureType" minOccurs="0"/>
         <xs:element name="thinking" type="thinkingType" minOccurs="0"/>
         <xs:element name="answer" type="xs:string" minOccurs="0"/>
       </xs:all>
