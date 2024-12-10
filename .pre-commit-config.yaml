@@ -1,0 +1,83 @@
+---
+exclude: ^democracy_exe/alembic/.*
+# To use:
+#
+#     pre-commit run -a
+#
+# Or:
+#
+#     pre-commit install  # (runs every time you commit in git)
+#
+# To update this file:
+#
+#     pre-commit autoupdate
+#
+# See https://github.com/pre-commit/pre-commit
+ci:
+  autofix_commit_msg: 'style: pre-commit fixes'
+  autofix_prs: true
+  autoupdate_branch: ''
+  autoupdate_commit_msg: 'chore: update pre-commit hooks'
+  autoupdate_schedule: weekly
+  skip: []
+  submodules: false
+default_install_hook_types:
+  # is triggered before the commit is finalized to allow checks on the code being committed. Running hooks on unstaged changes can lead to both false-positives and false-negatives during committing. pre-commit only runs on the staged contents of files by temporarily stashing the unstaged changes while running hooks.
+  - pre-commit
+  # hooks will be passed a single filename -- this file contains the current contents of the commit message to be validated. The commit will be aborted if there is a nonzero exit code.
+  - commit-msg
+  # pre-push is triggered on git push.
+  - pre-push
+default_stages:
+  - pre-commit
+  - pre-push
+# TODO: Work with team to see when the right time is to enable this
+# # exclude: '^validate_pyproject/_vendor'
+repos:
+  # When running with --fix, Ruff's lint hook should be placed before Ruff's formatter hook, and before Black, isort, and other formatting tools, as Ruff's fix behavior can output code changes that require reformatting.
+  # SOURCE: https://github.com/astral-sh/ruff-pre-commit
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.7.3
+    hooks:
+      # Run the linter.
+      - id: ruff
+        args:
+          - --fix
+          - --exit-non-zero-on-fix
+          - --show-fixes
+          - --config=pyproject.toml
+        # SOURCE: https://github.com/girder/large_image/blob/2e6fd90cfb9179f2c0bd59031f45805018f3f04a/.pre-commit-config.yaml
+        types_or:
+          - python
+          - pyi
+          # - jupyter
+        exclude: ^(scripts|typings)/.*
+
+      # Run the formatter.
+      - id: ruff-format
+        # entry: ruff format --force-exclude
+        types_or:
+          - python
+          - pyi
+          # - jupyter
+        args:
+          - --config=pyproject.toml
+        files: ^((src|tests|notebooks)/.+)?[^/]+\.(py|pyi|ipynb)$
+        exclude: (.tasks|hack)
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-case-conflict
+      - id: check-merge-conflict
+      - id: check-symlinks
+      - id: end-of-file-fixer
+      - id: mixed-line-ending
+      - id: trailing-whitespace
+
+  # SOURCE:https://github.com/humblFINANCE/humblAPI/blob/master/.pre-commit-config.yaml
+  # SOURCE: https://github.com/pypa/pip/blob/main/.pre-commit-config.yaml
+  - repo: https://github.com/pre-commit/pygrep-hooks
+    rev: v1.10.0
+    hooks:
+      - id: python-no-log-warn
+      # - id: text-unicode-replacement-char

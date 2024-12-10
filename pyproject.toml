@@ -25,9 +25,1279 @@ dependencies = [
     "imageio>=2.36.1",
     "logging-tree>=1.10",
     "typer>=0.15.1",
+    "files-to-prompt>=0.4",
+    "python-dotenv>=1.0.1",
+    "pydantic-settings>=2.6.1",
+    "altair>=5.5.0",
+    "vega-datasets>=0.9.0",
+    "pandas>=2.2.3",
+    "matplotlib>=3.9.3",
+    "mako>=1.3.8",
+    "pyperclip>=1.9.0",
 ]
 
 [dependency-groups]
 dev = [
     "bpython>=0.24",
+    "pre-commit>=4.0.1",
+    "pylint-pydantic>=0.3.4",
+    "ruff>=0.8.2",
 ]
+
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+
+
+
+[tool.ruff]
+target-version = "py312"
+line-length = 120
+fix = true
+
+extend-include = [
+    "*.ipynb",
+    "src/*.ipynb",
+    "notebook/*.ipynb",
+    "notebooks/*.ipynb",
+    "notebooks/*.py",
+    "*.py",
+    "*.pyi",
+    "**/pyproject.toml",
+    "*.ipynb",
+    "pyproject.toml",
+    "src/**/*.py",
+]
+output-format = "full"
+force-exclude = true
+respect-gitignore = true
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".ipynb_checkpoints",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pyenv",
+    ".pytest_cache",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    ".vscode",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "site-packages",
+    "venv",
+]
+extend-exclude = [
+    "__pycache__",
+    "__pypackages__",
+    "_build",
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git-rewrite",
+    ".git",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "**/__pycache__",
+    "buck-out",
+    "build",
+    "data",
+    "data/*",
+    "dist",
+    "docs",
+    "doc",
+    "git",
+    "logs/*",
+    "node_modules",
+    # "notebooks/*",
+    "tests/data",
+    "venv",
+    "typings",
+    "contrib",
+]
+
+# https://docs.astral.sh/ruff/settings/#indent-width
+# The formatter wraps lines at a length of 88
+unsafe-fixes = false
+
+[tool.ruff.lint]
+# **************************************
+# extend-select = ["I", "N812"]
+unfixable = [
+    "ERA", # do not autoremove commented out code
+]
+fixable = ["ALL"]
+select = [
+    # flake8-2020
+    "YTT",
+    # flake8-bandit
+    "S",
+    # flake8-bugbear
+    "B",
+    # flake8-builtins
+    "A",
+    # flake8-comprehensions
+    "C4",
+    # flake8-debugger
+    "T10",
+    # flake8-simplify
+    "SIM",
+    # isort
+    "I",
+    # mccabe
+    "C90",
+    # pycodestyle
+    "E",
+    "W",
+    # pyflakes
+    "F",
+    # pygrep-hooks
+    "PGH",
+    # pyupgrade
+    "UP",
+    # ruff
+    "RUF",
+    # tryceratops
+    # "TRY",
+
+    "C90",    # mccabe
+    "I002",   # from __future__ import annotations
+    "N812",   # lowercase-imported-as-non-lowercase (N812) - Derived from the pep8-naming linter.
+    "NPY001", # numpy-deprecated-type-alias
+]
+# ignore = [
+#     # LineTooLong
+#     "E501",
+#     # DoNotAssignLambda
+#     "E731",
+# ]
+# SOURCE: https://github.com/ansible-collections/cloud-content-handbook/blob/9be137d78af4d1cc140b210f3058977164021c9d/proposals/ruff_transition.md - end
+# Conflicts with the formatter
+ignore = [
+    "C408",  # Checks for unnecessary calls to dict(), list(), or tuple() that can be rewritten as empty literals
+    "UP031", # Checks for unnecessary format string usage
+    "UP040", # Checks for unnecessary use of typing.TypeAlias in Python 3.12+
+
+    "SIM110", # Checks for `return` statements that can be simplified to a single `return` statement
+    "SIM103", # Checks for `return` statements that can be simplified by removing unnecessary `else` clauses
+    "RUF012", # Checks for mutable default values in class attributes
+    "A002",   # Checks for function arguments that shadow built-in names
+    "RUF008", # Checks for non-pep604 unions (e.g., `Union[int, str]` instead of `int | str`)
+    "RUF013", # Checks for implicit `Optional` in type annotations when the default parameter value is `None`
+    "S602",   # Checks for `subprocess` calls with `shell=True`
+    "RUF006", # Checks for unnecessary `elif` statements after `if` statements that always return
+    "SIM108", # Checks for `if`-`else` blocks that can be replaced with a ternary operator
+    "C416",   # Checks for unnecessary list/set/dict comprehensions
+    "SIM101", # Checks for duplicate `if` conditions
+    "B007",   # Checks for unused loop variables
+    "RUF002", # Checks for ambiguous unicode characters
+    "S608",   # Checks for SQL injection vulnerabilities in SQL string formatting
+    "SIM116", # Checks for `if` blocks that can be replaced with `dict.get()` or `getattr()`
+    "S101",   # Checks for uses of the `assert` keyword
+    "B904",   # Checks for `raise` statements in exception handlers without a `from` clause
+    "SIM117", # Checks for nested `with` statements that can be combined
+    "UP038",  # Checks for uses of `sys.version` or `sys.version_info`
+    "A001",   # Checks for variable assignments that shadow built-in names
+    "SIM115", # Checks for cases where files are opened without using a context manager
+    "S113",   # Checks for HTTP requests without a timeout
+    "S108",   # Checks for hardcoded temporary file paths
+    "S605",   # Checks for calls to `subprocess.run()` without explicitly setting `shell=False`
+    "C417",   # Checks for unnecessary use of `map()` or `filter()` with `lambda`
+    "B018",   # Checks for useless expressions
+
+
+    "S105",    # Possible hardcoded password
+    "UP007",   # Use X | Y for union types
+    "TRY003",  # Long messages outside exception class
+    "N815",    # Mixed case vars in class scope
+    "PLW0603", # Global statement at module level
+    "D",       # Docstring style rules (multiple)
+    "COM812",  # Missing trailing comma
+    "ISC001",  # Implicit string concatenation
+    "N804",    # First param of classmethod not cls
+    "F821",    # Undefined name
+    "PLR1722", # Use sys.exit() instead of exit
+    "N802",    # Function name should be lowercase
+    "N801",    # Class name should use CapWords
+    "PLW0602", # Global variable undefined
+    "PLW2901", # Outer loop variable overwritten
+    "YTT201",  # sys.version instead of sys.version_info
+    "E722",    # Do not use bare except
+    "PLC0132", # Use format specifiers in logging
+    "PLW0128", # Redundant if-else in comprehension
+    "W191",    # tab-indentation
+    "E111",    # indentation-with-invalid-multiple
+    "E114",    # indentation-with-invalid-multiple-comment
+    "E117",    # over-indented
+    "D206",    # indent-with-spaces
+    "D300",    # triple-single-quotes
+    "Q000",    # bad-quotes-inline-string
+    "Q001",    # bad-quotes-multiline-string
+    "Q002",    # bad-quotes-docstring
+    "Q003",    # avoidable-escaped-quote
+    "COM812",  # missing-trailing-comma
+    "COM819",  # prohibited-trailing-comma
+    "ISC001",  # single-line-implicit-string-concatenation
+    "ISC002",  # multi-line-implicit-string-concatenation
+
+    "E501",    # Line too long
+    "E721",    # Don't compare types, use isinstance()
+    "E741",    # Ambiguous variable name
+    "E731",    # Do not assign lambda expression
+    "PLR1714", # Consider merging dict literals
+    "N818",    # Exception name should end with "Error"
+    "PLW0127", # Self-assigning variable
+    "PT012",   # pytest.raises() without match=
+    "N806",    # Variable in function should be lowercase
+    "E712",    # Use "is" to compare with True/False/None
+    "E711",    # Use "is" to compare with None
+    "W505",    # Doc line too long
+    "PT006",   # pytest.parametrize() values not a tuple
+    "PLR2004", # Magic value used in comparison
+    "N812",    # Lowercase imported as non-lowercase
+    "F841",    # Local variable is assigned but unused
+
+    "TID",     # flake8-tidy-imports (TID)#
+    "F401",    # unused-import	{name} imported but unused; consider using importlib.util.find_spec to test for availability
+    "F402",    # import-shadowed-by-loop-var	Import {name} from {row} shadowed by loop variable
+    "F403",    # undefined-local-with-import-star	from {name} import * used; unable to detect undefined names
+    "F404",    # late-future-import	from __future__ imports must occur at the beginning of the file
+    "F405",    # undefined-local-with-import-star-usage	{name} may be undefined, or defined from star imports
+    "F406",    # undefined-local-with-nested-import-star-usage	from {name} import * only allowed at module level
+    "E401",    # multiple-imports-on-one-line	Multiple imports on one line
+    "E402",    # module-import-not-at-top-of-file	Module level import not at top of cell
+    "UP026",   # deprecated-mock-import	mock is deprecated, use unittest.mock
+    "UP029",   # unnecessary-builtin-import	Unnecessary builtin import: {import}
+    "UP035",   # deprecated-import	Import from {target} instead: {names}
+    "ICN",     # flake8-import-conventions (ICN)
+    "TCH",     # flake8-type-checking (TCH)#
+    "PLC0414", # useless-import-alias	Import alias does not rename original package
+    "PLC0415", # PLC0415	import-outside-top-level	import should be at the top-level of a file
+    "PLC2403", # non-ascii-import-name	Module alias {name} contains a non-ASCII character, use an ASCII-only alias
+    "PLC2701", # import-private-name	Private name import {name} from external module {module}
+    "PLR0402", # manual-from-import	Use from {module} import {name} in lieu of alias
+    "PLW0406", # import-self	Module {name} imports itself
+
+    # via hatch: https://github.com/pypa/hatch/blob/864854478bac936de2d94273ae083c7c29564df2/scripts/update_ruff.py#L12
+    # Allow non-abstract empty methods in abstract base classes
+    'B027', # empty-method-without-abstract-decorator	{name} is an empty method in an abstract base class, but has no abstract decorator
+    # Allow boolean positional values in function calls, like `dict.get(... True)`
+    'FBT003', # boolean-positional-value-in-call	Boolean positional value in function call
+    # Ignore complexity
+    'C901',    # complex-structure	{name} is too complex ({complexity} > {max_complexity})
+    'PLR0904', # too-many-public-methods	Too many public methods ({methods} > {max_methods})
+    "PLR0911", # too-many-return-statements	Too many return statements ({returns} > {max_returns})
+    "PLR0912", # too-many-branches	Too many branches ({branches} > {max_branches})
+    "PLR0913", # too-many-arguments	Too many arguments in function definition ({c_args} > {max_args})
+    "PLR0914", # too-many-locals	Too many local variables ({current_amount}/{max_amount})
+    "PLR0915", # too-many-statements	Too many statements ({statements} > {max_statements})
+    "PLR0916", # too-many-boolean-expressions	Too many Boolean expressions ({expressions} > {max_expressions})
+    "PLR0917", # too-many-positional	Too many positional arguments ({c_pos}/{max_pos})
+    'PLR1702', # too-many-nested-blocks	Too many nested blocks ({nested_blocks} > {max_nested_blocks})
+
+    # These are dependent on projects themselves
+    'AIR', # airflow
+    'CPY', # flake8-copyright (CPY)#
+    'D',   # pydocstyle (D)#
+    # 'NPY', # NumPy-specific rules (NPY)#
+    'PD', # pandas-vet (PD)
+
+    # Many projects either don't have type annotations or it would take much effort to satisfy this
+    'ANN', # flake8-annotations (ANN).
+
+    # Don't be too strict about TODOs as not everyone uses them the same way
+    'FIX',     # flake8-fixme (FIX)#
+    'TD001',   # invalid-todo-tag	Invalid TODO tag: {tag}
+    'TD002',   # missing-todo-author	Missing author in TODO; try: # TODO(<author_name>): ... or # TODO @<author_name>: ...
+    'TD003',   # missing-todo-link	Missing issue link on the line following this TODO
+    'PTH',     # flake8-use-pathlib (PTH) # There are valid reasons to not use pathlib such as performance and import cost
+    'FURB101', # read-whole-file	open and read should be replaced by Path({filename}).{suggestion}
+
+    # Conflicts with type checking
+    'RET501', # unnecessary-return-none	Do not explicitly return None in function if it is the only possible return value
+    'RET502', # implicit-return-value	Do not implicitly return None in function able to return non-None value
+
+    # Under review https://github.com/astral-sh/ruff/issues/8796
+    'PT004', # pytest-missing-fixture-name-underscore	Fixture {function} does not return anything, add leading underscore
+    'PT005', # pytest-incorrect-fixture-name-underscore	Fixture {function} returns a value, remove leading underscore
+
+    # Buggy https://github.com/astral-sh/ruff/issues/4845
+    'ERA001', # commented-out-code	Found commented-out code
+
+    # Business logic relying on other programs has no choice but to use subprocess
+    'S404', # suspicious-subprocess-import	subprocess module is possibly insecure
+
+    # Too prone to false positives and might be removed https://github.com/astral-sh/ruff/issues/4045
+    'S603', # subprocess-without-shell-equals-true	subprocess call: check for execution of untrusted input
+
+    # Too prone to false positives https://github.com/astral-sh/ruff/issues/8761
+    'SIM401', # if-else-block-instead-of-dict-get	Use {contents} instead of an if block
+
+    # Allow for easy ignores
+    'PGH003', # blanket-type-ignore	Use specific rule codes when ignoring type issues
+    'PGH004', # blanket-noqa	Use specific rule codes when using noqa
+
+    # This is required sometimes, and doesn't matter on Python 3.11+
+    'PERF203', # try-except-in-loop	try-except within a loop incurs performance overhead
+
+    # Potentially unnecessary on Python 3.12+
+    'FURB140', # reimplemented-starmap	Use itertools.starmap instead of the generator
+
+    # Conflicts with formatter, see:
+    # https://docs.astral.sh/ruff/formatter/#conflicting-lint-rules
+    "E111",    # indentation-with-invalid-multiple	Indentation is not a multiple of {indent_size}
+    "E114",    # indentation-with-invalid-multiple-comment	Indentation is not a multiple of {indent_size} (comment)
+    "E117",    # over-indented	Over-indented (comment)
+    "E301",    # blank-line-between-methods	Expected {BLANK_LINES_NESTED_LEVEL:?} blank line, found 0
+    "E302",    # blank-lines-top-level	Expected {expected_blank_lines:?} blank lines, found {actual_blank_lines}
+    "E303",    # too-many-blank-lines	Too many blank lines ({actual_blank_lines})
+    "E304",    # blank-line-after-decorator	Blank lines found after function decorator ({lines})
+    "E305",    # blank-lines-after-function-or-class	Expected 2 blank lines after class or function definition, found ({blank_lines})
+    "E306",    # blank-lines-before-nested-definition	Expected 1 blank line before a nested definition, found 0
+    "E501",    # line-too-long	Line too long ({width} > {limit})
+    "W191",    # tab-indentation	Indentation contains tabs
+    "D206",    # indent-with-spaces	Docstring should be indented with spaces, not tabs
+    "D300",    # triple-single-quotes	Use triple double quotes """
+    "COM812",  # missing-trailing-comma	Trailing comma missing
+    "COM819",  # prohibited-trailing-comma	Trailing comma prohibited
+    "ISC001",  # single-line-implicit-string-concatenation	Implicitly concatenated string literals on one line
+    "ISC002",  # multi-line-implicit-string-concatenation	Implicitly concatenated string literals over multiple lines
+    "Q000",    # bad-quotes-inline-string	Single quotes found but double quotes preferred
+    "Q001",    # bad-quotes-multiline-string	Single quote multiline found but double quotes preferred
+    "Q002",    # bad-quotes-docstring	Single quote docstring found but double quotes preferred
+    "Q003",    # avoidable-escaped-quote	Change outer quotes to avoid escaping inner quotes
+    "Q004",    # unnecessary-escaped-quote	Unnecessary escape on inner quote character
+    "PLE1141", # dict-iter-missing-items	Unpacking a dictionary in iteration without calling .items()
+    "PLE1142", # await-outside-async	await should be used within an async function
+    "Q",       # Various quote-related rules
+    "N999",    # Invalid module name
+    "S702",     # Mako templates allow HTML/JS rendering (known XSS risk we accept)
+]
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "all"
+
+[tool.ruff.lint.flake8-pytest-style]
+fixture-parentheses = true
+mark-parentheses = true
+
+# SOURCE: https://github.com/google/jax/blob/a1c82219e2d23ec994e42761ebcaf4c53d9e4ea7/pyproject.toml#L159C1-L160C20
+[tool.ruff.lint.mccabe]
+# max-complexity = 18
+max-complexity = 31 # C901: Recommended goal is 10
+
+# 4. Ignore `E402` (import violations) in all `__init__.py` files, and in select subdirectories.
+[tool.ruff.lint.per-file-ignores]
+"src/models/loggers/__init__.py" = ["N815", "B005", "RUF005", "F811"]
+"src/agentic/studio/react/*" = ["N815", "B005", "RUF005"]
+"src/agentic/studio/*" = ["N815", "B005", "RUF005"]
+"cookbook/studio/*" = ["N815", "B005", "RUF005"]
+"src/agentic/graph.py" = ["N815", "B005", "RUF005"]
+"src/agentic/studio/graph.py" = ["N815", "B005", "RUF005"]
+"src/src/gen_ai/models/vectorstores/*" = ["N815"]
+"tests/*" = ["PT011", "S101"]
+"src/src/tutorials/design_patterns/practical_examples/*" = [
+    "PT018",
+    "PLW0211",
+    "ISC003",
+    "N803",
+]
+"__init__.py" = ["F401", "E402"]
+"**/{tests,docs,doc}/*" = ["E402"]
+# https://github.com/astral-sh/ruff/issues/3928
+# "*.pyi" = [
+#     "I002", # from __future__ import annotations
+# ]
+"conf/*" = ["D"]
+"demo/*" = ["D"]
+"docs/*" = ["D"]
+"test/*" = ["D"]
+"tests/conftest.py" = ["D", "F811"]
+"*.pyi" = ["D", "E501", "E701", "I002"]
+
+# ===========================[ ISORT ]========================
+# SOURCE: https://github.com/zulip/zulip/blob/f4d109c289f614273b43b411cbd8d1fad128842e/pyproject.toml#L199
+[tool.ruff.lint.isort]
+# Use a single line between direct and from import.
+lines-between-types = 1
+# Use a single line after each import block.
+lines-after-imports = 2
+
+# Add the specified import line to all files.
+# PEP 563: Postponed evaluation of annotations
+# https://peps.python.org/pep-0563/
+required-imports = ["from __future__ import annotations"]
+
+# Allow imports relative to the "app" directory.
+known-third-party = [
+    "boto3",
+    "fastapi",
+    "langchain",
+    "pydantic",
+    "beautifulsoup4",
+    "langchain_community",
+    "langchain_openai",
+    "openai",
+    "requests",
+    "discord",
+    "uvicorn",
+]
+split-on-trailing-comma = false
+
+known-first-party = ["src", "tests"]
+
+known-local-folder = ["src/*"]
+
+section-order = [
+    "future",
+    "standard-library",
+    "third-party",
+    "pytest",
+    "first-party",
+    "local-folder",
+]
+
+[tool.ruff.lint.isort.sections]
+# Group all Django imports into a separate section.
+"pytest" = ["conftest", "pytest", "pytest_mock"]
+
+# ===========================[ FLAKE8-TYPE-CHECKING ]========================
+[tool.ruff.lint.flake8-type-checking]
+# pydantic models use annotations at runtime
+runtime-evaluated-base-classes = [
+    # NOTE: ruff is unable to detect that these are subclasses of pydantic.BaseModel
+    "pydantic.BaseModel",
+]
+runtime-evaluated-decorators = ["pydantic.dataclasses.dataclass"]
+
+# ===========================[ PYUPGRADE ]========================
+[tool.ruff.lint.pyupgrade]
+# Preserve types, even if a file imports `from __future__ import annotations`.
+keep-runtime-typing = true
+
+[tool.ruff.lint.pydocstyle]
+ignore-decorators = ["typing.overload"]
+property-decorators = ["gi.repository.GObject.Property"]
+# NOTE: Enabling a convention will disable any rules that are not included in the specified convention. As such, the intended workflow is to enable a convention and then selectively enable or disable any additional rules on top of it. See: https://github.com/astral-sh/ruff/blob/c3e28f9d55b4484b0e7507d3bee6339b9fb83bb5/docs/faq.md
+# Accepts: "google", "numpy", or "pep257".
+convention = "pep257"
+
+
+[tool.ruff.format]
+preview = true
+# SOURCE: https://github.com/ansible-collections/cloud-content-handbook/blob/9be137d78af4d1cc140b210f3058977164021c9d/proposals/ruff_transition.md - end
+# Conflicts with the formatter
+exclude = [
+    "N999", # Invalid module name
+    "D203", # one-blank-line-before-class	1 blank line required before class docstring
+
+    "COM812",  # Missing trailing comma
+    "ISC001",  # Implicit string concatenation
+    "N804",    # First param of classmethod not 'cls'
+    "F821",    # Undefined name
+    "PLR1722", # Use sys.exit() instead of exit()
+    "N802",    # Function name should be lowercase
+    "N801",    # Class name should use CapWords
+    "PLW0602", # Global variable undefined
+    "F811",    # Redefinition of unused name
+    "PLW2901", # Outer loop var overwritten in loop
+    "YTT201",  # sys.version instead of version_info
+    "E722",    # Do not use bare 'except'
+    "PLC0132", # Use f-strings in logging
+    "PLW0128", # Redundant if-else in comprehension
+
+    "W191",   # tab-indentation
+    "E111",   # indentation-with-invalid-multiple
+    "E114",   # indentation-with-invalid-multiple-comment
+    "E117",   # over-indented
+    "D206",   # indent-with-spaces
+    "D300",   # triple-single-quotes
+    "Q000",   # bad-quotes-inline-string
+    "Q001",   # bad-quotes-multiline-string
+    "Q002",   # bad-quotes-docstring
+    "Q003",   # avoidable-escaped-quote
+    "COM812", # missing-trailing-comma
+    "COM819", # prohibited-trailing-comma
+    "ISC001", # single-line-implicit-string-concatenation
+    "ISC002", # multi-line-implicit-string-concatenation
+
+    "E501",    # Line too long
+    "E721",    # Don't compare types, use isinstance()
+    "E741",    # Ambiguous variable name
+    "E731",    # Do not assign lambda expression
+    "PLR1714", # Consider merging dict literals
+    "N818",    # Exception name should end with "Error"
+    "PLW0127", # Self-assigning variable
+    "PT012",   # pytest.raises() without match=
+    "N806",    # Variable in function should be lowercase
+    "E712",    # Use "is" to compare with True/False/None
+    "E711",    # Use "is" to compare with None
+    "W505",    # Doc line too long
+    "PT006",   # pytest.parametrize() values not a tuple
+    "PLR2004", # Magic value used in comparison
+    "N812",    # Lowercase imported as non-lowercase
+    "F841",    # Local variable is assigned but unused
+
+    "TID",     # flake8-tidy-imports (TID)#
+    "F401",    # unused-import	{name} imported but unused; consider using importlib.util.find_spec to test for availability
+    "F402",    # import-shadowed-by-loop-var	Import {name} from {row} shadowed by loop variable
+    "F403",    # undefined-local-with-import-star	from {name} import * used; unable to detect undefined names
+    "F404",    # late-future-import	from __future__ imports must occur at the beginning of the file
+    "F405",    # undefined-local-with-import-star-usage	{name} may be undefined, or defined from star imports
+    "F406",    # undefined-local-with-nested-import-star-usage	from {name} import * only allowed at module level
+    "E401",    # multiple-imports-on-one-line	Multiple imports on one line
+    "E402",    # module-import-not-at-top-of-file	Module level import not at top of cell
+    "UP026",   # deprecated-mock-import	mock is deprecated, use unittest.mock
+    "UP029",   # unnecessary-builtin-import	Unnecessary builtin import: {import}
+    "UP035",   # deprecated-import	Import from {target} instead: {names}
+    "ICN",     # flake8-import-conventions (ICN)
+    "TCH",     # flake8-type-checking (TCH)#
+    "PLC0414", # useless-import-alias	Import alias does not rename original package
+    "PLC0415", # PLC0415	import-outside-top-level	import should be at the top-level of a file
+    "PLC2403", # non-ascii-import-name	Module alias {name} contains a non-ASCII character, use an ASCII-only alias
+    "PLC2701", # import-private-name	Private name import {name} from external module {module}
+    "PLR0402", # manual-from-import	Use from {module} import {name} in lieu of alias
+    "PLW0406", # import-self	Module {name} imports itself
+
+    # via hatch: https://github.com/pypa/hatch/blob/864854478bac936de2d94273ae083c7c29564df2/scripts/update_ruff.py#L12
+    # Allow non-abstract empty methods in abstract base classes
+    'B027', # empty-method-without-abstract-decorator	{name} is an empty method in an abstract base class, but has no abstract decorator
+    # Allow boolean positional values in function calls, like `dict.get(... True)`
+    'FBT003', # boolean-positional-value-in-call	Boolean positional value in function call
+    # Ignore complexity
+    'C901',    # complex-structure	{name} is too complex ({complexity} > {max_complexity})
+    'PLR0904', # too-many-public-methods	Too many public methods ({methods} > {max_methods})
+    "PLR0911", # too-many-return-statements	Too many return statements ({returns} > {max_returns})
+    "PLR0912", # too-many-branches	Too many branches ({branches} > {max_branches})
+    "PLR0913", # too-many-arguments	Too many arguments in function definition ({c_args} > {max_args})
+    "PLR0914", # too-many-locals	Too many local variables ({current_amount}/{max_amount})
+    "PLR0915", # too-many-statements	Too many statements ({statements} > {max_statements})
+    "PLR0916", # too-many-boolean-expressions	Too many Boolean expressions ({expressions} > {max_expressions})
+    "PLR0917", # too-many-positional	Too many positional arguments ({c_pos}/{max_pos})
+    'PLR1702', # too-many-nested-blocks	Too many nested blocks ({nested_blocks} > {max_nested_blocks})
+
+    # These are dependent on projects themselves
+    'AIR', # airflow
+    'CPY', # flake8-copyright (CPY)#
+    'D',   # pydocstyle (D)#
+
+    'PD', # pandas-vet (PD)
+
+    # Many projects either don't have type annotations or it would take much effort to satisfy this
+    'ANN', # flake8-annotations (ANN).
+
+    # Don't be too strict about TODOs as not everyone uses them the same way
+    'FIX',     # flake8-fixme (FIX)#
+    'TD001',   # invalid-todo-tag	Invalid TODO tag: {tag}
+    'TD002',   # missing-todo-author	Missing author in TODO; try: # TODO(<author_name>): ... or # TODO @<author_name>: ...
+    'TD003',   # missing-todo-link	Missing issue link on the line following this TODO
+    'PTH',     # flake8-use-pathlib (PTH) # There are valid reasons to not use pathlib such as performance and import cost
+    'FURB101', # read-whole-file	open and read should be replaced by Path({filename}).{suggestion}
+
+    # Conflicts with type checking
+    'RET501', # unnecessary-return-none	Do not explicitly return None in function if it is the only possible return value
+    'RET502', # implicit-return-value	Do not implicitly return None in function able to return non-None value
+
+    # Under review https://github.com/astral-sh/ruff/issues/8796
+    'PT004', # pytest-missing-fixture-name-underscore	Fixture {function} does not return anything, add leading underscore
+    'PT005', # pytest-incorrect-fixture-name-underscore	Fixture {function} returns a value, remove leading underscore
+
+    # Buggy https://github.com/astral-sh/ruff/issues/4845
+    'ERA001', # commented-out-code	Found commented-out code
+
+    # Business logic relying on other programs has no choice but to use subprocess
+    'S404', # suspicious-subprocess-import	subprocess module is possibly insecure
+
+    # Too prone to false positives and might be removed https://github.com/astral-sh/ruff/issues/4045
+    'S603', # subprocess-without-shell-equals-true	subprocess call: check for execution of untrusted input
+
+    # Too prone to false positives https://github.com/astral-sh/ruff/issues/8761
+    'SIM401', # if-else-block-instead-of-dict-get	Use {contents} instead of an if block
+
+    # Allow for easy ignores
+    'PGH003', # blanket-type-ignore	Use specific rule codes when ignoring type issues
+    'PGH004', # blanket-noqa	Use specific rule codes when using noqa
+
+    # This is required sometimes, and doesn't matter on Python 3.11+
+    'PERF203', # try-except-in-loop	try-except within a loop incurs performance overhead
+
+    # Potentially unnecessary on Python 3.12+
+    'FURB140', # reimplemented-starmap	Use itertools.starmap instead of the generator
+
+    # Conflicts with formatter, see:
+    # https://docs.astral.sh/ruff/formatter/#conflicting-lint-rules
+    "E111",    # indentation-with-invalid-multiple	Indentation is not a multiple of {indent_size}
+    "E114",    # indentation-with-invalid-multiple-comment	Indentation is not a multiple of {indent_size} (comment)
+    "E117",    # over-indented	Over-indented (comment)
+    "E301",    # blank-line-between-methods	Expected {BLANK_LINES_NESTED_LEVEL:?} blank line, found 0
+    "E302",    # blank-lines-top-level	Expected {expected_blank_lines:?} blank lines, found {actual_blank_lines}
+    "E303",    # too-many-blank-lines	Too many blank lines ({actual_blank_lines})
+    "E304",    # blank-line-after-decorator	Blank lines found after function decorator ({lines})
+    "E305",    # blank-lines-after-function-or-class	Expected 2 blank lines after class or function definition, found ({blank_lines})
+    "E306",    # blank-lines-before-nested-definition	Expected 1 blank line before a nested definition, found 0
+    "E501",    # line-too-long	Line too long ({width} > {limit})
+    "W191",    # tab-indentation	Indentation contains tabs
+    "D206",    # indent-with-spaces	Docstring should be indented with spaces, not tabs
+    "D300",    # triple-single-quotes	Use triple double quotes """
+    "COM812",  # missing-trailing-comma	Trailing comma missing
+    "COM819",  # prohibited-trailing-comma	Trailing comma prohibited
+    "ISC001",  # single-line-implicit-string-concatenation	Implicitly concatenated string literals on one line
+    "ISC002",  # multi-line-implicit-string-concatenation	Implicitly concatenated string literals over multiple lines
+    "Q000",    # bad-quotes-inline-string	Single quotes found but double quotes preferred
+    "Q001",    # bad-quotes-multiline-string	Single quote multiline found but double quotes preferred
+    "Q002",    # bad-quotes-docstring	Single quote docstring found but double quotes preferred
+    "Q003",    # avoidable-escaped-quote	Change outer quotes to avoid escaping inner quotes
+    "Q004",    # unnecessary-escaped-quote	Unnecessary escape on inner quote character
+    "PLE1141", # dict-iter-missing-items	Unpacking a dictionary in iteration without calling .items()
+    "PLE1142", # await-outside-async	await should be used within an async function
+    "Q",
+]
+# Like Black, use double quotes for strings.
+quote-style = "double"
+# Like Black, indent with spaces, rather than tabs.
+indent-style = "space"
+# Like Black, respect magic trailing commas.
+skip-magic-trailing-comma = false
+# Like Black, automatically detect the appropriate line ending.
+line-ending = "auto"
+# Enable auto-formatting of code examples in docstrings. Markdown, reStructuredText code/literal blocks and doctests are all supported
+# This is currently disabled by default, but it is planned for this to be opt-out in the future.
+docstring-code-format = true
+# Set the line length limit used when formatting code snippets in docstrings. This only has an effect when the `docstring-code-format` setting is enabled.
+docstring-code-line-length = "dynamic"
+
+# ===========================[ RUFF pycodestyle ]========================
+# https://docs.astral.sh/ruff/settings/#lint_pycodestyle_max-doc-length
+[tool.ruff.lint.pycodestyle]
+# E501 reports lines that exceed the length of 100
+max-doc-length = 120
+# E501 reports lines that exceed the length of 100.
+max-line-length = 120
+
+[tool.coverage.report]
+skip_empty = true
+
+exclude_lines = [
+    '\(Protocol\):$',
+    '\s*\.\.\.$',
+    "@(abc.)?abstractmethod",
+    "@overload",
+    "@typing.overload",
+    "assert_never",
+    "def __repr__",
+    "def __str__",
+    "except ImportError:",
+    "if __name__ == .__main__.:",
+    "if not _PANDAS_AVAILABLE:",
+    "if self.debug",
+    "if settings.DEBUG",
+    "if TYPE_CHECKING:",
+    "if TYPE_CHECKING",
+    "if typing.TYPE_CHECKING:",
+    "pragma: $TEST_PLATFORM no cover",
+    "pragma: no cover",
+    "pragma: py$PYTHON_MAJOR_VERSION no cover",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "return NotImplemented",
+    "typing.assert_never",
+]
+omit = [
+    "test/*",
+    "tests/*",
+    "src/agentic/studio/*",
+    "cookbook/studio/*",
+]
+# fail if coverage drops below the specified percentage:
+fail_under = 10
+
+# Regexes for lines to exclude from consideration
+exclude_also = [
+    # Don't complain about missing debug-only code:
+    "def __repr__",
+    "if self\\.debug",
+
+    # Don't complain if tests don't hit defensive assertion code:
+    "raise AssertionError",
+    "raise NotImplementedError",
+
+    # Don't complain if non-runnable code isn't run:
+    "if 0:",
+    "if __name__ d .__main__.:",
+
+    # Don't complain about abstract methods, they aren't run:
+    "@(abc\\.)?abstractmethod",
+
+    # 1. Exclude an except clause of a specific form:
+    "except ValueError:\\n\\s*assume\\(False\\)",
+    # 2. Comments to turn coverage on and off:
+    "no cover: start(?s:.)*?no cover: stop",
+    # 3. A pragma comment that excludes an entire file:
+    "\\A(?s:.*# pragma: exclude file.*)\\Z",
+]
+
+# (boolean, default False) Ignore source code that can't be found, emitting a warning instead of an exception.
+ignore_errors = false
+# (boolean, default False) When running a summary report, show missing lines. See Coverage summary: coverage report for more information.
+show_missing = true
+# (boolean, default False) Don't report files that are 100% covered. This helps you focus on files that need attention.
+skip_covered = false
+
+[tool.coverage.run]
+parallel = true
+
+# NOTE: This might break some SHIT (5/8/2024)
+# SOURCE: https://github.com/anthonycorletti/snok/blob/039ae9aaf403485ce9b7fedb0e1943c25a250eed/snok/templates/__shared/_pyproject_toml#L130
+concurrency = ["thread", "greenlet", "multiprocessing"]
+omit = [
+    "**/src/tutorials/**",
+]
+
+
+branch = true
+source = ["src"]
+
+[tool.coverage.html]
+directory = "htmlcov"
+
+[tool.coverage.xml]
+output = "cov.xml"
+
+
+# =========================[ PYTEST INI OPTIONS ]========================
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+filterwarnings = [
+    'ignore:configuration option "asyncio_default_fixture_loop_scope" is unset',
+]
+# retries = 5
+# retry_delay = 0.5
+# retry_delay = 30
+pythonpath = "."
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+addopts = [
+    # Print runtimes of the slowest tests.
+    '--durations=10',
+    '--durations-min=0.05',
+    '--junitxml=junit/test-results.xml',
+    '--cov-report=annotate:cov_annotate',
+]
+
+# ###################################################################################
+# # enable live logging when needed (very useful when debugging evals)
+# ###################################################################################
+log_cli = false
+log_cli_level = "DEBUG"
+log_cli_format = "%(asctime)s [%(levelname)8s] %(message)s (%(filename)s:%(lineno)s)"
+log_cli_date_format = "%Y-%m-%d %H:%M:%S"
+
+# Enable live logging to a file when needed (very useful when debugging evals)
+log_file = "pytest-accuracy-debug.log"
+log_file_date_format = "%Y-%m-%d %H:%M:%S"
+log_file_format = "%(asctime)s [%(levelname)8s] %(message)s (%(filename)s:%(lineno)s)"
+log_file_level = "DEBUG"
+
+# markers=["basic", "filetree", "suites", "markers", "parametrization", "buildmeta"]
+# allows you to conditionally call only a subset of pytest baased on the marker provided
+markers = [
+    "cogs: marks tests that run code that utilizes the cogs module (deselect with '-m \"not cogs\"')",
+    "configonly: marks tests that run code that utilizes the config module (deselect with '-m \"not configonly\"')",
+    "e2e: marks tests dealing with e2e testing (deselect with '-m \"not e2e\"')",
+    "evals: marks tests as evals (run with '-m evals')",
+    "fast: marks tests as fast (run with '-m fast')",
+    "httpclientonly: marks tests that run code that utilizes the http_client module (deselect with '-m \"not httpclientonly\"')",
+    "imgops: marks tests as imgops (run with '-m imgops')",
+    "integration: marks tests dealing with integration testing (deselect with '-m \"not integration\"')",
+    "onboardingonly: marks tests that run code that utilizes the new_dev_onboarding_tool module (deselect with '-m \"not onboardingonly\"')",
+    "utilsonly: marks tests that run code that utilizes any utils module (deselect with '-m \"not utilsonly\"')",
+    "retryonly: marks tests that run code that utilizes the retry module (deselect with '-m \"not retryonly\"')",
+    "skip_in_parallel: marks tests that should be run in serial only (deselect with '-m \"not skip_in_parallel\"')",
+    "slow: marks tests as slow (run with '-m slow')",
+    "toolonly: marks tests that run code that utilizes a Custom Langchain tool module in the tools directory (deselect with '-m \"not toolonly\"')",
+    "toolonly: marks tests that run code that utilizes llm tool classes  (deselect with '-m \"not toolonly\"')",
+    "unittest: marks tests dealing with unittest (deselect with '-m \"not unittest\"')",
+    "vectorstoronly: marks tests that run code that utilizes the flex_vector_store_tool module (deselect with '-m \"not vectorstoronly\"')",
+    "visiontoolonly: marks tests that run code that utilizes vision_tool.py (deselect with '-m \"not visiontoolonly\"')",
+    "webpagetoolonly: marks tests that run code that utilizes the fetch_webpage_tool module (deselect with '-m \"not webpagetoolonly\"')",
+    "vcronly: marks tests that run code that utilizes the vcr module (deselect with '-m \"not vcronly\"')",
+    "vcrcanary: marks tests that run code that utilizes the vcr test canary module (deselect with '-m \"not vcrcanary\"')",
+    "pgvectoronly: marks tests that run code that utilizes the pgvector module (deselect with '-m \"not pgvectoronly\"')",
+    "services: marks tests that run code that belongs to the services module  (deselect with '-m \"not services\"')",
+    "slower: marks tests that run code that belongs to the slower calls at end of pytest run module  (deselect with '-m \"not slower\"')",
+    "discordonly: marks tests that run code that belongs to the discordonly calls at end of pytest run module  (deselect with '-m \"not discordonly\"')",
+    "cursorgenerated: marks tests that are cursor generated (deselect with '-m \"not cursorgenerated\"')",
+    "aidergenerated: marks tests that are aider generated (deselect with '-m \"not aidergenerated\"')",
+    "asynciotyper: marks tests that are asyncio typer generated (deselect with '-m \"not asynciotyper\"')",
+    "cli: marks tests that are cli generated (deselect with '-m \"not cli\"')",
+]
+
+
+# =========================[ PYTEST-COV ]========================
+[tool.coverage.paths]
+# SOURCE: https://coverage.readthedocs.io/en/latest/config.html
+# the first path is the path on the local filesystem
+# the second path is the path as it appears within the Docker container
+source = [
+    "src/",
+    "/src",
+]
+
+# =========================[ BLACK ]========================
+[tool.black]
+line-length = 120
+target-version = ["py310", "py311", "py312"]
+
+
+[tool.pylint.MAIN]
+extension-pkg-allow-list = [
+    "torch",
+    "numpy",
+    "orjson",
+    "cv2",
+]
+extension-pkg-whitelist = ["pydantic", "torch", "numpy", "orjson", "cv2"]
+py-version = "3.12"
+# Use a conservative default here; 2 should speed up most setups and not hurt
+# any too bad. Override on command line as appropriate.
+jobs = 0
+fail-on = ["I"]
+load-plugins = [
+    "pylint.extensions.code_style",
+    "pylint.extensions.typing",
+    "pylint_pydantic",
+]
+persistent = false
+# ignore = "lib"
+ignore-paths = [
+    ".venv",                               # Virtual Environment
+    "^.*.pyi$",                            # Type Hinting
+    "^.*_prv_.*$",                         # Private Files/Folders (e.g. _prv_*.py | _prv_* folder)
+    "lib",                                 # External Libraries
+    "src/utils/run_service.py",
+    "src/utils/imgops.py",
+    "src/utils/files_import.py",
+    "src/agentic/studio/*",
+]
+
+# SOURCE: https://github.com/ocellicode/gpyt-commandbus/blob/80172644b35af7b4679ace734bea1c5ea2212a52/pyproject.toml#L21
+[tool.pylint.exceptions]
+overgeneral-exceptions = ["builtins.BaseException", "builtins.Exception"]
+
+
+[tool.pylint.BASIC]
+class-const-naming-style = "any"
+
+[tool.pylint."MESSAGES CONTROL"]
+# https://github.com/pydantic/pydantic/issues/1961
+extension-pkg-whitelist = "pydantic"
+
+# Reasons disabled:
+# format - handled by ruff
+# locally-disabled - it spams too much
+# duplicate-code - unavoidable
+# cyclic-import - doesn't test if both import on load
+# abstract-class-little-used - prevents from setting right foundation
+# unused-argument - generic callbacks and setup methods create a lot of warnings
+# too-many-* - are not enforced for the sake of readability
+# too-few-* - same as too-many-*
+# abstract-method - with intro of async there are always methods missing
+# inconsistent-return-statements - doesn't handle raise
+# too-many-ancestors - it's too strict.
+# wrong-import-order - isort guards this
+# consider-using-f-string - str.format sometimes more readable
+# ---
+# Pylint CodeStyle plugin
+# consider-using-namedtuple-or-dataclass - too opinionated
+# consider-using-assignment-expr - decision to use := better left to devs
+disable = [
+    "possibly-used-before-assignment",                  # Warns about variables potentially used before assignment
+    "raw-checker-failed",                               # Internal pylint error
+    "bad-inline-option",                                # Invalid inline pylint option
+    "file-ignored",                                     # Entire file was ignored due to configuration
+    "suppressed-message",                               # Message was suppressed via inline comment
+    "deprecated-pragma",                                # Use of deprecated pragma
+    "use-implicit-booleaness-not-comparison-to-string", # Suggests using implicit boolean check instead of comparing to empty string
+    "use-implicit-booleaness-not-comparison-to-zero",   # Suggests using implicit boolean check instead of comparing to zero
+    "fixme",                                            # Warns about FIXME, TODO and XXX comments
+    "line-too-long",                                    # Line exceeds maximum allowed length
+    "missing-class-docstring",                          # Class has no docstring
+    "missing-function-docstring",                       # Function or method has no docstring
+    "missing-module-docstring",                         # Module has no docstring
+    "too-few-public-methods",                           # Class has too few public methods
+    "raise-missing-from",                               # Exception raised without 'from' clause
+    "abstract-method",                                  # Abstract method is not overridden
+    "consider-using-assignment-expr",                   # Suggests using assignment expression (:=)
+    "consider-using-f-string",                          # Suggests using f-strings for string formatting
+    "consider-using-namedtuple-or-dataclass",           # Suggests using namedtuple or dataclass
+    "cyclic-import",                                    # Detects cyclic imports between modules
+    "duplicate-code",                                   # Detects duplicated code
+    "format",                                           # Related to code formatting issues
+    "inconsistent-return-statements",                   # Function has inconsistent return statements
+    "locally-disabled",                                 # Warns about locally disabled pylint messages
+    "not-context-manager",                              # Suggests using 'with' statement for context managers
+    "too-few-public-methods",                           # Class has too few public methods (duplicate)
+    "too-many-ancestors",                               # Class has too many parent classes
+    "too-many-arguments",                               # Function or method has too many arguments
+    "too-many-boolean-expressions",                     # Boolean expression is too complex
+    "too-many-instance-attributes",                     # Class has too many instance attributes
+    "too-many-lines",                                   # Module has too many lines
+    "too-many-locals",                                  # Function or method has too many local variables
+    "too-many-public-methods",                          # Class has too many public methods
+    "wrong-import-order",                               # Imports are in the wrong order
+    # Handled by ruff
+    # Ref: <https://github.com/astral-sh/ruff/issues/970>
+    "await-outside-async",    # PLE1142  # Warns about 'await' used outside an async function
+    "bad-str-strip-call",     # PLE1310  # Detects suspicious arguments in str.strip() calls
+    "bad-string-format-type", # PLE1307  # Warns about invalid format string types
+    "bidirectional-unicode",  # PLE2502  # Detects potentially dangerous bidirectional Unicode characters
+    "continue-in-finally",    # PLE0116  # Warns about 'continue' in 'finally' block which may swallow exceptions
+    "duplicate-bases",        # PLE0241  # Detects duplicate base classes in class definitions
+    "format-needs-mapping",   # F502     # Warns when a format string needs a mapping (dict) but receives something else
+    "function-redefined",     # F811     # Detects when a function is redefined
+    # Needed because ruff does not understand type of __all__ generated by a function
+    # "invalid-all-format", # PLE0605
+    "anomalous-backslash-in-string",      # W605     # Detects anomalous backslash in string
+    "assert-on-string-literal",           # PLW0129  # Warns about assert statements on string literals
+    "assert-on-tuple",                    # F631     # Warns about assert statements on tuples
+    "bad-format-string",                  # W1302, F # Detects invalid format strings
+    "bad-format-string-key",              # W1300, F # Warns about invalid keys in format strings
+    "bare-except",                        # E722     # Warns about bare except clauses
+    "binary-op-exception",                # PLW0711  # Warns about binary operators used with exceptions
+    "cell-var-from-loop",                 # B023     # Detects cell variables from loop variables
+    "invalid-all-object",                 # PLE0604  # Warns about invalid objects in __all__
+    "invalid-character-backspace",        # PLE2510  # Detects invalid backspace characters
+    "invalid-character-esc",              # PLE2513  # Detects invalid escape characters
+    "invalid-character-nul",              # PLE2514  # Detects invalid null characters
+    "invalid-character-sub",              # PLE2512  # Detects invalid substitute characters
+    "invalid-character-zero-width-space", # PLE2515  # Detects invalid zero-width space characters
+    "logging-too-few-args",               # PLE1206  # Warns about too few arguments in logging calls
+    "logging-too-many-args",              # PLE1205  # Warns about too many arguments in logging calls
+    "missing-format-string-key",          # F524     # Detects missing keys in format strings
+    "mixed-format-string",                # F506     # Warns about mixed old and new style format strings
+    "no-method-argument",                 # N805     # Warns when a method has no 'self' parameter
+    "no-self-argument",                   # N805     # Warns when a method has no 'self' parameter (duplicate)
+    "nonexistent-operator",               # B002     # Warns about nonexistent operators
+    "nonlocal-without-binding",           # PLE0117  # Warns about nonlocal variables without binding
+    "not-in-loop",                        # F701, F702 # Warns about break/continue statements outside loops
+    "notimplemented-raised",              # F901     # Warns when NotImplemented is raised instead of NotImplementedError
+    "return-in-init",                     # PLE0101  # Warns about return statements in __init__ methods
+    "return-outside-function",            # F706     # Warns about return statements outside functions
+    "syntax-error",                       # E999     # Detects syntax errors
+    "too-few-format-args",                # F524     # Warns about too few arguments for format string
+    "too-many-format-args",               # F522     # Warns about too many arguments for format string
+    "too-many-star-expressions",          # F622     # Warns about too many starred expressions in assignment
+    "truncated-format-string",            # F501     # Detects truncated format strings
+    "undefined-all-variable",             # F822     # Warns about undefined variables in __all__
+    "undefined-variable",                 # F821     # Warns about undefined variables
+    "used-prior-global-declaration",      # PLE0118  # Warns when a variable is used before its global declaration
+    "yield-inside-async-function",        # PLE1700  # Warns about yield statements inside async functions
+    "yield-outside-function",             # F704     # Warns about yield statements outside functions
+    # "dangerous-default-value", # B006, ruff catches new occurrences, needs more work
+    "duplicate-except",                     # B014     # Warns about duplicate except clauses
+    "duplicate-key",                        # F601     # Warns about duplicate keys in dictionaries
+    "duplicate-string-formatting-argument", # F        # Warns about duplicate keys in format strings
+    "duplicate-value",                      # F        # Warns about duplicate values in sets
+    "eval-used",                            # S307     # Warns about the use of eval()
+    "exec-used",                            # S102     # Warns about the use of exec()
+    "expression-not-assigned",              # B018     # Warns about expressions that are not assigned
+    "f-string-without-interpolation",       # F541     # Warns about f-strings without any interpolation
+    "forgotten-debug-statement",            # T100     # Warns about forgotten debug statements
+    "format-string-without-interpolation",  # F        # Warns about format strings without any interpolation
+    # "global-statement", # PLW0603, ruff catches new occurrences, needs more work
+    "global-variable-not-assigned",  # PLW0602  # Warns about global variables that are not assigned
+    "implicit-str-concat",           # ISC001   # Warns about implicit string concatenation
+    "import-self",                   # PLW0406  # Warns when a module imports itself
+    "inconsistent-quotes",           # Q000     # Warns about inconsistent use of quotes
+    "invalid-envvar-default",        # PLW1508  # Warns about invalid default values for environment variables
+    "keyword-arg-before-vararg",     # B026     # Warns about keyword arguments appearing before variable arguments
+    "logging-format-interpolation",  # G        # Warns about using % formatting in logging functions
+    "logging-fstring-interpolation", # G        # Warns about using f-strings in logging functions
+    "logging-not-lazy",              # G        # Warns about non-lazy logging calls
+    "misplaced-future",              # F404     # Warns about misplaced __future__ imports
+    "named-expr-without-context",    # PLW0131  # Warns about named expressions (walrus operator) without proper context
+    "nested-min-max",                # PLW3301  # Warns about nested min/max calls that can be flattened
+    "pointless-statement",           # B018     # Warns about pointless statements
+    "raise-missing-from",            # B904     # Warns about raise statements missing 'from' clause
+    # "redefined-builtin", # A001, ruff is way more stricter, needs work
+    "bad-classmethod-argument",          # N804     # Warns about incorrect first argument name in classmethods
+    "comparison-of-constants",           # PLR0133  # Warns about comparisons between constants
+    "comparison-with-itself",            # PLR0124  # Warns about comparisons of a value with itself
+    "consider-alternative-union-syntax", # UP007    # Suggests using alternative union syntax (Python 3.10+)
+    "consider-iterating-dictionary",     # SIM118   # Suggests iterating over dictionary items directly
+    "consider-merging-isinstance",       # PLR1701  # Suggests merging multiple isinstance checks
+    "consider-using-alias",              # UP006    # Suggests using type aliases (Python 3.7+)
+    "consider-using-dict-comprehension", # C402     # Suggests using dict comprehension instead of dict()
+    "consider-using-generator",          # C417     # Suggests using a generator expression instead of a list comprehension
+    "consider-using-get",                # SIM401   # Suggests using dict.get() instead of checking for key existence
+    "consider-using-set-comprehension",  # C401     # Suggests using set comprehension instead of set()
+    "consider-using-sys-exit",           # PLR1722  # Suggests using sys.exit() instead of exit()
+    "consider-using-ternary",            # SIM108   # Suggests using ternary operator instead of if-else
+    "empty-docstring",                   # D419     # Warns about empty docstrings
+    "invalid-name",                      # N815     # Warns about invalid names (variables, functions, classes, etc.)
+    "line-too-long",                     # E501     # Warns about lines that are too long (disabled globally)
+    "literal-comparison",                # F632     # Warns about comparisons to literals using is/is not
+    "missing-class-docstring",           # D101     # Warns about missing docstrings in classes
+    "missing-final-newline",             # W292     # Warns about missing final newline in files
+    "missing-function-docstring",        # D103     # Warns about missing docstrings in functions
+    "missing-module-docstring",          # D100     # Warns about missing docstrings in modules
+    "multiple-imports",                  # E401     # Warns about multiple imports on one line
+    "no-else-break",                     # RET508   # Suggests removing unnecessary else after break
+    "no-else-continue",                  # RET507   # Suggests removing unnecessary else after continue
+    "no-else-raise",                     # RET506   # Suggests removing unnecessary else after raise
+    "no-else-return",                    # RET505   # Suggests removing unnecessary else after return
+    "property-with-parameters",          # PLR0206  # Warns about properties with parameters
+    "singleton-comparison",              # E711, E712 # Warns about comparison to True, False, or None
+    "subprocess-run-check",              # PLW1510  # Suggests using check=True with subprocess.run()
+    "super-with-arguments",              # UP008    # Suggests using super() without arguments (Python 3+)
+    "superfluous-parens",                # UP034    # Warns about unnecessary parentheses
+    "too-many-branches",                 # PLR0912  # Warns about too many branches in a function
+    "too-many-return-statements",        # PLR0911  # Warns about too many return statements in a function
+    "too-many-statements",               # PLR0915  # Warns about too many statements in a function
+    "trailing-comma-tuple",              # COM818   # Warns about trailing commas in single-item tuples
+    "try-except-raise",                  # TRY302   # Suggests simplifying try-except-raise blocks
+    "ungrouped-imports",                 # I001     # Warns about ungrouped imports
+    "unidiomatic-typecheck",             # E721     # Warns about unidiomatic type checking
+    "unnecessary-comprehension",         # C416     # Warns about unnecessary list comprehensions
+    "unnecessary-direct-lambda-call",    # PLC3002  # Warns about unnecessary direct lambda calls
+    "unnecessary-lambda-assignment",     # PLC3001  # Warns about unnecessary lambda assignments
+    "unnecessary-pass",                  # PIE790   # Warns about unnecessary pass statements
+    "unneeded-not",                      # SIM208   # Suggests simplifying unnecessary not operators
+    "unused-argument",                   # ARG001   # Warns about unused function arguments
+    "unused-format-string-argument",     # F507     # Warns about unused format string arguments
+    "unused-format-string-key",          # F504     # Warns about unused format string keys
+    "unused-import",                     # F401     # Warns about unused imports
+    "unused-variable",                   # F841     # Warns about unused variables
+    "use-a-generator",                   # C417     # Suggests using a generator instead of a list comprehension
+    "use-dict-literal",                  # C406     # Suggests using dict literal instead of dict()
+    "use-list-literal",                  # C405     # Suggests using list literal instead of list()
+    "useless-else-on-loop",              # PLW0120  # Warns about useless else clauses on loops
+    "useless-import-alias",              # PLC0414  # Warns about useless import aliases
+    "useless-object-inheritance",        # UP004    # Warns about useless object inheritance in Python 3
+    "useless-return",                    # PLR1711  # Warns about useless return statements
+    "wildcard-import",                   # F403     # Warns about wildcard imports
+    "wrong-import-order",                # I001     # Warns about incorrect import order
+    "wrong-import-position",             # E402     # Warns about imports not at the top of the file
+    # "no-self-use", # PLR6301  # Optional plugin, not enabled
+    # Handled by mypy
+    # Ref: <https://github.com/antonagestam/pylint-mypy-overlap>
+    "abstract-class-instantiated",               # Warns about instantiation of abstract classes
+    "arguments-differ",                          # Warns when overridden method arguments differ from superclass
+    "assigning-non-slot",                        # Warns about assigning to attributes not defined in __slots__
+    "assignment-from-no-return",                 # Warns about assigning result of a function that doesn't return
+    "assignment-from-none",                      # Warns about assigning None to variables
+    "bad-exception-cause",                       # Warns about incorrect exception causes
+    "bad-format-character",                      # Warns about bad characters in format strings
+    "bad-reversed-sequence",                     # Warns about reversing non-sequence objects
+    "bad-super-call",                            # Warns about incorrect super() calls
+    "bad-thread-instantiation",                  # Warns about incorrect threading.Thread subclass instantiation
+    "catching-non-exception",                    # Warns about catching non-exception objects
+    "comparison-with-callable",                  # Warns about comparisons between callable and non-callable
+    "deprecated-class",                          # Warns about usage of deprecated classes
+    "dict-iter-missing-items",                   # Warns about dict.iter*() methods missing .items()
+    "format-combined-specification",             # Warns about combined format string specifications
+    "global-variable-undefined",                 # Warns about undefined global variables
+    "import-error",                              # Warns about imports that cannot be resolved
+    "inconsistent-mro",                          # Warns about inconsistent method resolution order
+    "inherit-non-class",                         # Warns about inheriting from non-class objects
+    "init-is-generator",                         # Warns about __init__ methods declared as generators
+    "invalid-class-object",                      # Warns about invalid objects in class statements
+    "invalid-enum-extension",                    # Warns about invalid enum extensions
+    "invalid-envvar-value",                      # Warns about invalid environment variable values
+    "invalid-format-returned",                   # Warns about invalid values returned by __format__
+    "invalid-hash-returned",                     # Warns about invalid values returned by __hash__
+    "invalid-metaclass",                         # Warns about invalid metaclasses
+    "invalid-overridden-method",                 # Warns about invalid method overrides
+    "invalid-repr-returned",                     # Warns about invalid values returned by __repr__
+    "invalid-sequence-index",                    # Warns about invalid sequence indices
+    "invalid-slice-index",                       # Warns about invalid slice indices
+    "invalid-slots",                             # Used when an invalid __slots__ is found in class. Only a string, an iterable or a sequence is permitted.
+    "invalid-slots-object",                      # Warns about invalid __slots__ objects
+    "invalid-star-assignment-target",            # Warns about invalid targets in star assignments
+    "invalid-str-returned",                      # Warns when __str__ doesn't return a string
+    "invalid-unary-operand-type",                # Warns about invalid types for unary operators
+    "invalid-unicode-codec",                     # Warns about invalid Unicode codec operations
+    "isinstance-second-argument-not-valid-type", # Warns when isinstance() second argument is not a type
+    "method-hidden",                             # Warns about methods hidden by instance attributes
+    "misplaced-format-function",                 # Warns about misplaced string format method calls
+    "missing-format-argument-key",               # Warns about missing keys in format string arguments
+    "missing-format-attribute",                  # Warns about missing attributes in format strings
+    "missing-kwoa",                              # Warns about missing keyword-only arguments
+    # "no-member",
+    "no-value-for-parameter",                       # Warns when a function call is missing a required parameter
+    "non-iterator-returned",                        # Warns when a __iter__ method doesn't return an iterator
+    "non-str-assignment-to-dunder-name",            # Warns when assigning non-string to __name__
+    "nonlocal-and-global",                          # Warns when a variable is declared both nonlocal and global
+    "not-a-mapping",                                # Warns when a non-mapping is used where a mapping is expected
+    "not-an-iterable",                              # Warns when a non-iterable is used where an iterable is expected
+    "not-async-context-manager",                    # Warns when an async context manager is expected but not used
+    "not-callable",                                 # Warns when trying to call a non-callable object
+    "not-context-manager",                          # Warns when a context manager is expected but not used
+    "overridden-final-method",                      # Warns when a final method is overridden
+    "raising-bad-type",                             # Warns when raising a non-exception type
+    "raising-non-exception",                        # Warns when raising a non-exception object
+    "redundant-keyword-arg",                        # Warns about redundant keyword arguments
+    "relative-beyond-top-level",                    # Warns about relative imports beyond top-level package
+    "self-cls-assignment",                          # Warns about assigning to self or cls in methods
+    "signature-differs",                            # Warns when an overriding method's signature differs
+    "star-needs-assignment-target",                 # Warns when * is used without an assignment target
+    "subclassed-final-class",                       # Warns when a final class is subclassed
+    "super-without-brackets",                       # Warns about using super without parentheses (Python 2 style)
+    "too-many-function-args",                       # Warns when a function is called with too many arguments
+    "typevar-double-variance",                      # Warns about TypeVar with conflicting variance
+    "typevar-name-mismatch",                        # Warns when a TypeVar name doesn't match its parameter
+    "unbalanced-dict-unpacking",                    # Warns about unbalanced dict unpacking in assignments
+    "unbalanced-tuple-unpacking",                   # Warns about unbalanced tuple unpacking in assignments
+    "unexpected-keyword-arg",                       # Warns about unexpected keyword arguments in function calls
+    "unhashable-member",                            # Warns when trying to hash an unhashable object
+    "unpacking-non-sequence",                       # Warns when trying to unpack a non-sequence
+    "unsubscriptable-object",                       # Warns when trying to subscript a non-subscriptable object
+    "unsupported-assignment-operation",             # Warns about unsupported assignment operations
+    "unsupported-binary-operation",                 # Warns about unsupported binary operations
+    "unsupported-delete-operation",                 # Warns about unsupported delete operations
+    "unsupported-membership-test",                  # Warns about unsupported membership test operations
+    "used-before-assignment",                       # Warns when a variable is used before it's assigned
+    "using-final-decorator-in-unsupported-version", # Warns about using @final decorator in unsupported Python versions
+    "wrong-exception-operation",                    # Warns about wrong operations on exception objects
+]
+enable = [
+    "use-symbolic-message-instead",
+]
+
+[tool.pylint.REPORTS]
+score = false
+
+# SOURCE: https://github.com/atlassian-api/atlassian-python-api/blob/master/pyproject.toml
+[tool.pylint.TYPECHECK]
+# List of members which are set dynamically and missed by pylint inference
+# system, and so shouldn't trigger E1101 when accessed. Python regular
+# expressions are accepted.
+generated-members = 'numpy.*, torch.*, cv2.*, discord.*,logging.root.*'
+ignored-classes = [
+    "_CountingAttr", # for attrs
+]
+mixin-class-rgx = ".*[Mm]ix[Ii]n"
+
+[tool.pylint.FORMAT]
+expected-line-ending-format = "LF"
+
+
+[tool.pylint.TYPING]
+runtime-typing = false
+
+[tool.pylint.CODE_STYLE]
+# Max line length for which to sill emit suggestions.
+# Used to prevent optional suggestions which would get split by a code formatter
+# (e.g., black). Will default to the setting for ``max-line-length``.
+max-line-length-suggestions = 72
+
+[tool.pylint.logging]
+# Possible choices: ['old', 'new']
+logging-format-style = "new"
+
+logging-modules = ["logging", "loguru"]
+
+[tool.pylint.similarities]
+ignore-comments = true
+ignore-docstrings = true
+ignore-imports = false
+min-similarity-lines = 5
+
+# NOTE: see https://github.com/Ruzzy77/python-template/blob/57c8964f1efb2635d0bdca5684613a8d8736aed0/pyrightconfig.json
+[tool.pyright]
+include = [
+    "src",
+    "tests",
+]
+exclude = [
+    "**/__pycache__",
+    "build",
+    "dist",
+    "docs",
+    "**/.venv",
+    "**/node_modules",
+    "**/__pycache__",
+    ".git",
+    "**/build",
+    "tasks",
+    "typings",
+]
+extraPaths = [
+    ".venv",
+]
+############################################################################
+# FIXME: THIS MIGHT BREAK SHIT
+# SOURCE: https://github.com/charbonnierg/pytest-broadcaster/blob/e98456b2f6db7f99a034795f162ac0013a8001d7/pyproject.toml#L157C1-L158C15
+venv = ".venv"
+venvPath = "."
+# FIXME: THIS MIGHT BREAK SHIT
+############################################################################
+defineConstant = {DEBUG = true}
+stubPath = "./typings"
+# https://github.com/microsoft/pyright/blob/main/docs/configuration.md#reportGeneralTypeIssues
+reportUnnecessaryTypeIgnoreComment = "none"
+pythonVersion = "3.12"
+verboseOutput = true
+reportUnusedImport = "none"
+reportMissingImports = "error"
+reportImportCycles = "error"
+reportUnusedVariable = "none"
+reportMissingTypeStubs = "warning"
+
+reportUnusedFunction = "warning" # this is what we use in ad
+reportUnusedClass = "warning"    # this is what we use in ad
+
+reportUnknownVariableType = false
+reportUnknownMemberType = false
+reportUnknownArgumentType = false
+
+# very strict errors
+reportUnusedCallResult = false
+reportImplicitStringConcatenation = false
+reportCallInDefaultInitializer = true
+reportAttributeAccessIssue = "error"
+
+[tool.pydocstringformatter]
+write = false
+style = ["pep257"]
+strip-whitespaces = true
+# Activate or deactivate split-summary-body: Split the
+# summary and body of a docstring based on a period and
+# max length. The maximum length of a summary can be set
+# with the --max-summary-lines option. Styles: pep257.
+# (default: True)
+split-summary-body = false
+numpydoc-section-hyphen-length = false
+
+
+[tool.pydocstyle]
+convention = "pep257"
+
+
+
+[tool.nbqa.md]
+blacken-docs = true
+
+[tool.nbqa.shell]
+flake8heavened = true

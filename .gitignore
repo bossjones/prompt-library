@@ -723,3 +723,10 @@ democracy_exe/vendored/langchain-academy/
 democracy_exe/vendored/dpytest
 helldivers_wiki
 helldivers_wiki.bak
+
+
+__pycache__/
+
+.venv/
+
+prompt_executions/
