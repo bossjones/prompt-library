@@ -830,3 +830,6 @@ corefiles:
 
 install-youtube-transcript:
 	cargo install youtube-transcript
+
+pylint-to-ruff:
+	{{UV_RUN}} pylint-to-ruff
