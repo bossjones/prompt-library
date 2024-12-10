@@ -821,9 +821,12 @@ marimo-run-all:
 
 # Tree the project while respecting .gitignore
 tree:
-	tree -C -I '__pycache__|*.py[cod]|*$$py.class|*.so|build|develop-eggs|dist|downloads|eggs|.eggs|lib|lib64|parts|sdist|var|wheels|share/python-wheels|*.egg-info|.installed.cfg|*.egg|MANIFEST|*.manifest|*.spec|pip-log.txt|pip-delete-this-directory.txt|htmlcov|.tox|.nox|.coverage|.coverage.*|.cache|nosetests.xml|coverage.xml|*.cover|*.py,cover|.hypothesis|.pytest_cache|cover|*.mo|*.pot|*.log|local_settings.py|db.sqlite3|db.sqlite3-journal|instance|.webassets-cache|.scrapy|docs/_build|.pybuilder|target|.ipynb_checkpoints|profile_default|ipython_config.py|__pypackages__|celerybeat-schedule|celerybeat.pid|*.sage.py|.env|.venv|env|venv|ENV|env.bak|venv.bak|.spyderproject|.spyproject|.ropeproject|site|.mypy_cache|.dmypy.json|dmypy.json|.pyre|.pytype|cython_debug|.idea|.vscode|*.swp|.DS_Store|.sass-cache|*.css.map|*.pyc|database.db|messages.db|*.avi|*.hdf5|*.h5|*.pth|*.zip|.virtual_documents|chroma|file.out|*.sqlite|.env.langraph|datasets'
+	tree -C -I '__pycache__|*.py[cod]|*$$py.class|*.so|build|develop-eggs|dist|downloads|eggs|.eggs|lib|lib64|parts|sdist|var|wheels|share/python-wheels|*.egg-info|.installed.cfg|*.egg|MANIFEST|*.manifest|*.spec|pip-log.txt|pip-delete-this-directory.txt|htmlcov|.tox|.nox|.coverage|.coverage.*|.cache|nosetests.xml|coverage.xml|*.cover|*.py,cover|.hypothesis|.pytest_cache|cover|*.mo|*.pot|*.log|local_settings.py|db.sqlite3|db.sqlite3-journal|instance|.webassets-cache|.scrapy|docs/_build|.pybuilder|target|.ipynb_checkpoints|profile_default|ipython_config.py|__pypackages__|celerybeat-schedule|celerybeat.pid|*.sage.py|.env|.venv|env|venv|ENV|env.bak|venv.bak|.spyderproject|.spyproject|.ropeproject|site|.mypy_cache|.dmypy.json|dmypy.json|.pyre|.pytype|cython_debug|.idea|.vscode|*.swp|.DS_Store|.sass-cache|*.css.map|*.pyc|database.db|messages.db|*.avi|*.hdf5|*.h5|*.pth|*.zip|.virtual_documents|chroma|file.out|*.sqlite|.env.langraph|datasets|.envrc'
 
 
 # Getting corefiles
 corefiles:
 	{{UV_RUN}} files-to-prompt -e rs -e py -e toml --ignore "node_modules|__pycache__|scripts|debug|.o|deps|release|target|inputs" . | pbcopy
+
+install-youtube-transcript:
+	cargo install youtube-transcript

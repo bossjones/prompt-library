@@ -25,8 +25,8 @@ function main {
 
     # Build initial version of application code.
     printf "\nGenerating initial version of %s\n\n" "$app_file" >&2
-    files-to-prompt "$tests_file" conventions.txt | \
-        llm prompt --system "$INITIAL_PROMPT" > "$app_file"
+    uv run files-to-prompt "$tests_file" conventions.txt | \
+        uv run llm prompt --system "$INITIAL_PROMPT" > "$app_file"
 
     for i in $(seq 2 $ATTEMPTS)
     do
@@ -48,8 +48,8 @@ function main {
             bat "$test_output_file" >&2
 
             printf "\nGenerating v%s of %s\n\n" "$i" "$app_file" >&2
-            files-to-prompt "$tests_file" conventions.txt "$test_output_file" | \
-                llm prompt --continue --system "$RETRY_PROMPT" > "$app_file"
+            uv run files-to-prompt "$tests_file" conventions.txt "$test_output_file" | \
+                uv run llm prompt --continue --system "$RETRY_PROMPT" > "$app_file"
         fi
     done
 
