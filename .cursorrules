@@ -1,7 +1,9 @@
+
+
 <?xml version="1.0" encoding="UTF-8"?>
 <cursorrules>
   <purpose>
-    You are an AI assistant responsible for helping a developer create a LLM prompt library.
+    You are an AI assistant responsible for helping a developer create a LLM prompt library and maintain Python code quality.
   </purpose>
 
   <instructions>
@@ -14,6 +16,190 @@
     <instruction>Create a `templates` folder to store reusable prompt structures.</instruction>
     <instruction>Include a comprehensive README.md file at the root level.</instruction>
   </instructions>
+
+  <python_standards>
+    <project_structure>
+      <standard>Maintain clear project structure with separate directories for source code, tests (`tests/`), and documentation (`docs/`).</standard>
+      <standard>Use modular design with distinct files for models, services, controllers, and utilities.</standard>
+      <standard>Create separate files for AI components (chat models, prompts, output parsers, chat history, documents/loaders, stores, retrievers, tools)</standard>
+      <standard>Follow modular design patterns for LangChain/LangGraph components</standard>
+      <standard>Use UV (https://docs.astral.sh/uv) for dependency management and virtual environments</standard>
+      <standard>Follow composition over inheritance principle.</standard>
+      <standard>Use design patterns like Adapter, Decorator, and Bridge when appropriate.</standard>
+    </project_structure>
+
+    <code_quality>
+      <standard>Add typing annotations to ALL functions and classes with return types.</standard>
+      <standard>Include PEP 257-compliant docstrings in Google style for all functions and classes.</standard>
+      <standard>Implement robust error handling and logging using loguru with context capture.</standard>
+      <standard>Use descriptive variable and function names.</standard>
+      <standard>Add detailed comments for complex logic.</standard>
+      <standard>Provide rich error context for debugging.</standard>
+      <standard>Follow DRY (Don't Repeat Yourself) and KISS (Keep It Simple, Stupid) principles.</standard>
+    </code_quality>
+
+    <testing>
+      <standard>Use pytest exclusively for all testing (no unittest module).</standard>
+      <standard>Place all tests in `./tests/` directory.</standard>
+      <standard>Include `__init__.py` files in all test directories.</standard>
+      <standard>Add type annotations and docstrings to all tests.</standard>
+      <standard>Use pytest markers to categorize tests (e.g., `@pytest.mark.unit`, `@pytest.mark.integration`).</standard>
+      <standard>Mark cursor-generated code with `@pytest.mark.cursor`.</standard>
+      <standard>Strive for 100% unit test code coverage.</standard>
+      <standard>Use pytest-recording for tests involving Langchain runnables (limited to unit/integration tests)</standard>
+      <standard>Implement proper Discord.py testing using discord.ext.test</standard>
+      <standard>Use typer.testing.CliRunner for CLI application testing</standard>
+      <standard>For file-based tests, use tmp_path fixture to handle test files.</standard>
+      <standard>Avoid context managers for pytest mocks, use mocker.patch instead.</standard>
+    </testing>
+
+    <dependency_management>
+      <standard>Use uv (https://docs.astral.sh/uv) for dependency management.</standard>
+      <standard>Use `uv sync` to install dependencies, avoid `uv pip install`.</standard>
+      <standard>Use Ruff for code style consistency.</standard>
+      <standard>Document Ruff rules in pyproject.toml with stability indicators.</standard>
+      <standard>Use UV for all package management operations</standard>
+      <standard>Prefer `uv sync` over `uv pip install` for dependency installation</standard>
+      <standard>Maintain clear dependency specifications in pyproject.toml</standard>
+    </dependency_management>
+
+    <langchain_standards>
+      <standard>Mark tests involving Langchain runnables with @pytest.mark.vcr (except evaluation tests).</standard>
+      <standard>Use proper VCR.py configuration for HTTP interaction recording.</standard>
+      <standard>Implement proper typing for all Langchain components.</standard>
+      <standard>Follow Langchain's component structure guidelines.</standard>
+    </langchain_standards>
+
+    <langchain_integration>
+      <standard>Implement proper typing for all LangChain components</standard>
+      <standard>Follow component structure guidelines from LangChain documentation</standard>
+      <standard>Use VCR.py for recording HTTP interactions in tests</standard>
+      <standard>Create distinct files for different LangChain component types</standard>
+      <reference>https://python.langchain.com/v0.2/docs/concepts/#few-shot-prompting</reference>
+    </langchain_integration>
+
+    <design_patterns>
+      <pattern>
+        <name>Composition Over Inheritance</name>
+        <description>Favor object composition over class inheritance to avoid subclass explosion and enhance flexibility</description>
+      </pattern>
+      <pattern>
+        <name>Decorator Pattern</name>
+        <description>Use for dynamically adjusting behavior of objects without modifying their structure</description>
+      </pattern>
+      <pattern>
+        <name>Adapter Pattern</name>
+        <description>Allow incompatible interfaces to work together, promoting flexibility and reusability</description>
+      </pattern>
+      <pattern>
+        <name>Global Object Pattern</name>
+        <description>Use for creating module-level objects that provide methods for actions</description>
+      </pattern>
+    </design_patterns>
+  </python_standards>
+
+  <configuration_standards>
+    <ruff_rules>
+      <standard>Document all Ruff rules in pyproject.toml with inline comments.</standard>
+      <standard>Include stability indicators for each rule:
+        - ✔️ (stable)
+        - 🧪 (unstable/preview)
+        - ⚠️ (deprecated)
+        - ❌ (removed)
+        - 🛠️ (auto-fixable)
+      </standard>
+      <standard>Keep rule descriptions under 160 characters when possible.</standard>
+      <standard>Reference Ruff version from .pre-commit-config.yaml.</standard>
+      <example>
+        <![CDATA[
+        [tool.ruff.lint]
+        select = [
+            "D200", # fits-on-one-line: One-line docstring should fit on one line (stable)
+            "E226", # missing-whitespace-around-arithmetic-operator: Missing whitespace around arithmetic operator (unstable)
+        ]
+        ]]>
+      </example>
+    </ruff_rules>
+
+    <tool_configurations>
+      <standard>Document configuration options for:
+        - pylint (reference: pylint.pycqa.org)
+        - pyright (reference: microsoft.github.io/pyright)
+        - mypy (reference: mypy.readthedocs.io)
+        - commitizen (reference: commitizen-tools.github.io)
+      </standard>
+      <standard>Include descriptive comments for each configuration option.</standard>
+    </tool_configurations>
+
+    <test_imports>
+      <standard>Import necessary pytest types in TYPE_CHECKING block:
+        - CaptureFixture
+        - FixtureRequest
+        - LogCaptureFixture
+        - MonkeyPatch
+        - MockerFixture
+        - VCRRequest (when using pytest-recording)
+      </standard>
+    </test_imports>
+  </configuration_standards>
+
+  <testing_practices>
+    <fixtures>
+      <standard>Use pytest fixtures for reusable test components.</standard>
+      <standard>Utilize tmp_path fixture for file-based tests.</standard>
+      <example>
+        <![CDATA[
+        @pytest.fixture()
+        def mock_pdf_file(tmp_path: Path) -> Path:
+            """Create a mock PDF file for testing purposes.
+
+            This fixture creates a temporary directory and copies a test PDF file into it.
+
+            Args:
+                tmp_path (Path): The temporary path provided by pytest.
+
+            Returns:
+                Path: Path to the mock PDF file.
+            """
+            test_pdf_path: Path = tmp_path / "test.pdf"
+            shutil.copy("fixtures/test.pdf", test_pdf_path)
+            return test_pdf_path
+        ]]>
+      </example>
+    </fixtures>
+
+    <test_organization>
+      <standard>Mirror source code directory structure in tests directory.</standard>
+      <standard>Use appropriate pytest markers for test categorization.</standard>
+      <standard>Include comprehensive docstrings for all test functions.</standard>
+      <example>
+        <![CDATA[
+        @pytest.mark.slow()
+        @pytest.mark.services()
+        @pytest.mark.vcr(
+            allow_playback_repeats=True,
+            match_on=["method", "scheme", "port", "path", "query"],
+            ignore_localhost=False
+        )
+        def test_load_documents(
+            mocker: MockerFixture,
+            mock_pdf_file: Path,
+            vcr: Any
+        ) -> None:
+            """Test the loading of documents from a PDF file.
+
+            Verifies that the load_documents function correctly processes PDF files.
+
+            Args:
+                mocker: The pytest-mock fixture
+                mock_pdf_file: Path to test PDF
+                vcr: VCR.py fixture
+            """
+            # Test implementation
+        ]]>
+      </example>
+    </test_organization>
+  </testing_practices>
 
   <examples>
     <example>
@@ -29,7 +215,7 @@ prompt-library/
 │   │   └── quote-generation/
 │   │
 │   └── engineering/
-│       ├── code-generation/
+│       ├��─ code-generation/
 │       ├── code-review/
 │       ├── bug-finding/
 │       └── style-enforcement/
