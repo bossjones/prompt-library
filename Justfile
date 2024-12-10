@@ -770,3 +770,49 @@ run:
 # Download the read the docs
 download-read-the-docs:
 	wget -r -A.html -P rtdocs https://python.langchain.com/en/latest/
+
+# Marimo Notebook Commands
+
+# Edit the marimo demo notebook
+marimo-demo-edit:
+	{{UV_RUN}} marimo edit marimo_is_awesome_demo.py
+
+# Run the marimo demo notebook
+marimo-demo-run:
+	{{UV_RUN}} marimo run marimo_is_awesome_demo.py
+
+# Edit the ad-hoc prompting notebook
+marimo-adhoc-edit:
+	{{UV_RUN}} marimo edit adhoc_prompting.py
+
+# Run the ad-hoc prompting notebook
+marimo-adhoc-run:
+	{{UV_RUN}} marimo run adhoc_prompting.py
+
+# Edit the prompt library notebook
+marimo-library-edit:
+	{{UV_RUN}} marimo edit prompt_library.py
+
+# Run the prompt library notebook
+marimo-library-run:
+	{{UV_RUN}} marimo run prompt_library.py
+
+# Edit the multi-LLM prompting notebook
+marimo-multi-llm-edit:
+	{{UV_RUN}} marimo edit multi_llm_prompting.py
+
+# Run the multi-LLM prompting notebook
+marimo-multi-llm-run:
+	{{UV_RUN}} marimo run multi_llm_prompting.py
+
+# Edit the multi language model ranker notebook
+marimo-ranker-edit:
+	{{UV_RUN}} marimo edit multi_language_model_ranker.py
+
+# Run the multi language model ranker notebook
+marimo-ranker-run:
+	{{UV_RUN}} marimo run multi_language_model_ranker.py
+
+# Run all marimo notebooks
+marimo-run-all:
+	{{UV_RUN}} marimo run marimo_is_awesome_demo.py adhoc_prompting.py prompt_library.py multi_llm_prompting.py multi_language_model_ranker.py
