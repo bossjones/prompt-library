@@ -14,8 +14,8 @@ def __():
     import marimo as mo
     import pyperclip
 
-    import src.marimo_notebook.modules.llm_module as llm_module
-    import src.marimo_notebook.modules.prompt_library_module as prompt_library_module
+    import src.prompt_library.modules.llm_module as llm_module
+    import src.prompt_library.modules.prompt_library_module as prompt_library_module
 
     return json, llm_module, mo, prompt_library_module, pyperclip
 

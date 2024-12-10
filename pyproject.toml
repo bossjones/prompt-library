@@ -710,7 +710,6 @@ docstring-code-line-length = "dynamic"
 max-doc-length = 120
 # E501 reports lines that exceed the length of 100.
 max-line-length = 120
-
 [tool.coverage.report]
 skip_empty = true
 

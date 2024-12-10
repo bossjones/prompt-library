@@ -816,3 +816,12 @@ marimo-ranker-run:
 # Run all marimo notebooks
 marimo-run-all:
 	{{UV_RUN}} marimo run marimo_is_awesome_demo.py adhoc_prompting.py prompt_library.py multi_llm_prompting.py multi_language_model_ranker.py
+
+
+# Tree the project
+tree:
+	tree -I 'node_modules|__pycache__|scripts|debug|.o|deps|release|target'
+
+# Getting corefiles
+corefiles:
+	{{UV_RUN}} files-to-prompt -e rs -e py -e toml --ignore "node_modules|__pycache__|scripts|debug|.o|deps|release|target|inputs" . | pbcopy
