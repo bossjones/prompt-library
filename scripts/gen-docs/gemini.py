@@ -1,4 +1,5 @@
 # USAGE: python gemini.py config.yaml < input.txt
+# SOURCE: https://github.com/dstoc/gen-docs/tree/00bd651872141dec56b6d27983ed9d9db1b56123
 from __future__ import annotations
 
 import os

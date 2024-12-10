@@ -1,6 +1,19 @@
-import xml.etree.ElementTree as ET
+from __future__ import annotations
 
-def get_urls_from_local_sitemap(file_path):
+from typing import List
+
+from defusedxml import ElementTree as ET
+
+
+def get_urls_from_local_sitemap(file_path: str) -> list[str]:
+    """Parse a local sitemap XML file and extract all URLs.
+
+    Args:
+        file_path: Path to the sitemap XML file.
+
+    Returns:
+        List of URLs extracted from the sitemap.
+    """
     tree = ET.parse(file_path)
     root = tree.getroot()
 
@@ -9,6 +22,7 @@ def get_urls_from_local_sitemap(file_path):
         urls.append(url.text)
 
     return urls
+
 
 sitemap_file = "sitemap-helldivers_en-NS_0-0.xml"
 urls = get_urls_from_local_sitemap(sitemap_file)
