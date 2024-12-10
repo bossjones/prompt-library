@@ -24,6 +24,42 @@ This repository contains a structured collection of prompts for various AI tasks
 
 - `templates/`: Reusable prompt structures and templates
 
+## Folder Layout Details
+
+### Core Directories
+
+- `agents/`: Contains prompts designed for continuous use in automated systems
+  - Each subdirectory focuses on specific types of tasks (creative or engineering)
+  - Includes standardized prompt formats for consistent output
+
+- `one-off-tasks/`: Houses prompts intended for single-use scenarios
+  - Each subdirectory contains task-specific prompts
+  - Example: `lore-writing/helldivers2/johnhelldiver/` shows a complete prompt structure with:
+    - `prompt.xml`: The actual prompt definition
+    - `README.md`: Usage instructions and context
+    - `metadata.json`: Technical details about the prompt
+    - `examples/`: Sample outputs and use cases
+
+- `templates/`: Contains reusable structures for creating new prompts
+  - `prompt_template.xml`: Base structure for XML prompts
+  - `readme_template.md`: Template for prompt documentation
+  - `metadata_template.json`: Standard metadata format
+
+### Key Files
+
+- `prompt_schema.xsd`: XML schema definition for validating prompt structure
+- `.gitignore`: Specifies which files Git should ignore
+- `Justfile`: Contains automation commands for common tasks
+- `pyproject.toml`: Python project configuration and tool settings
+
+### Documentation
+
+Each directory contains its own `README.md` that explains:
+- Purpose of that prompt category
+- Expected inputs/outputs
+- Special considerations
+- Usage examples
+
 ## Usage
 
 1. Navigate to the appropriate category for your task

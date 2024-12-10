@@ -14,16 +14,16 @@ from src.prompt_library.modules.typings import ModelRanking, MultiLLMPromptExecu
 load_dotenv()
 
 
-def pull_in_dir_recursively(dir: str) -> dict[str, str]:
+def pull_in_dir_recursively(directory: str) -> dict[str, str]:
     """Recursively read all files in a directory and its subdirectories.
 
     Args:
-        dir: The directory path to read from.
+        directory: The directory path to read from.
 
     Returns:
         A dictionary mapping relative file paths to their contents.
     """
-    if not os.path.exists(dir):
+    if not os.path.exists(directory):
         return {}
 
     result: dict[str, str] = {}
@@ -32,13 +32,13 @@ def pull_in_dir_recursively(dir: str) -> dict[str, str]:
         for item in os.listdir(current_dir):
             item_path = os.path.join(current_dir, item)
             if os.path.isfile(item_path):
-                relative_path = os.path.relpath(item_path, dir)
+                relative_path = os.path.relpath(item_path, directory)
                 with open(item_path, encoding="utf-8") as f:
                     result[relative_path] = f.read()
             elif os.path.isdir(item_path):
                 recursive_read(item_path)
 
-    recursive_read(dir)
+    recursive_read(directory)
     return result
 
 
@@ -48,7 +48,7 @@ def pull_in_prompt_library() -> dict[str, str]:
     Returns:
         A dictionary mapping relative file paths to their contents.
     """
-    prompt_library_dir = os.getenv("PROMPT_LIBRARY_DIR", "./prompt_library")
+    prompt_library_dir = os.getenv("PROMPT_LIBRARY_DIR", "./src/prompt_library/data/prompt_lib")
     return pull_in_dir_recursively(prompt_library_dir)
 
 
@@ -58,7 +58,7 @@ def pull_in_testable_prompts() -> dict[str, str]:
     Returns:
         A dictionary mapping relative file paths to their contents.
     """
-    testable_prompts_dir = os.getenv("TESTABLE_PROMPTS_DIR", "./testable_prompts")
+    testable_prompts_dir = os.getenv("TESTABLE_PROMPTS_DIR", "./src/prompt_library/data/testable_prompts")
     return pull_in_dir_recursively(testable_prompts_dir)
 
 
@@ -73,7 +73,7 @@ def record_llm_execution(prompt: str, list_model_execution_dict: list[dict], pro
     Returns:
         The filepath where the execution record was saved.
     """
-    execution_dir = os.getenv("PROMPT_EXECUTIONS_DIR", "./prompt_executions")
+    execution_dir = os.getenv("PROMPT_EXECUTIONS_DIR", "./src/prompt_library/data/prompt_executions")
     os.makedirs(execution_dir, exist_ok=True)
 
     if prompt_template:
@@ -106,7 +106,9 @@ def get_rankings() -> list[ModelRanking]:
     Returns:
         A list of ModelRanking objects representing the current rankings.
     """
-    rankings_file = os.getenv("LANGUAGE_MODEL_RANKINGS_FILE", "./language_model_rankings/rankings.json")
+    rankings_file = os.getenv(
+        "LANGUAGE_MODEL_RANKINGS_FILE", "./src/prompt_library/data/language_model_rankings/rankings.json"
+    )
     if not os.path.exists(rankings_file):
         return []
     with open(rankings_file, encoding="utf-8") as f:
@@ -120,7 +122,9 @@ def save_rankings(rankings: list[ModelRanking]) -> None:
     Args:
         rankings: List of ModelRanking objects to save.
     """
-    rankings_file = os.getenv("LANGUAGE_MODEL_RANKINGS_FILE", "./language_model_rankings/rankings.json")
+    rankings_file = os.getenv(
+        "LANGUAGE_MODEL_RANKINGS_FILE", "./src/prompt_library/data/language_model_rankings/rankings.json"
+    )
     os.makedirs(os.path.dirname(rankings_file), exist_ok=True)
     rankings_dict = [ranking.model_dump() for ranking in rankings]
     with open(rankings_file, "w", encoding="utf-8") as f:
