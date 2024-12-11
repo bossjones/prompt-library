@@ -14,8 +14,8 @@
 ## show this help message and exit
 #help: xxx
 
-#######
-# Main:
+#############
+# Main model:
 ## Specify the OpenAI API key
 #openai-api-key: xxx
 
@@ -114,7 +114,7 @@ env-file: aider_configs/.env
 cache-prompts: true
 
 ## Number of times to ping at 5min intervals to keep prompt cache warm (default: 0)
-cache-keepalive-pings: 2
+cache-keepalive-pings: 5
 
 ###################
 # Repomap Settings:
@@ -344,3 +344,31 @@ encoding: utf-8
 
 ## Specify the language for voice using ISO 639-1 code (default: auto)
 #voice-language: en
+
+## Enable/disable watching files for ai coding comments (default: False)
+#watch-files: false
+
+############
+# Analytics:
+## Enable/disable analytics for current session (default: random)
+#analytics: xxx
+
+## Specify a file to log analytics events
+#analytics-log: xxx
+
+## Permanently disable analytics
+#analytics-disable: false
+
+############
+# Upgrading:
+## Enable automatic copy/paste of chat between aider and web UI (default: False)
+#copy-paste: false
+
+## Enable/disable fancy input with history and completion (default: True)
+#fancy-input: true
+
+## Enable/disable detection and offering to add URLs to chat (default: True)
+#detect-urls: true
+
+## Specify which editor to use for the /editor command
+#editor: xxx
