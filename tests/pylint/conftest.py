@@ -64,6 +64,32 @@ def marimo_cell_validator_fixture() -> ModuleType:
     )
 
 
+@pytest.fixture(name="marimo_imports_validator", scope="package")
+def marimo_imports_validator_fixture() -> ModuleType:
+    """Fixture to provide the Marimo imports validator module.
+
+    Returns:
+        ModuleType: The loaded Marimo imports validator module
+    """
+    return _load_plugin_from_file(
+        "marimo_imports_validator",
+        "pylint/plugins/marimo_imports_validator.py",
+    )
+
+
+@pytest.fixture(name="marimo_function_validator", scope="package")
+def marimo_function_validator_fixture() -> ModuleType:
+    """Fixture to provide the Marimo function validator module.
+
+    Returns:
+        ModuleType: The loaded Marimo function validator module
+    """
+    return _load_plugin_from_file(
+        "marimo_function_validator",
+        "pylint/plugins/marimo_function_validator.py",
+    )
+
+
 @pytest.fixture(name="marimo_checker")
 def marimo_checker_fixture(marimo_cell_validator: ModuleType, linter: UnittestLinter) -> BaseChecker:
     """Fixture to provide a Marimo checker instance.
@@ -78,6 +104,38 @@ def marimo_checker_fixture(marimo_cell_validator: ModuleType, linter: UnittestLi
     marimo_checker = marimo_cell_validator.MarimoChecker(linter)
     marimo_checker.module = "prompt_library.marimo_test"
     return marimo_checker
+
+
+@pytest.fixture(name="marimo_imports_checker")
+def marimo_imports_checker_fixture(marimo_imports_validator: ModuleType, linter: UnittestLinter) -> BaseChecker:
+    """Fixture to provide a Marimo imports checker instance.
+
+    Args:
+        marimo_imports_validator: The Marimo imports validator module
+        linter: The pylint linter instance
+
+    Returns:
+        BaseChecker: An instance of the Marimo imports checker
+    """
+    marimo_imports_checker = marimo_imports_validator.MarimoImportsChecker(linter)
+    marimo_imports_checker.module = "prompt_library.marimo_test"
+    return marimo_imports_checker
+
+
+@pytest.fixture(name="marimo_function_checker")
+def marimo_function_checker_fixture(marimo_function_validator: ModuleType, linter: UnittestLinter) -> BaseChecker:
+    """Fixture to provide a Marimo function checker instance.
+
+    Args:
+        marimo_function_validator: The Marimo function validator module
+        linter: The pylint linter instance
+
+    Returns:
+        BaseChecker: An instance of the Marimo function checker
+    """
+    marimo_function_checker = marimo_function_validator.MarimoFunctionChecker(linter)
+    marimo_function_checker.module = "prompt_library.marimo_test"
+    return marimo_function_checker
 
 
 @pytest.fixture(name="linter")
