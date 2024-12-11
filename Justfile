@@ -838,3 +838,82 @@ pylint-to-ruff:
 	{{UV_RUN}} pylint-to-ruff
 
 test-debug: uv_new_unittests_debug open-coverage
+
+pyright-verify-types:
+	#!/bin/bash
+	# Get the list of installed packages
+	packages=$(uv run pip freeze | cut -d '=' -f 1)
+
+	rm -f pyright-verify-types.log
+	touch pyright-verify-types.log
+
+	# Iterate through each package
+	for package in $packages; do
+	    echo "Checking package: $package"
+	    echo "----------------------------------------"
+
+	    # Run pyright and print the output
+	    # uv run pyright --verifytypes "$package" --verbose
+	    uv run pyright --verifytypes "$package" | tee -a pyright-verify-types.log
+
+	    echo "----------------------------------------"
+	done
+
+	echo "Verification complete."
+
+pyright-createstubs:
+	#!/bin/bash
+
+	# Function to run pyright-verify-types and capture output
+	run_pyright_verify() {
+	    packages=$(uv run pyright | cut -d '=' -f 1)
+	    output=""
+
+	    for package in $packages; do
+	        output+="Checking package: $package\n"
+	        output+="----------------------------------------\n"
+	        output+=$(pyright --verifytypes "$package")
+	        output+="\n----------------------------------------\n"
+	    done
+
+	    echo "$output"
+	}
+
+	# Run pyright-verify-types and store the output
+	current_output=$(run_pyright_verify)
+
+	# Check if previous output file exists
+	if [ -f "previous_output.log" ]; then
+	    previous_output=$(cat previous_output.log)
+
+	    # Compare current and previous outputs
+	    if [ "$current_output" != "$previous_output" ]; then
+	        echo "Changes detected. Updating typestubs..."
+
+	        # Update typestubs for each package
+	        packages=$(uv run pip freeze | cut -d '=' -f 1)
+	        for package in $packages; do
+	            echo "Updating typestubs for $package"
+	            pyright --createstub "$package"
+	        done
+
+	        echo "Typestubs updated successfully."
+	    else
+	        echo "No changes detected. Typestubs are up to date."
+	    fi
+	else
+	    echo "No previous output found. Creating initial output file."
+	fi
+
+	# Save current output for future comparison
+	echo "$current_output" > previous_output.log
+
+	echo "Script execution completed."
+
+pyright-createstubs-missing:
+	#!/bin/bash
+	# Run pyright and capture output
+	uv run pyright . | grep -E "warning: Stub file not found for \"[^\"]+\"" | sed -E 's/.*"([^"]+)".*/\1/' | sort -u | while read package; do
+		echo "Creating stub for package: $package"
+		uv run pyright --createstub "$package"
+	done
