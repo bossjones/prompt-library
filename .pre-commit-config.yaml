@@ -1,5 +1,5 @@
 ---
-exclude: ^democracy_exe/alembic/.*
+exclude: ^prompt_library/alembic/.*
 # To use:
 #
 #     pre-commit run -a
@@ -81,3 +81,14 @@ repos:
     hooks:
       - id: python-no-log-warn
       # - id: text-unicode-replacement-char
+
+  # NOTE: This requires you to brew install taplo
+  - repo: local
+    hooks:
+      - id: detect-pytest-live-log
+        name: detect-pytest-live-log
+        entry: bash -x ./detect_pytest_live_logging.sh
+        language: system
+        types:
+          - toml
+        files: ^pyproject.*$

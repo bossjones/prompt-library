@@ -679,7 +679,7 @@ tests/fixtures/25MB_song.mp3
 ruff_config.toml
 .virtual_documents/
 notebooks/e2e_evals.ipynb
-democracy_exe/data/chroma/vectorstorage/
+prompt_library/data/chroma/vectorstorage/
 file.out
 
 typingcov_cobertura/*
@@ -706,21 +706,21 @@ runtime_time_table.jsonl
 bup/
 notebooks/travel2.backup.sqlite
 notebooks/travel2.sqlite
-democracy_exe/vendored/dpytest
-democracy_exe/vendored/langgraph
-democracy_exe/vendored/langchain
+prompt_library/vendored/dpytest
+prompt_library/vendored/langgraph
+prompt_library/vendored/langchain
 .env.langraph
-democracy_exe/vendored/goob_ai
-democracy_exe/vendored/brevia
-democracy_exe/vendored/chat-langchain
-democracy_exe/vendored/sandbox_agent
-democracy_exe/vendored/retrieval-agent-template
-democracy_exe/vendored/rag-research-agent-template
-democracy_exe/vendored/memory-template
-democracy_exe/vendored/react-agent
-democracy_exe/vendored/cerebro-bot
-democracy_exe/vendored/langchain-academy/
-democracy_exe/vendored/dpytest
+prompt_library/vendored/goob_ai
+prompt_library/vendored/brevia
+prompt_library/vendored/chat-langchain
+prompt_library/vendored/prompt_library
+prompt_library/vendored/retrieval-agent-template
+prompt_library/vendored/rag-research-agent-template
+prompt_library/vendored/memory-template
+prompt_library/vendored/react-agent
+prompt_library/vendored/cerebro-bot
+prompt_library/vendored/langchain-academy/
+prompt_library/vendored/dpytest
 helldivers_wiki
 helldivers_wiki.bak
 

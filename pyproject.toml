@@ -468,15 +468,15 @@ max-complexity = 31 # C901: Recommended goal is 10
 
 # 4. Ignore `E402` (import violations) in all `__init__.py` files, and in select subdirectories.
 [tool.ruff.lint.per-file-ignores]
-"src/models/loggers/__init__.py" = ["N815", "B005", "RUF005", "F811"]
-"src/agentic/studio/react/*" = ["N815", "B005", "RUF005"]
-"src/agentic/studio/*" = ["N815", "B005", "RUF005"]
+"src/prompt_library/models/loggers/__init__.py" = ["N815", "B005", "RUF005", "F811"]
+"src/prompt_library/agentic/studio/react/*" = ["N815", "B005", "RUF005"]
+"src/prompt_library/agentic/studio/*" = ["N815", "B005", "RUF005"]
 "cookbook/studio/*" = ["N815", "B005", "RUF005"]
-"src/agentic/graph.py" = ["N815", "B005", "RUF005"]
-"src/agentic/studio/graph.py" = ["N815", "B005", "RUF005"]
-"src/src/gen_ai/models/vectorstores/*" = ["N815"]
+"src/prompt_library/agentic/graph.py" = ["N815", "B005", "RUF005"]
+"src/prompt_library/agentic/studio/graph.py" = ["N815", "B005", "RUF005"]
+"src/prompt_library/prompt_library/gen_ai/models/vectorstores/*" = ["N815"]
 "tests/*" = ["PT011", "S101"]
-"src/src/tutorials/design_patterns/practical_examples/*" = [
+"src/prompt_library/prompt_library/tutorials/design_patterns/practical_examples/*" = [
     "PT018",
     "PLW0211",
     "ISC003",
@@ -835,6 +835,8 @@ source = [
 
 [tool.coverage.run]
 parallel = true
+branch = true
+source = ["prompt_library"]
 
 # NOTE: This might break some SHIT (5/8/2024)
 # SOURCE: https://github.com/anthonycorletti/snok/blob/039ae9aaf403485ce9b7fedb0e1943c25a250eed/snok/templates/__shared/_pyproject_toml#L130
@@ -844,8 +846,6 @@ omit = [
 ]
 
 
-branch = true
-source = ["prompt_library"]
 
 [tool.coverage.html]
 directory = "htmlcov"

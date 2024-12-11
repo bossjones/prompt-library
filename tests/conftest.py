@@ -485,7 +485,7 @@ def mock_ebook_txt_file(tmp_path: Path) -> Path:
         tmp_path / "The Project Gutenberg eBook of A Christmas Carol in Prose; Being a Ghost Story of Christmas.txt"
     )
     shutil.copy(
-        "democracy_exe/data/chroma/documents/The Project Gutenberg eBook of A Christmas Carol in Prose; Being a Ghost Story of Christmas.txt",
+        "prompt_library/data/chroma/documents/The Project Gutenberg eBook of A Christmas Carol in Prose; Being a Ghost Story of Christmas.txt",
         test_ebook_txt_path,
     )
     return test_ebook_txt_path

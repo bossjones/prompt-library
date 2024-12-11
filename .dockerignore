@@ -372,4 +372,4 @@ ruff_config.toml
 .virtual_documents/
 notebooks/e2e_evals.ipynb
 # tests/services/cassettes/.*
-democracy_exe/data/chroma/vectorstorage/
+prompt_library/data/chroma/vectorstorage/

@@ -1,6 +1,11 @@
 from __future__ import annotations
 
-from .modules import chain, prompt_library_module, typings, utils
+import logging
+
+from prompt_library.__version__ import __version__
 
 
-__all__ = ["chain", "prompt_library_module", "typings", "utils"]
+logging.getLogger("asyncio").setLevel(logging.DEBUG)
+logging.getLogger("httpx").setLevel(logging.DEBUG)
+logging.getLogger("faker").setLevel(logging.DEBUG)
+logging.getLogger("sentry_sdk").setLevel(logging.WARNING)

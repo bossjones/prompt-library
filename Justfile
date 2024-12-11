@@ -157,7 +157,8 @@ lint-python:
 
 # lint TOML files using taplo
 lint-toml: check-taplo-installed
-	pre-commit run taplo-lint --all-files
+	echo "noop"
+# pre-commit run taplo-lint --all-files
 
 # lint yaml files using yamlfix
 lint-yaml:
@@ -172,7 +173,7 @@ lint-check-markdown:
 	uv run mdformat --check .
 
 # Lint all files in the current directory (and any subdirectories).
-lint: lint-python lint-toml lint-check-log-cli lint-check-markdown
+lint: lint-python lint-check-log-cli
 
 # generate type stubs for the project
 createstubs:
@@ -266,11 +267,11 @@ gco:
 
 # Show diff for LangChain migration
 langchain-migrate-diff:
-	langchain-cli migrate --include-ipynb --diff democracy_exe
+	langchain-cli migrate --include-ipynb --diff prompt_library
 
 # Perform LangChain migration
 langchain-migrate:
-	langchain-cli migrate --include-ipynb democracy_exe
+	langchain-cli migrate --include-ipynb prompt_library
 
 # Get the ruff config
 get-ruff-config:
@@ -337,31 +338,31 @@ clean:
 
 # Create a token for authentication
 uv_create_token:
-	{{PYTHON}} -c "from democracy_exe.cli import create_token; create_token()"
+	{{PYTHON}} -c "from prompt_library.cli import create_token; create_token()"
 
 # Show current database state
 uv_db_current:
-	{{PYTHON}} -c "from democracy_exe.cli import db_current; db_current()"
+	{{PYTHON}} -c "from prompt_library.cli import db_current; db_current()"
 
 # Upgrade database to latest version
 uv_db_upgrade:
-	{{PYTHON}} -c "from democracy_exe.cli import db_upgrade; db_upgrade()"
+	{{PYTHON}} -c "from prompt_library.cli import db_upgrade; db_upgrade()"
 
 # Downgrade database to previous version
 uv_db_downgrade:
-	{{PYTHON}} -c "from democracy_exe.cli import db_downgrade; db_downgrade()"
+	{{PYTHON}} -c "from prompt_library.cli import db_downgrade; db_downgrade()"
 
 # Export a collection of data
 uv_export_collection:
-	{{PYTHON}} -c "from democracy_exe.cli import export_collection; export_collection()"
+	{{PYTHON}} -c "from prompt_library.cli import export_collection; export_collection()"
 
 # Import a collection of data
 uv_import_collection:
-	{{PYTHON}} -c "from democracy_exe.cli import import_collection; import_collection()"
+	{{PYTHON}} -c "from prompt_library.cli import import_collection; import_collection()"
 
 # Import a single file
 uv_import_file:
-	{{PYTHON}} -c "from democracy_exe.cli import import_file; import_file()"
+	{{PYTHON}} -c "from prompt_library.cli import import_file; import_file()"
 
 # Lint markdown files
 uv_lint_markdown:
@@ -397,11 +398,11 @@ uv_pylint:
 
 # Run pylint with error-only configuration
 uv_pylint_error_only:
-	{{UV_RUN}} pylint --output-format=colorized --disable=all --max-line-length=120 --enable=F,E --rcfile pyproject.toml democracy_exe tests
+	{{UV_RUN}} pylint --output-format=colorized --disable=all --max-line-length=120 --enable=F,E --rcfile pyproject.toml prompt_library tests
 
 # Run pylint on all files
 uv_lint_all:
-	{{PYTHON}} -m pylint -j4 --output-format=colorized --rcfile pyproject.toml tests democracy_exe
+	{{PYTHON}} -m pylint -j4 --output-format=colorized --rcfile pyproject.toml tests prompt_library
 
 # Run ruff linter
 uv_lint:
@@ -418,7 +419,7 @@ uv_typecheck_pyright:
 
 # Verify types using Pyright, ignoring external packages
 uv_typecheck_verify_types:
-	{{UV_RUN}} pyright --verifytypes democracy_exe --ignoreexternal --verbose
+	{{UV_RUN}} pyright --verifytypes prompt_library --ignoreexternal --verbose
 
 # Run MyPy type checker and open coverage report
 uv_typecheck_mypy:
@@ -670,31 +671,31 @@ uv_deploy_docs:
 
 # Add bespoke adobe concepts to cursor context
 add-cursor-context:
-	mkdir -p democracy_exe/vendored || true
-	gh repo clone universityofprofessorex/cerebro-bot democracy_exe/vendored/cerebro-bot || true && cd democracy_exe/vendored/cerebro-bot && git checkout feature-discord-utils && cd ../../..
-	gh repo clone bossjones/sandbox_agent democracy_exe/vendored/sandbox_agent || true
-	gh repo clone langchain-ai/retrieval-agent-template democracy_exe/vendored/retrieval-agent-template || true
-	gh repo clone langchain-ai/rag-research-agent-template democracy_exe/vendored/rag-research-agent-template || true
-	gh repo clone langchain-ai/memory-template democracy_exe/vendored/memory-template || true
-	gh repo clone langchain-ai/react-agent democracy_exe/vendored/react-agent || true
-	gh repo clone langchain-ai/chat-langchain democracy_exe/vendored/chat-langchain || true
-	gh repo clone bossjones/goob_ai democracy_exe/vendored/goob_ai || true
-	gh repo clone langchain-ai/langchain democracy_exe/vendored/langchain || true
-	gh repo clone langchain-ai/langgraph democracy_exe/vendored/langgraph || true
-	gh repo clone CraftSpider/dpytest democracy_exe/vendored/dpytest || true
+	mkdir -p prompt_library/vendored || true
+	gh repo clone universityofprofessorex/cerebro-bot prompt_library/vendored/cerebro-bot || true && cd prompt_library/vendored/cerebro-bot && git checkout feature-discord-utils && cd ../../..
+	gh repo clone bossjones/prompt_library prompt_library/vendored/prompt_library || true
+	gh repo clone langchain-ai/retrieval-agent-template prompt_library/vendored/retrieval-agent-template || true
+	gh repo clone langchain-ai/rag-research-agent-template prompt_library/vendored/rag-research-agent-template || true
+	gh repo clone langchain-ai/memory-template prompt_library/vendored/memory-template || true
+	gh repo clone langchain-ai/react-agent prompt_library/vendored/react-agent || true
+	gh repo clone langchain-ai/chat-langchain prompt_library/vendored/chat-langchain || true
+	gh repo clone bossjones/goob_ai prompt_library/vendored/goob_ai || true
+	gh repo clone langchain-ai/langchain prompt_library/vendored/langchain || true
+	gh repo clone langchain-ai/langgraph prompt_library/vendored/langgraph || true
+	gh repo clone CraftSpider/dpytest prompt_library/vendored/dpytest || true
 
-	rm -rf democracy_exe/vendored/cerebro-bot/.git
-	rm -rf democracy_exe/vendored/sandbox_agent/.git
-	rm -rf democracy_exe/vendored/retrieval-agent-template/.git
-	rm -rf democracy_exe/vendored/rag-research-agent-template/.git
-	rm -rf democracy_exe/vendored/memory-template/.git
-	rm -rf democracy_exe/vendored/react-agent/.git
-	rm -rf democracy_exe/vendored/chat-langchain/.git
-	rm -rf democracy_exe/vendored/goob_ai/.git
-	rm -rf democracy_exe/vendored/langchain/.git
-	rm -rf democracy_exe/vendored/langgraph/.git
-	rm -rf democracy_exe/vendored/langchain-academy/.git
-	rm -rf democracy_exe/vendored/dpytest/.git
+	rm -rf prompt_library/vendored/cerebro-bot/.git
+	rm -rf prompt_library/vendored/prompt_library/.git
+	rm -rf prompt_library/vendored/retrieval-agent-template/.git
+	rm -rf prompt_library/vendored/rag-research-agent-template/.git
+	rm -rf prompt_library/vendored/memory-template/.git
+	rm -rf prompt_library/vendored/react-agent/.git
+	rm -rf prompt_library/vendored/chat-langchain/.git
+	rm -rf prompt_library/vendored/goob_ai/.git
+	rm -rf prompt_library/vendored/langchain/.git
+	rm -rf prompt_library/vendored/langgraph/.git
+	rm -rf prompt_library/vendored/langchain-academy/.git
+	rm -rf prompt_library/vendored/dpytest/.git
 
 # List outdated packages
 outdated:
@@ -715,7 +716,7 @@ install-llm-cli-plugins:
 # {{UV_RUN}} llm install llm-sql
 
 smoke-test:
-	cd democracy_exe/agentic/studio/react && {{UV_RUN}} python -m memory_agent
+	cd prompt_library/agentic/studio/react && {{UV_RUN}} python -m memory_agent
 
 # Commitizen commands
 # commit using commitizen

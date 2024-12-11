@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING, Any, Dict, List
 
 import pytest
 
-from src.prompt_library.modules.utils import (
+from prompt_library.modules.utils import (
     build_file_name_session,
     build_file_path,
     current_date_str,

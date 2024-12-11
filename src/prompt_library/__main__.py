@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""democracy_exe.main."""
+"""prompt_library.main."""
 
 from __future__ import annotations
 
