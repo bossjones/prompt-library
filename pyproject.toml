@@ -186,6 +186,14 @@ extend-exclude = [
     "venv",
     "typings",
     "contrib",
+    # Marimo notebook exclusions
+    "marimo_prompt_analysis.py",
+    "marimo_prompt_library.py",
+    "marimo_adhoc_prompting.py",
+    "marimo_is_awesome_demo.py",
+    "marimo_multi_llm_prompting.py",
+    "marimo_multi_language_model_ranker.py",
+    ".marimo",
 ]
 
 # https://docs.astral.sh/ruff/settings/#indent-width

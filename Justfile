@@ -778,47 +778,55 @@ download-read-the-docs:
 
 # Edit the marimo demo notebook
 marimo-demo-edit:
-	{{UV_RUN}} marimo edit mariomo_is_awesome_demo.py
+	{{UV_RUN}} marimo edit marimo_is_awesome_demo.py
 
 # Run the marimo demo notebook
 marimo-demo-run:
-	{{UV_RUN}} marimo run mariomo_is_awesome_demo.py
+	{{UV_RUN}} marimo run marimo_is_awesome_demo.py
 
 # Edit the ad-hoc prompting notebook
 marimo-adhoc-edit:
-	{{UV_RUN}} marimo edit mariomo_adhoc_prompting.py
+	{{UV_RUN}} marimo edit marimo_adhoc_prompting.py
 
 # Run the ad-hoc prompting notebook
 marimo-adhoc-run:
-	{{UV_RUN}} marimo run mariomo_adhoc_prompting.py
+	{{UV_RUN}} marimo run marimo_adhoc_prompting.py
 
 # Edit the prompt library notebook
 marimo-library-edit:
-	{{UV_RUN}} marimo edit mariomo_prompt_library.py
+	{{UV_RUN}} marimo edit marimo_prompt_library.py
 
 # Run the prompt library notebook
 marimo-library-run:
-	{{UV_RUN}} marimo run mariomo_prompt_library.py
+	{{UV_RUN}} marimo run marimo_prompt_library.py
 
 # Edit the multi-LLM prompting notebook
 marimo-multi-llm-edit:
-	{{UV_RUN}} marimo edit mariomo_multi_llm_prompting.py
+	{{UV_RUN}} marimo edit marimo_multi_llm_prompting.py
 
 # Run the multi-LLM prompting notebook
 marimo-multi-llm-run:
-	{{UV_RUN}} marimo run mariomo_multi_llm_prompting.py
+	{{UV_RUN}} marimo run marimo_multi_llm_prompting.py
 
 # Edit the multi language model ranker notebook
 marimo-ranker-edit:
-	{{UV_RUN}} marimo edit mariomo_multi_language_model_ranker.py
+	{{UV_RUN}} marimo edit marimo_multi_language_model_ranker.py
 
 # Run the multi language model ranker notebook
 marimo-ranker-run:
-	{{UV_RUN}} marimo run mariomo_multi_language_model_ranker.py
+	{{UV_RUN}} marimo run marimo_multi_language_model_ranker.py
+
+# Edit the prompt analysis notebook
+marimo-analysis-edit:
+	{{UV_RUN}} marimo edit marimo_prompt_analysis.py
+
+# Run the prompt analysis notebook
+marimo-analysis-run:
+	{{UV_RUN}} marimo run marimo_prompt_analysis.py
 
 # Run all marimo notebooks
 marimo-run-all:
-	{{UV_RUN}} marimo run mariomo_is_awesome_demo.py mariomo_adhoc_prompting.py mariomo_prompt_library.py mariomo_multi_llm_prompting.py mariomo_multi_language_model_ranker.py
+	{{UV_RUN}} marimo run marimo_is_awesome_demo.py marimo_adhoc_prompting.py marimo_prompt_library.py marimo_multi_llm_prompting.py marimo_multi_language_model_ranker.py marimo_prompt_analysis.py
 
 
 

@@ -1,5 +1,3 @@
-
-
 <?xml version="1.0" encoding="UTF-8"?>
 <cursorrules>
   <purpose>
@@ -215,7 +213,7 @@ prompt-library/
 │   │   └── quote-generation/
 │   │
 │   └── engineering/
-│       ├��─ code-generation/
+│       ├ code-generation/
 │       ├── code-review/
 │       ├── bug-finding/
 │       └── style-enforcement/
@@ -378,4 +376,452 @@ prompt-library/
     <point>Templates folder promotes consistency in prompt creation.</point>
     <point>README file provides clear documentation for all users.</point>
   </reasoning>
+
+  <prompt_engineering_standards>
+    <xml_structure>
+      <standard>Use clear, descriptive tag names that are self-explanatory (e.g., &lt;context&gt;, &lt;task&gt;, &lt;examples&gt;).</standard>
+      <standard>Organize content hierarchically with proper nesting of tags.</standard>
+      <standard>Maintain consistent tag usage throughout prompts.</standard>
+      <standard>Use line breaks and indentation for readability.</standard>
+    </xml_structure>
+
+    <component_organization>
+      <standard>Separate different components with distinct tags.</standard>
+      <standard>Use &lt;context&gt; for background information.</standard>
+      <standard>Use &lt;instructions&gt; for specific directives.</standard>
+      <standard>Use &lt;examples&gt; for sample inputs and outputs.</standard>
+      <standard>Use &lt;output_format&gt; to define response structure.</standard>
+      <standard>Use &lt;reflection&gt; for AI thinking steps.</standard>
+    </component_organization>
+
+    <best_practices>
+      <standard>Include only necessary information in each tag.</standard>
+      <standard>Number or bullet point instructions for clarity.</standard>
+      <standard>Use variables with descriptive names (e.g., &lt;variable_name&gt;{{value}}&lt;/variable_name&gt;).</standard>
+      <standard>Combine XML tags with other prompt engineering techniques when appropriate.</standard>
+      <standard>Include validation using XSD schemas for prompt structure.</standard>
+    </best_practices>
+
+    <reflection_patterns>
+      <standard>Include explicit thinking steps in prompts using &lt;reflection&gt; tags.</standard>
+      <standard>Break down complex tasks into clear steps.</standard>
+      <standard>Use chain-of-thought prompting for complex reasoning.</standard>
+      <example>
+        <![CDATA[
+        <prompt>
+          <context>Analyzing a complex codebase for refactoring.</context>
+          <reflection>
+            1. First, I'll identify the main components and their relationships
+            2. Then, I'll analyze each component for SOLID principles
+            3. Finally, I'll propose specific refactoring steps
+          </reflection>
+          <output_format>
+            Provide a structured analysis with:
+            - Component relationships
+            - SOLID violations
+            - Refactoring proposals
+          </output_format>
+        </prompt>
+        ]]>
+      </example>
+    </reflection_patterns>
+
+    <variable_handling>
+      <standard>Use descriptive variable names in XML tags.</standard>
+      <standard>Include type hints and validation rules for variables.</standard>
+      <standard>Document expected formats and constraints.</standard>
+      <example>
+        <![CDATA[
+        <prompt>
+          <variables>
+            <code_snippet type="python" max_length="500">{{code_to_review}}</code_snippet>
+            <style_guide type="url">{{style_guide_link}}</style_guide>
+            <severity_level type="enum" values="high,medium,low">{{severity}}</severity_level>
+          </variables>
+          <task>Review the code according to the style guide at the specified severity level.</task>
+        </prompt>
+        ]]>
+      </example>
+    </variable_handling>
+  </prompt_engineering_standards>
+
+  <marimo_standards>
+    <cell_definition>
+      <standard>All cells must be decorated with @app.cell and contain proper docstrings.</standard>
+      <standard>Always use explicit tuple returns, even for single values.</standard>
+      <standard>Include proper type hints for all parameters and return values.</standard>
+      <example>
+        <![CDATA[
+        # ✅ Correct Pattern
+        @app.cell
+        def __(previous_cell_output: str) -> tuple[str]:
+            """Process the output from previous cell and return formatted result.
+
+            Args:
+                previous_cell_output: The string output from previous cell
+
+            Returns:
+                tuple[str]: Processed result wrapped in a tuple
+            """
+            result = process_data(previous_cell_output)
+            return (result,)  # Note the comma for single-item tuple
+
+        # ❌ Common Errors
+        @app.cell
+        def __():  # Missing type hints
+            result = process_data()
+            return result  # Missing tuple wrapping
+
+        @app.cell
+        def __():
+            # Missing docstring
+            return (result)  # Missing comma for single-item tuple
+        ]]>
+      </example>
+    </cell_definition>
+
+    <state_management>
+      <standard>All cell dependencies must be explicitly declared as parameters.</standard>
+      <standard>Avoid mutating shared state between cells.</standard>
+      <standard>Use proper typing for all state variables.</standard>
+      <example>
+        <![CDATA[
+        # ✅ Correct Pattern
+        @app.cell
+        def __(data: pd.DataFrame, config: dict[str, Any]) -> tuple[pd.DataFrame]:
+            """Transform input data based on configuration.
+
+            Args:
+                data: Input DataFrame to transform
+                config: Configuration dictionary with transform parameters
+
+            Returns:
+                tuple[pd.DataFrame]: Transformed DataFrame in a tuple
+            """
+            transformed = transform_data(data, config)
+            return (transformed,)
+
+        # ❌ Common Errors
+        global_var = []  # Avoid global state
+
+        @app.cell
+        def __():
+            global_var.append(1)  # Mutating global state
+            return ()  # Empty tuple return
+        ]]>
+      </example>
+    </state_management>
+
+    <ui_components>
+      <standard>UI components should be created and modified through the reactive system.</standard>
+      <standard>Use proper typing for all UI components.</standard>
+      <standard>Include descriptive labels and help text.</standard>
+      <example>
+        <![CDATA[
+        # ✅ Correct Pattern
+        @app.cell
+        def __() -> tuple[mo.ui.Select, mo.ui.Slider]:
+            """Create UI components for model selection and temperature control.
+
+            Returns:
+                tuple[mo.ui.Select, mo.ui.Slider]: Model selector and temperature slider
+            """
+            model_select = mo.ui.Select(
+                options=["gpt-4", "gpt-3.5-turbo"],
+                value="gpt-3.5-turbo",
+                label="Select Model",
+                help="Choose the model to use for generation"
+            )
+
+            temp_slider = mo.ui.Slider(
+                value=0.7,
+                min=0.0,
+                max=1.0,
+                step=0.1,
+                label="Temperature",
+                help="Controls randomness in generation"
+            )
+
+            return (model_select, temp_slider)
+
+        # ❌ Common Errors
+        @app.cell
+        def __(slider):
+            slider.value = 0.5  # Direct mutation - avoid this
+            return ()
+        ]]>
+      </example>
+    </ui_components>
+
+    <error_handling>
+      <standard>Use proper error boundaries and guards in each cell.</standard>
+      <standard>Provide descriptive error messages with context.</standard>
+      <standard>Use mo.stop() for validation guards.</standard>
+      <example>
+        <![CDATA[
+        # ✅ Correct Pattern
+        @app.cell
+        def __(form: mo.ui.Form, mo: Any) -> tuple[str]:
+            """Process form data with proper error handling.
+
+            Args:
+                form: The form UI component
+                mo: The marimo module
+
+            Returns:
+                tuple[str]: Processing result or error message
+            """
+            # Guard clause
+            mo.stop(not form.value, "Please fill out the form")
+
+            try:
+                result = process_form_data(form.value)
+                return (result,)
+            except ValidationError as e:
+                mo.md(f"""
+                ❌ **Validation Error**:
+                ```
+                {str(e)}
+                ```
+                Please check your input and try again.
+                """).style({
+                    "color": "red",
+                    "padding": "10px",
+                    "border-radius": "5px",
+                    "background": "#ffebee"
+                })
+                return ("",)
+            except Exception as e:
+                mo.md(f"""
+                ❌ **Unexpected Error**:
+                ```
+                {str(e)}
+                ```
+                Please contact support if this persists.
+                """).style({
+                    "color": "red",
+                    "padding": "10px",
+                    "border-radius": "5px",
+                    "background": "#ffebee"
+                })
+                return ("",)
+
+        # ❌ Common Errors
+        @app.cell
+        def __():
+            result = process_data()  # Missing try/except
+            return (result,)
+        ]]>
+      </example>
+    </error_handling>
+
+    <cell_dependencies>
+      <standard>All cell dependencies must be explicitly declared.</standard>
+      <standard>Avoid circular dependencies between cells.</standard>
+      <standard>Use proper ordering of cells based on dependencies.</standard>
+      <example>
+        <![CDATA[
+        # ✅ Correct Pattern
+        @app.cell
+        def __(data: pd.DataFrame) -> tuple[dict[str, Any]]:
+            """Process input data and return statistics.
+
+            Args:
+                data: Input DataFrame to analyze
+
+            Returns:
+                tuple[dict[str, Any]]: Dictionary of statistics
+            """
+            stats = calculate_statistics(data)
+            return (stats,)
+
+        @app.cell
+        def __(stats: dict[str, Any]) -> tuple[mo.md]:
+            """Create markdown display of statistics.
+
+            Args:
+                stats: Dictionary of statistics to display
+
+            Returns:
+                tuple[mo.md]: Formatted markdown output
+            """
+            return (mo.md(f"Statistics:\n{stats}"),)
+
+        # ❌ Common Errors
+        # Circular dependency
+        @app.cell
+        def __(cell2_output):
+            return (cell2_output * 2,)
+
+        @app.cell
+        def __(cell1_output):
+            return (cell1_output + 1,)
+        ]]>
+      </example>
+    </cell_dependencies>
+
+    <ui_styling>
+      <standard>Use consistent styling objects for UI components.</standard>
+      <standard>Follow Material Design principles for component styling.</standard>
+      <standard>Maintain responsive design patterns.</standard>
+      <example>
+        <![CDATA[
+        @app.cell
+        def __() -> tuple[dict[str, Any]]:
+            """Define reusable UI styles.
+
+            Returns:
+                tuple[dict[str, Any]]: Dictionary of style configurations
+            """
+            styles = {
+                "container": {
+                    "max-width": "800px",
+                    "margin": "0 auto",
+                    "padding": "20px",
+                },
+                "card": {
+                    "background": "#ffffff",
+                    "border-radius": "8px",
+                    "box-shadow": "0 2px 4px rgba(0,0,0,0.1)",
+                    "padding": "16px",
+                    "margin-bottom": "16px",
+                },
+                "error": {
+                    "color": "red",
+                    "padding": "10px",
+                    "border-radius": "5px",
+                    "background": "#ffebee",
+                },
+                "success": {
+                    "color": "green",
+                    "padding": "10px",
+                    "border-radius": "5px",
+                    "background": "#e8f5e9",
+                }
+            }
+            return (styles,)
+
+        @app.cell
+        def __(styles: dict[str, Any]) -> tuple[mo.md]:
+            """Create styled UI components.
+
+            Args:
+                styles: Dictionary of style configurations
+
+            Returns:
+                tuple[mo.md]: Styled markdown component
+            """
+            return (
+                mo.md("# Dashboard").style(styles["container"]),
+            )
+        ]]>
+      </example>
+    </ui_styling>
+
+    <python_differences>
+      <standard>Understand key differences from regular Python code.</standard>
+      <standard>Follow Marimo-specific patterns for state and reactivity.</standard>
+      <example>
+        <![CDATA[
+        # Regular Python vs Marimo Patterns
+
+        # ❌ Regular Python - Global State
+        global_counter = 0
+        def increment():
+            global global_counter
+            global_counter += 1
+
+        # ✅ Marimo - Reactive State
+        @app.cell
+        def __() -> tuple[int]:
+            """Initialize counter state.
+
+            Returns:
+                tuple[int]: Initial counter value
+            """
+            return (0,)
+
+        @app.cell
+        def __(counter: int) -> tuple[int]:
+            """Increment counter reactively.
+
+            Args:
+                counter: Current counter value
+
+            Returns:
+                tuple[int]: Incremented counter value
+            """
+            return (counter + 1,)
+
+        # ❌ Regular Python - Direct DOM Updates
+        def update_ui():
+            document.getElementById("result").innerHTML = "Updated"
+
+        # ✅ Marimo - Reactive UI Updates
+        @app.cell
+        def __(data: Any) -> tuple[mo.md]:
+            """Update UI reactively based on data changes.
+
+            Args:
+                data: Data to display
+
+            Returns:
+                tuple[mo.md]: Updated UI component
+            """
+            return (mo.md(f"Result: {data}"),)
+        ]]>
+      </example>
+    </python_differences>
+
+    <reactive_patterns>
+      <standard>Use reactive programming patterns for UI and state updates.</standard>
+      <standard>Maintain unidirectional data flow.</standard>
+      <standard>Handle side effects properly in reactive contexts.</standard>
+      <example>
+        <![CDATA[
+        # ✅ Correct Reactive Pattern
+        @app.cell
+        def __() -> tuple[mo.ui.Text, mo.ui.Button]:
+            """Create input and action components.
+
+            Returns:
+                tuple[mo.ui.Text, mo.ui.Button]: Text input and submit button
+            """
+            text_input = mo.ui.text(placeholder="Enter text")
+            submit_btn = mo.ui.button("Submit")
+            return (text_input, submit_btn)
+
+        @app.cell
+        def __(
+            text_input: mo.ui.Text,
+            submit_btn: mo.ui.Button
+        ) -> tuple[mo.md]:
+            """Handle reactive updates based on input changes.
+
+            Args:
+                text_input: Text input component
+                submit_btn: Submit button component
+
+            Returns:
+                tuple[mo.md]: Updated display component
+            """
+            if not submit_btn.clicked:
+                return (mo.md("Waiting for submission..."),)
+
+            if not text_input.value:
+                return (mo.md("Please enter some text."),)
+
+            return (mo.md(f"Submitted: {text_input.value}"),)
+
+        # ❌ Common Anti-patterns
+        @app.cell
+        def __(text_input: mo.ui.Text):
+            # Direct mutation of state
+            global_state["text"] = text_input.value
+            # Missing tuple return
+            return text_input.value
+        ]]>
+      </example>
+    </reactive_patterns>
+  </marimo_standards>
 </cursorrules>

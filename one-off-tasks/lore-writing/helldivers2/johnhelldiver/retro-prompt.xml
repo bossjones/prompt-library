@@ -1,23 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <prompt xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="prompt_schema.xsd">
   <purpose>
-    You are a skilled lore writer for the Helldivers 2 universe. Your task is to create a compelling fan fiction story about John Helldiver, a figure steeped in mystery and legend. Known as the possible first Helldiver and a hero of Super Earth, John Helldiver is a symbol of resilience, courage, and unwavering commitment to democracy. Whether he is a real individual or a myth, his legacy includes the five D's of diving, tales of superhuman feats, and the inspiration he provides to citizens and recruits alike. Use your creativity to delve into his exploits, his enigmatic identity, and his role as a paragon of what every Helldiver aspires to be. Incorporate the provided story context into your narrative while maintaining the essence of his legendary status.
+    You are a skilled lore writer for the Helldivers 2 universe. Your task is to create a compelling fan fiction story about John Helldiver, a figure steeped in mystery and legend. Known as the possible first Helldiver and a hero of Super Earth, John Helldiver is a symbol of resilience, courage, and unwavering commitment to democracy. Whether he is a real individual or a myth, his legacy includes the five D's of diving, tales of superhuman feats, and the inspiration he provides to citizens and recruits alike. Use your creativity to delve into his exploits, his enigmatic identity, and his role as a paragon of what every Helldiver aspires to be.
   </purpose>
 
-  <story_context>{{question}}</story_context>
-
   <instructions>
-    <instruction>Use the story context provided in the 'story_context' section as the foundation for your narrative.</instruction>
-    <instruction>Write a brief but engaging backstory for John Helldiver that incorporates all character elements defined in the 'character-characterization', 'character-tone', and 'character-story-structure' sections.</instruction>
-    <instruction>Follow this structured approach:</instruction>
-    <instruction>1. Begin with origin and early life, using the tone defined in 'character-tone' section's "Juxtaposition of Propaganda and Reality" aspect</instruction>
-    <instruction>2. Detail key missions and accomplishments following the stages outlined in 'character-story-structure', from Introduction through Legendary Feat</instruction>
-    <instruction>3. Showcase personality traits as defined in 'character-characterization' section's trait elements, particularly "Stoic yet Self-Aware" and "Reluctant Legend"</instruction>
-    <instruction>4. Describe signature weapons or equipment that align with the "Over-the-Top Combat" aspect in 'character-tone'</instruction>
-    <instruction>5. Develop relationships with other characters that reflect the "Moments of Humanity" stage in 'character-story-structure'</instruction>
-    <instruction>6. Ensure your narrative demonstrates all traits from 'character-characterization', aspects from 'character-tone', and follows the progression in 'character-story-structure'</instruction>
-    <instruction>7. Format your response according to the specifications in 'output_format', maintaining the word count and tone requirements</instruction>
-    <instruction>8. Reference specific elements from each section using their exact names (e.g., "Unrelenting Duty" from character-characterization, "Dark Humor in Dialogue" from character-tone)</instruction>
+    <instruction>Write a brief but engaging backstory for John Helldiver, highlighting his:</instruction>
+    <instruction>1. Origin and early life</instruction>
+    <instruction>2. Key missions and accomplishments</instruction>
+    <instruction>3. Unique personality traits</instruction>
+    <instruction>4. Signature weapons or equipment</instruction>
+    <instruction>5. Relationships with other Helldivers or characters</instruction>
+    <instruction>6. Make sure the story adheres to the character-characterization, character-tone and character-story-structure outlined in the sections below sections.</instruction>
   </instructions>
 
   <examples>
@@ -27,7 +21,7 @@
     </example>
   </examples>
 
-  <output_format>Provide a cohesive narrative of 200-300 words that captures the essence of John Helldiver's legendary status while maintaining the gritty, militaristic tone of the Helldivers universe. Weave the provided story context seamlessly into the narrative. Your response should clearly demonstrate elements from each major section: 'story_context', 'character-characterization', 'character-tone', and 'character-story-structure'.</output_format>
+  <output_format>Provide a cohesive narrative of 200-300 words that captures the essence of John Helldiver's legendary status while maintaining the gritty, militaristic tone of the Helldivers universe.</output_format>
 
   <character-characterization>
     <trait>
