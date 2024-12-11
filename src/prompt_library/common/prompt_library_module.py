@@ -7,6 +7,7 @@ from datetime import datetime
 from typing import List
 
 from dotenv import load_dotenv
+from loguru import logger
 
 from prompt_library.common.typings import ModelRanking, MultiLLMPromptExecution
 

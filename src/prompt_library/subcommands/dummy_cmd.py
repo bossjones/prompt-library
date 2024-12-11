@@ -6,6 +6,8 @@ import asyncio
 
 import typer
 
+from loguru import logger
+
 from prompt_library.asynctyper import AsyncTyper, AsyncTyperImproved
 
 

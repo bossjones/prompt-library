@@ -37,7 +37,7 @@ check:
 test:
 	@echo "🚀 Testing code: Running pytest"
 	{{UV_RUN}} pytest --diff-width=60 --diff-symbols --cov-append --cov-report=term-missing --junitxml=junit/test-results.xml --cov-report=xml:cov.xml --cov-report=html:htmlcov --cov-report=annotate:cov_annotate --cov=.
-# {{PYTHON}} -m pytest --cov --cov-config=pyproject.toml --cov-report=xml
+
 
 # Build wheel file
 build: clean-build

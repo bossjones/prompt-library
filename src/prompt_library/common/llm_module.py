@@ -7,6 +7,7 @@ from typing import Any
 import llm
 
 from dotenv import load_dotenv
+from loguru import logger
 from mako.template import Template
 
 

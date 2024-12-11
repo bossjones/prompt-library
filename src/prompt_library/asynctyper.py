@@ -15,6 +15,7 @@ import asyncer
 import rich
 import typer
 
+from loguru import logger
 from rich.pretty import pprint
 from typer import Typer
 from typer.core import TyperCommand, TyperGroup

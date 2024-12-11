@@ -39,6 +39,7 @@ import httpx
 import numpy as np
 
 from langchain_core.prompts.chat import BaseChatPromptTemplate, BaseMessage, BaseMessagePromptTemplate
+from loguru import logger
 from pydantic import BaseModel, Field
 
 

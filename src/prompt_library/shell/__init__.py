@@ -17,6 +17,7 @@ from typing import List, Tuple, Union
 import uritools
 
 from codetiming import Timer
+from loguru import logger
 
 
 HOME_PATH = os.environ.get("HOME")
@@ -197,6 +198,9 @@ def pquery(command: str | list, stdin: bool = None, **kwargs: any) -> str:
     try:
         with subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, **kwargs) as proc:
             stdout, _ = proc.communicate(stdin)
+    except FileNotFoundError:
+        print("[fail] Command not found")
+        raise ProcessException(127)  # 127 is standard shell error code for command not found
     except Exception:
         print("[fail] cmd={command}, ret={proc.returncode}")
         raise

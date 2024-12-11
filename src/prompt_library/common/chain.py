@@ -6,6 +6,8 @@ import re
 
 from typing import Any, Callable, Dict, List, Tuple, TypeVar, Union, cast
 
+from loguru import logger
+
 from prompt_library.common.typings import FusionChainResult
 
 

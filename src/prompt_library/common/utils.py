@@ -6,6 +6,8 @@ import os
 
 from typing import Dict, List, Union
 
+from loguru import logger
+
 
 OUTPUT_DIR = "output"
 
