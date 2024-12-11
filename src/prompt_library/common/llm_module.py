@@ -33,6 +33,29 @@ def conditional_render(
         str: The rendered template string with conditionals evaluated
 
     Example:
+        >>> template = '''% if show_greeting:\\nHello ${name}!\\n% endif'''
+        >>> context = {"show_greeting": True, "name": "World"}
+        >>> conditional_render(template, context)
+        'Hello World!'
+    """
+    # Ensure proper Mako syntax with colons
+    prompt = prompt.replace("% if ", "% if :")
+    """Render a template with conditional blocks using Mako templating.
+
+    This function takes a template string containing conditional blocks and renders it using
+    the provided context variables. The conditional blocks are delimited by customizable
+    start and end markers.
+
+    Args:
+        prompt: The template string containing conditional blocks
+        context: Dictionary mapping variable names to values for template rendering
+        start_delim: Starting delimiter for conditional blocks. Defaults to "% if"
+        end_delim: Ending delimiter for conditional blocks. Defaults to "% endif"
+
+    Returns:
+        str: The rendered template string with conditionals evaluated
+
+    Example:
         >>> template = "% if show_greeting\nHello ${name}!\n% endif"
         >>> context = {"show_greeting": True, "name": "World"}
         >>> conditional_render(template, context)

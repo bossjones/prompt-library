@@ -155,9 +155,10 @@ class MinimalChainable:
                     # Iterate over each key-value pair in the previous output
                     for key, value in previous_output.items():
                         # Check if the key reference is in the prompt
-                        if f"{{{{output[-{j}].{key}}}}}" in prompt:
+                        key_ref = f"{{{{output[-{j}].{key}}}}}"
+                        if key_ref in prompt:
                             # Replace the key reference with its value
-                            prompt = prompt.replace(f"{{{{output[-{j}].{key}}}}}", str(value))
+                            prompt = prompt.replace(key_ref, str(value))
                 # If not a dict, use the original string
                 else:
                     # Check if the reference is in the prompt

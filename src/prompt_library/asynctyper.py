@@ -12,7 +12,6 @@ from typing import Any, Dict, List, Optional, ParamSpec, Set, Tuple, Type, TypeV
 
 import anyio
 import asyncer
-import discord
 import rich
 import typer
 

@@ -743,3 +743,4 @@ __pycache__/
 .venv/
 
 prompt_executions/
+.aider*
