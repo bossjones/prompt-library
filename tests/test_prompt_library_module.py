@@ -89,6 +89,208 @@ def sample_rankings() -> list[ModelRanking]:
     ]
 
 
+@pytest.fixture
+def mock_one_off_tasks(tmp_path: Path) -> Generator[Path, None, None]:
+    """Create a temporary directory mimicking the one-off-tasks folder structure.
+
+    Args:
+        tmp_path: Pytest fixture providing temporary directory path.
+
+    Yields:
+        Path: Path to the temporary one-off-tasks directory.
+    """
+    one_off_tasks = tmp_path / "one-off-tasks"
+
+    # Create main subdirectories
+    dirs = ["code-generation", "code-review", "image-generation", "lore-writing/helldivers2/johnhelldiver/examples"]
+
+    for dir_path in dirs:
+        (one_off_tasks / dir_path).mkdir(parents=True, exist_ok=True)
+
+    # Create README files
+    readme_contents = {
+        "code-generation/README.md": """# One-Off Code Generation Prompts
+
+This directory contains prompts for specific, single-use code generation tasks.
+
+## Purpose
+- Generate code for specific project requirements
+- Create one-time scripts or utilities
+- Produce custom implementations
+
+## Contents
+- Project-specific code generators
+- Custom implementation templates
+- Specialized utility scripts
+- One-time automation tools
+""",
+        "code-review/README.md": """# One-Off Code Review Prompts
+
+This directory contains prompts for specific, single-instance code review tasks.
+
+## Purpose
+- Perform one-time code reviews
+- Analyze specific code implementations
+- Review particular pull requests
+- Assess individual components
+
+## Contents
+- Project-specific review templates
+- Custom review checklists
+- Special case review guides
+- Security audit templates
+""",
+        "image-generation/README.md": """# One-Off Image Generation Prompts
+
+This directory contains prompts for single-use image generation tasks, optimized for specific use cases.
+
+## Purpose
+- Generate specific, one-time images
+- Create custom artwork for particular projects
+- Produce unique visual content
+
+## Contents
+- Project-specific image prompts
+- Custom artwork generators
+- Special effect templates
+- Style transfer examples
+""",
+        "lore-writing/README.md": """# Lore Writing Prompts
+
+This directory contains prompts for creating specific pieces of lore and backstories for various projects and universes.
+
+## Purpose
+- Create detailed backstories for characters
+- Generate world-building content
+- Develop fictional histories
+- Craft universe-specific lore
+
+## Contents
+- Character backstory prompts
+- World history generators
+- Mythology creators
+- Cultural development templates
+
+## Projects
+- Helldivers 2
+  - Character backstories
+  - World-building elements
+  - Military histories
+""",
+    }
+
+    for file_path, content in readme_contents.items():
+        (one_off_tasks / file_path).write_text(content)
+
+    # Create Helldivers2 specific files
+    helldivers_path = one_off_tasks / "lore-writing/helldivers2/johnhelldiver"
+
+    # Write example files
+    for i in range(1, 5):
+        with open(helldivers_path / "examples" / f"example{i}.md", "w", encoding="utf-8") as f:
+            f.write(f"# Example {i} content")
+
+    # Write other Helldivers2 files
+    (helldivers_path / "Justfile").write_text("""lint:
+    xmllint --schema prompt_schema.xsd prompt.xml --noout
+
+ping:
+    uv run llm "ping"
+
+run:
+    uv run llm -m gpt-4o < prompt.xml
+""")
+
+    # Write metadata.json
+    (helldivers_path / "metadata.json").write_text("""{"promptName": "JohnHelldiverBackstory"}""")
+
+    # Write prompt.xml with full content
+    prompt_xml_content = """<?xml version="1.0" encoding="UTF-8"?>
+<prompt xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="prompt_schema.xsd">
+  <purpose>
+    You are a skilled lore writer for the Helldivers 2 universe. Your task is to create a compelling fan fiction story about John Helldiver, a figure steeped in mystery and legend.
+  </purpose>
+
+  <instructions>
+    <instruction>Write a brief but engaging backstory for John Helldiver</instruction>
+    <instruction>Include origin and early life</instruction>
+    <instruction>Highlight key missions and accomplishments</instruction>
+  </instructions>
+
+  <examples>
+    <example>
+      Sarah "Stormbreaker" Chen, born on a remote Super Earth colony, joined the Helldivers at 18 after her home was destroyed by Terminid forces.
+    </example>
+  </examples>
+
+  <output_format>Provide a cohesive narrative of 200-300 words</output_format>
+
+  <character-characterization>
+    <trait>
+      <name>Stoic yet Self-Aware</name>
+      <description>John embodies the ideal Helldiver but secretly questions the meaning of his unending missions.</description>
+    </trait>
+  </character-characterization>
+</prompt>"""
+    (helldivers_path / "prompt.xml").write_text(prompt_xml_content)
+
+    # Write prompt_schema.xsd with full content
+    schema_content = """<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:complexType name="instructionType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string"/>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="instructionsType">
+    <xs:sequence>
+      <xs:element name="instruction" type="instructionType" minOccurs="1" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="exampleType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string"/>
+    </xs:simpleContent>
+  </xs:complexType>
+
+  <xs:complexType name="examplesType">
+    <xs:sequence>
+      <xs:element name="example" type="exampleType" minOccurs="1" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="traitType">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string"/>
+      <xs:element name="description" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="characterCharacterizationType">
+    <xs:sequence>
+      <xs:element name="trait" type="traitType" minOccurs="1" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="prompt">
+    <xs:complexType>
+      <xs:all>
+        <xs:element name="purpose" type="xs:string"/>
+        <xs:element name="instructions" type="instructionsType"/>
+        <xs:element name="examples" type="examplesType"/>
+        <xs:element name="character-characterization" type="characterCharacterizationType" minOccurs="0"/>
+        <xs:element name="output_format" type="xs:string"/>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>"""
+    (helldivers_path / "prompt_schema.xsd").write_text(schema_content)
+
+    yield one_off_tasks
+
+
 def test_pull_in_dir_recursively(temp_dir_with_files: Path) -> None:
     """Test recursive directory reading.
 
@@ -255,3 +457,96 @@ def test_reset_rankings(mock_env_paths: dict[str, Path]) -> None:
     for ranking, model_id in zip(saved_rankings, model_ids, strict=False):
         assert ranking.llm_model_id == model_id
         assert ranking.score == 0
+
+
+def test_one_off_tasks_structure(mock_one_off_tasks: Path) -> None:
+    """Test the one-off-tasks directory structure.
+
+    Args:
+        mock_one_off_tasks: Fixture providing mock one-off-tasks directory.
+    """
+    # Verify main directories exist
+    assert (mock_one_off_tasks / "code-generation").is_dir()
+    assert (mock_one_off_tasks / "code-review").is_dir()
+    assert (mock_one_off_tasks / "image-generation").is_dir()
+    assert (mock_one_off_tasks / "lore-writing").is_dir()
+
+    # Verify README files exist and have content
+    assert (mock_one_off_tasks / "code-generation/README.md").is_file()
+    assert (mock_one_off_tasks / "code-review/README.md").is_file()
+    assert (mock_one_off_tasks / "image-generation/README.md").is_file()
+    assert (mock_one_off_tasks / "lore-writing/README.md").is_file()
+
+    # Verify Helldivers2 structure
+    helldivers_path = mock_one_off_tasks / "lore-writing/helldivers2/johnhelldiver"
+    assert helldivers_path.is_dir()
+    assert (helldivers_path / "examples").is_dir()
+    assert (helldivers_path / "Justfile").is_file()
+    assert (helldivers_path / "metadata.json").is_file()
+    assert (helldivers_path / "prompt.xml").is_file()
+    assert (helldivers_path / "prompt_schema.xsd").is_file()
+
+    # Verify example files
+    for i in range(1, 5):
+        assert (helldivers_path / "examples" / f"example{i}.md").is_file()
+
+
+def test_prompt_library_with_one_off_tasks(
+    mock_env_paths: dict[str, Path],
+    mock_one_off_tasks: Path,
+    monkeypatch: MonkeyPatch,
+) -> None:
+    """Test combining prompt library with one-off tasks.
+
+    This test verifies that we can successfully pull in both prompt library content
+    and one-off tasks content, ensuring they don't interfere with each other.
+
+    Args:
+        mock_env_paths: Fixture providing mock environment paths.
+        mock_one_off_tasks: Fixture providing mock one-off tasks directory.
+        monkeypatch: Pytest monkeypatch fixture.
+    """
+    # Set up prompt library with some content
+    lib_dir = mock_env_paths["PROMPT_LIBRARY_DIR"]
+    lib_dir.mkdir(parents=True, exist_ok=True)
+    (lib_dir / "prompt1.txt").write_text("prompt content 1")
+
+    # Create subdir and its content
+    subdir = lib_dir / "subdir"
+    subdir.mkdir(parents=True, exist_ok=True)
+    (subdir / "prompt2.txt").write_text("prompt content 2")
+
+    # Point the PROMPT_LIBRARY_DIR to include both directories
+    combined_dir = mock_env_paths["PROMPT_LIBRARY_DIR"].parent / "combined"
+    combined_dir.mkdir(parents=True, exist_ok=True)
+
+    # Create symbolic links to both directories
+    os.symlink(str(lib_dir), str(combined_dir / "prompt_lib"))
+    os.symlink(str(mock_one_off_tasks), str(combined_dir / "one_off_tasks"))
+
+    # Update the environment variable
+    monkeypatch.setenv("PROMPT_LIBRARY_DIR", str(combined_dir))
+
+    # Pull in all content
+    result = pull_in_prompt_library()
+
+    # Verify prompt library content
+    assert "prompt1.txt" in result
+    assert "subdir/prompt2.txt" in result
+    assert result["prompt1.txt"] == "prompt content 1"
+    assert result["subdir/prompt2.txt"] == "prompt content 2"
+
+    # Verify one-off tasks content
+    helldivers_path = "one_off_tasks/lore-writing/helldivers2/johnhelldiver"
+    assert f"{helldivers_path}/prompt.xml" in result
+    assert f"{helldivers_path}/metadata.json" in result
+    assert f"{helldivers_path}/prompt_schema.xsd" in result
+
+    # Verify content of specific files
+    metadata_path = f"{helldivers_path}/metadata.json"
+    prompt_path = f"{helldivers_path}/prompt.xml"
+    schema_path = f"{helldivers_path}/prompt_schema.xsd"
+
+    assert "JohnHelldiverBackstory" in result[metadata_path]
+    assert "<?xml version=" in result[prompt_path]
+    assert "xs:schema" in result[schema_path]
