@@ -74,11 +74,19 @@
     </xs:simpleContent>
   </xs:complexType>
 
+  <!-- Define story context type -->
+  <xs:complexType name="story_contextType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string"/>
+    </xs:simpleContent>
+  </xs:complexType>
+
   <!-- Main prompt element -->
   <xs:element name="prompt">
     <xs:complexType>
       <xs:all>
         <xs:element name="purpose" type="xs:string"/>
+        <xs:element name="story_context" type="story_contextType" minOccurs="0"/>
         <xs:element name="instructions" type="instructionsType"/>
         <xs:element name="examples" type="examplesType"/>
         <xs:element name="character-characterization" type="characterCharacterizationType" minOccurs="0"/>

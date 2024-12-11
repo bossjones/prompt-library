@@ -18,6 +18,7 @@ import pytest
 from prompt_library.common.prompt_library_module import (
     get_rankings,
     pull_in_dir_recursively,
+    pull_in_multiple_prompt_libraries,
     pull_in_prompt_library,
     pull_in_testable_prompts,
     record_llm_execution,
@@ -704,3 +705,246 @@ def test_prompt_library_with_one_off_tasks(
     assert "JohnHelldiverBackstory" in result[metadata_path]
     assert "<?xml version=" in result[prompt_path]
     assert "xs:schema" in result[schema_path]
+
+
+@pytest.fixture
+def multiple_temp_dirs(tmp_path: Path) -> Generator[list[Path], None, None]:
+    """Create multiple temporary directories with test files.
+
+    Args:
+        tmp_path: Pytest fixture providing temporary directory path.
+
+    Yields:
+        List[Path]: List of paths to temporary directories containing test files.
+    """
+    dir1 = tmp_path / "dir1"
+    dir2 = tmp_path / "dir2"
+    dir3 = tmp_path / "dir3"
+
+    # Create test files in dir1
+    dir1.mkdir()
+    (dir1 / "file1.txt").write_text("content1")
+    (dir1 / "common.txt").write_text("dir1_content")
+
+    # Create test files in dir2
+    dir2.mkdir()
+    (dir2 / "file2.txt").write_text("content2")
+    (dir2 / "common.txt").write_text("dir2_content")
+
+    # Create test files in dir3
+    dir3.mkdir()
+    (dir3 / "file3.txt").write_text("content3")
+    (dir3 / "subdir").mkdir()
+    (dir3 / "subdir" / "file4.txt").write_text("content4")
+
+    yield [dir1, dir2, dir3]
+
+
+def test_pull_in_multiple_prompt_libraries_basic(multiple_temp_dirs: list[Path], caplog: LogCaptureFixture) -> None:
+    """Test pull_in_multiple_prompt_libraries with multiple directories.
+
+    Args:
+        multiple_temp_dirs: Fixture providing multiple temporary directories with test files.
+        caplog: Pytest fixture for capturing log messages.
+    """
+    result = pull_in_multiple_prompt_libraries(multiple_temp_dirs)
+
+    # Check if all unique files are present
+    assert len(result) == 5  # file1.txt, file2.txt, file3.txt, subdir/file4.txt, common.txt
+    assert "file1.txt" in result
+    assert "file2.txt" in result
+    assert "file3.txt" in result
+    assert os.path.join("subdir", "file4.txt") in result
+    assert "common.txt" in result
+
+    # Verify content of overlapping file (common.txt should have content from last directory that has it)
+    assert result["common.txt"] == "dir2_content"
+
+    # Verify logging messages
+    assert "Loading prompt libraries from 3 directories" in caplog.text
+    assert "Successfully loaded 5 total files from all directories" in caplog.text
+
+
+def test_pull_in_multiple_prompt_libraries_nonexistent_dir(
+    multiple_temp_dirs: list[Path], caplog: LogCaptureFixture
+) -> None:
+    """Test pull_in_multiple_prompt_libraries with a nonexistent directory.
+
+    Args:
+        multiple_temp_dirs: Fixture providing multiple temporary directories with test files.
+        caplog: Pytest fixture for capturing log messages.
+    """
+    # Add a nonexistent directory to the list
+    nonexistent_dir = multiple_temp_dirs[0].parent / "nonexistent"
+    directories = multiple_temp_dirs + [nonexistent_dir]  # noqa: RUF005
+
+    result = pull_in_multiple_prompt_libraries(directories)
+
+    # Check if files from existing directories are still loaded
+    assert len(result) == 5
+    assert "Directory does not exist" in caplog.text
+
+
+def test_pull_in_multiple_prompt_libraries_empty_list(caplog: LogCaptureFixture) -> None:
+    """Test pull_in_multiple_prompt_libraries with an empty list of directories.
+
+    Args:
+        caplog: Pytest fixture for capturing log messages.
+    """
+    result = pull_in_multiple_prompt_libraries([])
+
+    assert result == {}
+    assert "Loading prompt libraries from 0 directories" in caplog.text
+
+
+def test_pull_in_multiple_prompt_libraries_with_path_objects(
+    multiple_temp_dirs: list[Path], caplog: LogCaptureFixture
+) -> None:
+    """Test pull_in_multiple_prompt_libraries with Path objects instead of strings.
+
+    Args:
+        multiple_temp_dirs: Fixture providing multiple temporary directories with test files.
+        caplog: Pytest fixture for capturing log messages.
+    """
+    # Convert string paths to Path objects
+    path_objects = [Path(str(dir_path)) for dir_path in multiple_temp_dirs]
+
+    result = pull_in_multiple_prompt_libraries(path_objects)
+
+    assert len(result) == 5
+    assert "Loading prompt libraries from 3 directories" in caplog.text
+    assert "Successfully loaded 5 total files from all directories" in caplog.text
+
+
+@pytest.fixture
+def multiple_temp_dirs_with_mixed_files(tmp_path: Path) -> Generator[list[Path], None, None]:
+    """Create multiple temporary directories with mixed file types.
+
+    Args:
+        tmp_path: Pytest fixture providing temporary directory path.
+
+    Yields:
+        List[Path]: List of paths to temporary directories containing test files.
+    """
+    dir1 = tmp_path / "dir1"
+    dir2 = tmp_path / "dir2"
+    dir3 = tmp_path / "dir3"
+
+    # Create test files in dir1
+    dir1.mkdir()
+    (dir1 / "file1.xml").write_text("<test>content1</test>")
+    (dir1 / "doc1.md").write_text("# Markdown 1")
+    (dir1 / "common.xml").write_text("<test>dir1_content</test>")
+
+    # Create test files in dir2
+    dir2.mkdir()
+    (dir2 / "file2.xml").write_text("<test>content2</test>")
+    (dir2 / "doc2.md").write_text("# Markdown 2")
+    (dir2 / "common.xml").write_text("<test>dir2_content</test>")
+
+    # Create test files in dir3
+    dir3.mkdir()
+    (dir3 / "file3.txt").write_text("plain text")
+    (dir3 / "subdir").mkdir()
+    (dir3 / "subdir" / "file4.xml").write_text("<test>content4</test>")
+    (dir3 / "subdir" / "doc3.md").write_text("# Markdown 3")
+
+    yield [dir1, dir2, dir3]
+
+
+def test_pull_in_multiple_prompt_libraries_filter_xml(
+    multiple_temp_dirs_with_mixed_files: list[Path], caplog: LogCaptureFixture
+) -> None:
+    """Test pull_in_multiple_prompt_libraries with XML file filtering.
+
+    Args:
+        multiple_temp_dirs_with_mixed_files: Fixture providing directories with mixed file types.
+        caplog: Pytest fixture for capturing log messages.
+    """
+    result = pull_in_multiple_prompt_libraries(multiple_temp_dirs_with_mixed_files, file_type="xml")
+
+    # Should only include XML files
+    assert len(result) == 4  # file1.xml, file2.xml, subdir/file4.xml, common.xml
+    assert "file1.xml" in result
+    assert "file2.xml" in result
+    assert os.path.join("subdir", "file4.xml") in result
+    assert "common.xml" in result
+
+    # Should not include non-XML files
+    assert "file3.txt" not in result
+    assert "doc1.md" not in result
+    assert "doc2.md" not in result
+    assert os.path.join("subdir", "doc3.md") not in result
+
+    # Verify content of overlapping file
+    assert "<test>dir2_content</test>" in result["common.xml"]
+
+    # Verify logging messages
+    assert "Filtering for .xml files" in caplog.text
+    assert "Successfully loaded 4 .xml files" in caplog.text
+
+
+def test_pull_in_multiple_prompt_libraries_filter_md(
+    multiple_temp_dirs_with_mixed_files: list[Path], caplog: LogCaptureFixture
+) -> None:
+    """Test pull_in_multiple_prompt_libraries with Markdown file filtering.
+
+    Args:
+        multiple_temp_dirs_with_mixed_files: Fixture providing directories with mixed file types.
+        caplog: Pytest fixture for capturing log messages.
+    """
+    result = pull_in_multiple_prompt_libraries(multiple_temp_dirs_with_mixed_files, file_type="md")
+
+    # Should only include Markdown files
+    assert len(result) == 3  # doc1.md, doc2.md, subdir/doc3.md
+    assert "doc1.md" in result
+    assert "doc2.md" in result
+    assert os.path.join("subdir", "doc3.md") in result
+
+    # Should not include non-Markdown files
+    assert "file1.xml" not in result
+    assert "file2.xml" not in result
+    assert "file3.txt" not in result
+    assert "common.xml" not in result
+
+    # Verify logging messages
+    assert "Filtering for .md files" in caplog.text
+    assert "Successfully loaded 3 .md files" in caplog.text
+
+
+def test_pull_in_multiple_prompt_libraries_filter_case_insensitive(
+    multiple_temp_dirs_with_mixed_files: list[Path], caplog: LogCaptureFixture
+) -> None:
+    """Test pull_in_multiple_prompt_libraries with case-insensitive file type filtering.
+
+    Args:
+        multiple_temp_dirs_with_mixed_files: Fixture providing directories with mixed file types.
+        caplog: Pytest fixture for capturing log messages.
+    """
+    # Test with uppercase extension
+    result_upper = pull_in_multiple_prompt_libraries(multiple_temp_dirs_with_mixed_files, file_type="XML")
+    assert len(result_upper) == 4  # Should find all XML files regardless of case
+
+    # Test with mixed case extension
+    result_mixed = pull_in_multiple_prompt_libraries(multiple_temp_dirs_with_mixed_files, file_type="XmL")
+    assert len(result_mixed) == 4  # Should find all XML files regardless of case
+
+    # Files should be identical between both results
+    assert set(result_upper.keys()) == set(result_mixed.keys())
+
+
+def test_pull_in_multiple_prompt_libraries_filter_nonexistent_type(
+    multiple_temp_dirs_with_mixed_files: list[Path], caplog: LogCaptureFixture
+) -> None:
+    """Test pull_in_multiple_prompt_libraries with a file type that doesn't exist.
+
+    Args:
+        multiple_temp_dirs_with_mixed_files: Fixture providing directories with mixed file types.
+        caplog: Pytest fixture for capturing log messages.
+    """
+    result = pull_in_multiple_prompt_libraries(multiple_temp_dirs_with_mixed_files, file_type="nonexistent")
+
+    # Should return empty dict when no files match the filter
+    assert result == {}
+    assert "Filtering for .nonexistent files" in caplog.text
+    assert "Successfully loaded 0 .nonexistent files" in caplog.text

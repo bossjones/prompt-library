@@ -5,7 +5,7 @@ import os
 
 from datetime import datetime
 from pathlib import Path
-from typing import List
+from typing import Dict, List, Optional, Union
 
 from dotenv import load_dotenv
 from loguru import logger
@@ -14,6 +14,15 @@ from prompt_library.common.typings import ModelRanking, MultiLLMPromptExecution
 
 
 load_dotenv()
+
+
+# Function to read markdown file content
+def read_question_file(filename: str, questions_dir: str) -> str:
+    if filename == "None":
+        return ""
+    file_path = os.path.join(questions_dir, filename)
+    with open(file_path) as f:
+        return f.read().strip()
 
 
 def pull_in_dir_recursively(directory: str) -> dict[str, str]:
@@ -184,3 +193,89 @@ def reset_rankings(model_ids: list[str]) -> list[ModelRanking]:
     new_rankings = [ModelRanking(llm_model_id=model_id, score=0) for model_id in model_ids]
     save_rankings(new_rankings)
     return new_rankings
+
+
+def get_question_files(questions_dir: str) -> list[str]:
+    """Get list of markdown files in questions directory.
+
+    Args:
+        questions_dir: Path to questions directory
+
+    Returns:
+        List of markdown filenames without path
+    """
+    import glob
+    import os
+
+    question_files = glob.glob(os.path.join(questions_dir, "*.md"))
+    return [os.path.basename(f) for f in question_files]
+
+
+def pull_in_multiple_prompt_libraries(
+    directories: list[Union[str, Path]], file_type: Optional[str] = None
+) -> dict[str, str]:
+    """Load and merge prompt library files from multiple directories.
+
+    This function recursively reads all files from the provided directories and merges
+    their contents into a single dictionary. If a file exists in multiple directories,
+    the last occurrence (based on directory order) will be used.
+
+    Args:
+        directories: List of directory paths to read from.
+        file_type: Optional file extension to filter results (e.g., 'xml', 'md').
+                  If provided, only returns files with matching extension.
+                  Case-insensitive. Do not include the dot.
+
+    Returns:
+        A dictionary mapping relative file paths to their contents.
+    """
+    logger.info(f"Loading prompt libraries from {len(directories)} directories")
+    if file_type:
+        logger.info(f"Filtering for .{file_type.lower()} files")
+
+    merged_results: dict[str, str] = {}
+
+    for directory in directories:
+        directory_str = str(directory)
+        logger.debug(f"Processing directory: {directory_str}")
+
+        if not os.path.exists(directory_str):
+            logger.warning(f"Directory does not exist: {directory_str}")
+            continue
+
+        try:
+            current_results = pull_in_dir_recursively(directory_str)
+            logger.info(f"Found {len(current_results)} files in {directory_str}")
+
+            # Filter by file type if specified
+            if file_type:
+                filtered_results = {
+                    k: v for k, v in current_results.items() if Path(k).suffix.lower() == f".{file_type.lower()}"
+                }
+                logger.debug(
+                    f"Filtered {len(current_results)} files to {len(filtered_results)} "
+                    f".{file_type.lower()} files in {directory_str}"
+                )
+                current_results = filtered_results
+
+            # Track any overwritten files for debugging
+            overlapping_files = set(merged_results.keys()) & set(current_results.keys())
+            if overlapping_files:
+                logger.debug(
+                    f"Overwriting {len(overlapping_files)} files from previous directories: {overlapping_files}"
+                )
+
+            merged_results.update(current_results)
+
+        except Exception as e:
+            logger.error(f"Failed to process directory {directory_str}: {e!s}")
+            continue
+
+    if file_type:
+        logger.info(f"Successfully loaded {len(merged_results)} .{file_type.lower()} files from all directories")
+    else:
+        logger.info(f"Successfully loaded {len(merged_results)} total files from all directories")
+
+    logger.debug(f"Final loaded files: {list(merged_results.keys())}")
+
+    return merged_results
