@@ -6,10 +6,13 @@ It ensures proper import organization, cell dependencies, and state management.
 
 from __future__ import annotations
 
-from typing import Any, Optional, cast
+from typing import Any, Optional, Sequence, cast
+
+import astroid
 
 from astroid import nodes
-from astroid.node_classes import Attribute, Name
+from astroid.context import Context, Load
+from astroid.nodes import AssignName, Attribute, Call, Decorators, Name, NodeNG, Return, Tuple
 
 from pylint.checkers import BaseChecker
 from pylint.lint import PyLinter
@@ -21,13 +24,16 @@ class MarimoImportsChecker(BaseChecker):
     This checker ensures that:
     1. All imports are in the first cell of marimo notebooks
     2. Cell dependencies are explicitly declared
-    3. No circular dependencies between cells
-    4. No global state mutations
+    3. No global state mutations
+    4. All cells return tuples
 
     Attributes:
-        name: The name of the checker
-        priority: The priority level of the checker
-        msgs: Dictionary of warning messages and their descriptions
+        name (str): The name of the checker
+        priority (int): The priority level of the checker (-1 for normal)
+        msgs (dict): Dictionary of warning messages and their descriptions
+        linter (PyLinter): The pylint linter instance
+        _first_cell_seen (bool): Whether the first cell has been seen
+        _current_cell_name (Optional[str]): The name of the current cell being checked
     """
 
     name = "marimo-imports"
@@ -95,12 +101,12 @@ class MarimoImportsChecker(BaseChecker):
             if not hasattr(node, "decorators") or not node.decorators:
                 return False
 
-            for decorator in node.decorators.nodes:
-                if isinstance(decorator, Name) and decorator.as_string() == "app.cell":
+            decorators: Decorators = node.decorators
+            decorator_nodes: Sequence[NodeNG] = getattr(decorators, "nodes", [])
+
+            for decorator in decorator_nodes:
+                if isinstance(decorator, (Name, Attribute)) and decorator.as_string() == "app.cell":
                     return True
-                if isinstance(decorator, Attribute):
-                    if decorator.as_string() == "app.cell":
-                        return True
             return False
         except AttributeError:
             return False
@@ -162,9 +168,9 @@ class MarimoImportsChecker(BaseChecker):
             node: The function definition node to check.
         """
         for child in node.get_children():
-            if isinstance(child, nodes.Return):
-                if not (isinstance(child.value, nodes.Tuple) or
-                       (isinstance(child.value, nodes.Call) and
+            if isinstance(child, Return):
+                if not (isinstance(child.value, Tuple) or
+                       (isinstance(child.value, Call) and
                         isinstance(child.value.func, Name) and
                         child.value.func.as_string() == "tuple")):
                     self.add_message("missing-tuple-return", node=child)

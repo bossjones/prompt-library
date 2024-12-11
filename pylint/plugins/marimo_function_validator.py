@@ -6,12 +6,12 @@ It ensures that no functions are defined in marimo notebook files, as they shoul
 
 from __future__ import annotations
 
-from typing import Any, cast
+from typing import Any, Sequence, cast
 
 import astroid
 
 from astroid import nodes
-from astroid.node_classes import NodeNG
+from astroid.nodes import AsyncFunctionDef, Attribute, Decorators, FunctionDef, Lambda, Name, NodeNG
 
 from pylint.checkers import BaseChecker
 from pylint.lint import PyLinter
@@ -26,10 +26,10 @@ class MarimoFunctionChecker(BaseChecker):
     3. Only cell definitions with @app.cell decorator are allowed
 
     Attributes:
-        name: The name of the checker
-        priority: The priority level of the checker
-        msgs: Dictionary of warning messages and their descriptions
-        linter: The pylint linter instance
+        name (str): The name of the checker
+        priority (int): The priority level of the checker (-1 for normal)
+        msgs (dict): Dictionary of warning messages and their descriptions
+        linter (PyLinter): The pylint linter instance
     """
 
     name = "marimo-functions"
@@ -68,7 +68,7 @@ class MarimoFunctionChecker(BaseChecker):
         except AttributeError:
             return False
 
-    def _has_app_cell_decorator(self, node: nodes.FunctionDef | nodes.AsyncFunctionDef) -> bool:
+    def _has_app_cell_decorator(self, node: FunctionDef | AsyncFunctionDef) -> bool:
         """Check if a function has the @app.cell decorator.
 
         Args:
@@ -81,14 +81,17 @@ class MarimoFunctionChecker(BaseChecker):
             if not hasattr(node, "decorators") or not node.decorators:
                 return False
 
-            for decorator in node.decorators.nodes:
-                if isinstance(decorator, NodeNG) and decorator.as_string() == "app.cell":
+            decorators: Decorators = node.decorators
+            decorator_nodes: Sequence[NodeNG] = getattr(decorators, "nodes", [])
+
+            for decorator in decorator_nodes:
+                if isinstance(decorator, (Name, Attribute)) and decorator.as_string() == "app.cell":
                     return True
             return False
         except AttributeError:
             return False
 
-    def visit_functiondef(self, node: nodes.FunctionDef) -> None:
+    def visit_functiondef(self, node: FunctionDef) -> None:
         """Visit and check a function definition node.
 
         Args:
@@ -104,7 +107,7 @@ class MarimoFunctionChecker(BaseChecker):
         # Disallow all other function definitions
         self.add_message("function-in-notebook", node=node)
 
-    def visit_asyncfunctiondef(self, node: nodes.AsyncFunctionDef) -> None:
+    def visit_asyncfunctiondef(self, node: AsyncFunctionDef) -> None:
         """Visit and check an async function definition node.
 
         Args:
@@ -120,7 +123,7 @@ class MarimoFunctionChecker(BaseChecker):
         # Disallow all other async function definitions
         self.add_message("async-function-in-notebook", node=node)
 
-    def visit_lambda(self, node: nodes.Lambda) -> None:
+    def visit_lambda(self, node: Lambda) -> None:
         """Visit and check a lambda function node.
 
         Args:
