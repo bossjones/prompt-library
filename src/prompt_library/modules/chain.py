@@ -6,7 +6,7 @@ import re
 
 from typing import Any, Callable, Dict, List, Tuple, Union
 
-from prompt_library.modules.typings import FusionChainResult
+from .typings import FusionChainResult
 
 
 class FusionChain:

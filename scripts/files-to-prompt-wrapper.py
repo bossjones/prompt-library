@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
+from __future__ import annotations
 
-import os
-import sys
 import argparse
 import glob
+import os
+import sys
+
 import tiktoken
+
 
 def main():
     # Parse command-line arguments
@@ -24,7 +27,7 @@ def main():
     # Load .gitignore if it exists
     ignores = []
     if os.path.exists('.gitignore'):
-        with open('.gitignore', 'r') as f:
+        with open('.gitignore') as f:
             ignores = [line.strip() for line in f if line.strip() and not line.startswith('#')]
 
     # Set the working directory
@@ -41,7 +44,7 @@ def main():
     for file in files:
         if not any(file.endswith(ignore.strip()) for ignore in ignores):
             print(f'<embedded-file path="{file}">')
-            with open(file, 'r', encoding='utf-8') as f:
+            with open(file, encoding='utf-8') as f:
                 content = f.read()
                 print(content)
             print("</embedded-file>")

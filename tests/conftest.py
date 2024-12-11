@@ -109,7 +109,7 @@ class DictSubSet:
     >> assert {"foo": "bar", "meh": 4} == DictSubSet({"foo": "bar"})
     """
 
-    __slots__ = ["items", "_missing", "_differing"]
+    __slots__ = ["_differing", "_missing", "items"]
 
     # TODO rename/alias to `a_dict_with()` to be more self-explanatory
 
@@ -245,12 +245,9 @@ def request_matcher(r1: VCRRequest, r2: VCRRequest) -> bool:
         if r1.body == r2.body:
             return True
     elif (
-        is_opensearch_uri(r1.uri)
-        and is_opensearch_uri(r2.uri)
-        or is_llm_uri(r1.uri)
-        and is_llm_uri(r2.uri)
-        or is_chroma_uri(r1.uri)
-        and is_chroma_uri(r2.uri)
+        (is_opensearch_uri(r1.uri) and is_opensearch_uri(r2.uri))
+        or (is_llm_uri(r1.uri) and is_llm_uri(r2.uri))
+        or (is_chroma_uri(r1.uri) and is_chroma_uri(r2.uri))
     ):
         return r1.body == r2.body
 

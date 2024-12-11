@@ -4,11 +4,14 @@ from __future__ import annotations
 
 import os
 import sys
+
 from typing import Any, NoReturn, Optional, TypeVar, cast
 
 import llm
 import yaml
+
 from dotenv import load_dotenv
+
 
 T = TypeVar('T')
 
@@ -41,7 +44,7 @@ def load_yaml_config(config_path: str) -> dict[str, Any]:
         SystemExit: If config is invalid, missing required fields, or file cannot be loaded.
     """
     try:
-        with open(config_path, 'r') as f:
+        with open(config_path) as f:
             config = yaml.safe_load(f)
 
         # Validate required properties

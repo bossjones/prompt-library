@@ -450,6 +450,8 @@ ignore = [
     "Q",       # Various quote-related rules
     "N999",    # Invalid module name
     "S702",     # Mako templates allow HTML/JS rendering (known XSS risk we accept)
+    "S607",
+    "S314"
 ]
 
 [tool.ruff.lint.flake8-tidy-imports]

@@ -4,6 +4,7 @@ from __future__ import annotations
 import json
 import os
 import sys
+
 from pathlib import Path
 from typing import Any, Dict, List, NoReturn, TypedDict
 
@@ -27,7 +28,7 @@ class FileUpdates(TypedDict):
         files: List of file updates to process
     """
 
-    files: List[FileUpdate]
+    files: list[FileUpdate]
 
 
 def read_stdin() -> str:

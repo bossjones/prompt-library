@@ -1,17 +1,21 @@
 # SOURCE:https://github.com/dat-lequoc/aaider/blob/main/README.md
-import re
-import subprocess
+from __future__ import annotations
+
 import argparse
-import shlex
-import sys
+import asyncio
 import json
 import os
-import xml.etree.ElementTree as ET
-from typing import List, Dict, Any
-import asyncio
+import re
+import shlex
 import shutil  # Added for cleaning log directory
+import subprocess
+import sys
+import xml.etree.ElementTree as ET
 
-def parse_fault_tolerant_xml(xml_string: str) -> List[Dict[str, Any]]:
+from typing import Any, Dict, List
+
+
+def parse_fault_tolerant_xml(xml_string: str) -> list[dict[str, Any]]:
     # Normalize line endings
     xml_string = xml_string.replace('\r\n', '\n').replace('\r', '\n')
 
@@ -43,7 +47,7 @@ def parse_fault_tolerant_xml(xml_string: str) -> List[Dict[str, Any]]:
                     file_info[child.tag] = child.text.strip() if child.text else ""
             result.append(file_info)
     except ET.ParseError as e:
-        print(f"Warning: Error parsing XML, attempting manual extraction: {str(e)}", file=sys.stderr)
+        print(f"Warning: Error parsing XML, attempting manual extraction: {e!s}", file=sys.stderr)
         # If parsing fails, try to extract information manually
         file_blocks = re.findall(r'<file>.*?</file>', xml_string, re.DOTALL)
         for block in file_blocks:
@@ -117,9 +121,9 @@ def parse_arguments():
 def get_input(input_file=None):
     if input_file:
         try:
-            with open(input_file, 'r') as file:
+            with open(input_file) as file:
                 return file.read().strip()
-        except IOError as e:
+        except OSError as e:
             print(f"Error reading input file: {e}", file=sys.stderr)
             sys.exit(1)
     else:
@@ -373,7 +377,7 @@ async def main():
         with open(tasks_json_path, 'w') as f:
             json.dump(tasks_with_ids, f, indent=4)
         print(f"Tasks saved to {tasks_json_path}")
-    except IOError as e:
+    except OSError as e:
         print(f"Error saving tasks to {tasks_json_path}: {e}", file=sys.stderr)
         sys.exit(1)
 
@@ -406,7 +410,7 @@ async def main():
             asyncio.gather(*task_coroutines),
             timeout=timeout_seconds
         )
-    except asyncio.TimeoutError:
+    except TimeoutError:
         print(f"\nTimeout reached after {timeout_seconds} seconds.")
         timeout_event.set()  # Signal tasks to stop if possible
 

@@ -1,9 +1,13 @@
-import subprocess
-import pyperclip
+from __future__ import annotations
+
 import re
+import subprocess
+
+import pyperclip
+
 
 # Read the file content
-with open('.run.xml', 'r') as file:
+with open('.run.xml') as file:
     content = file.read()
 
 # Remove XML comments (<!-- comment -->)
