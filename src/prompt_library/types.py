@@ -229,16 +229,57 @@ AnyImage = NewType("AnyImage", np.ndarray)
 # Single Channel image
 Image = NewType("Image", AnyImage)
 
-# 2D image types: a subtype of Image that is 2D only
-Image2D = NewType("Image2D", Image)
 
-# Multichannel images: a NumPy array in which the last dimension
-# represents "channels", ie measurements of different information at the same
-# coordinates
-ImageCh = NewType("ImageCh", AnyImage)
+class Image2D(np.ndarray):
+    """2D image type: a subtype of Image that is 2D only."""
 
-# Multichannel 2D images: a subtype of ImageCh restricted to only two channels
-ImageCh2D = NewType("ImageCh2D", ImageCh)
+    def __new__(cls, input_array: np.ndarray) -> Image2D:
+        """Create a new Image2D instance.
+
+        Args:
+            input_array: Input numpy array
+
+        Returns:
+            Image2D: New Image2D instance
+        """
+        obj = np.asarray(input_array).view(cls)
+        if obj.ndim != 2:
+            raise ValueError(f"Expected 2D array, got {obj.ndim}D array")
+        return obj
+
+
+class ImageCh(np.ndarray):
+    """Multichannel image type."""
+
+    def __new__(cls, input_array: np.ndarray) -> ImageCh:
+        """Create a new ImageCh instance.
+
+        Args:
+            input_array: Input numpy array
+
+        Returns:
+            ImageCh: New ImageCh instance
+        """
+        return np.asarray(input_array).view(cls)
+
+
+class ImageCh2D(ImageCh):
+    """Multichannel 2D image type: a subtype of ImageCh restricted to 3D arrays (channels, height, width)."""
+
+    def __new__(cls, input_array: np.ndarray) -> ImageCh2D:
+        """Create a new ImageCh2D instance.
+
+        Args:
+            input_array: Input numpy array
+
+        Returns:
+            ImageCh2D: New ImageCh2D instance
+        """
+        obj = super().__new__(cls, input_array)
+        if obj.ndim != 3:
+            raise ValueError(f"Expected 3D array, got {obj.ndim}D array")
+        return obj
+
 
 AnyImage2D = Union[Image2D, ImageCh2D]
 

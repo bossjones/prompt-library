@@ -31,15 +31,19 @@ def pull_in_dir_recursively(directory: str) -> dict[str, str]:
 
     result: dict[str, str] = {}
 
-    def recursive_read(current_dir: str) -> None:
+    def recursive_read(current_dir: str, prefix: str = "") -> None:
         for item in os.listdir(current_dir):
             item_path = os.path.join(current_dir, item)
             if os.path.isfile(item_path):
-                relative_path = os.path.relpath(item_path, directory)
+                if prefix:
+                    relative_path = os.path.join(prefix, item)
+                else:
+                    relative_path = os.path.relpath(item_path, directory)
                 with open(item_path, encoding="utf-8") as f:
                     result[relative_path] = f.read()
             elif os.path.isdir(item_path):
-                recursive_read(item_path)
+                new_prefix = os.path.join(prefix, item) if prefix else item
+                recursive_read(item_path, new_prefix)
 
     recursive_read(directory)
     return result

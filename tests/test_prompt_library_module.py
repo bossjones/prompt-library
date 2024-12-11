@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import shutil
 
 from datetime import datetime
 from pathlib import Path
@@ -520,9 +521,43 @@ def test_prompt_library_with_one_off_tasks(
     combined_dir = mock_env_paths["PROMPT_LIBRARY_DIR"].parent / "combined"
     combined_dir.mkdir(parents=True, exist_ok=True)
 
-    # Create symbolic links to both directories
-    os.symlink(str(lib_dir), str(combined_dir / "prompt_lib"))
-    os.symlink(str(mock_one_off_tasks), str(combined_dir / "one_off_tasks"))
+    # Create directories and copy files instead of symlinks
+    prompt_lib_dir = combined_dir / "prompt_lib"
+    one_off_tasks_dir = combined_dir / "one_off_tasks"
+
+    # Copy prompt library files
+    os.makedirs(prompt_lib_dir, exist_ok=True)
+    for item in os.listdir(lib_dir):
+        src = lib_dir / item
+        dst = prompt_lib_dir / item
+        if os.path.isfile(src):
+            os.makedirs(os.path.dirname(dst), exist_ok=True)
+            shutil.copy2(src, dst)
+        else:
+            os.makedirs(dst, exist_ok=True)
+            for root, _, files in os.walk(src):
+                for file in files:
+                    src_file = os.path.join(root, file)
+                    dst_file = os.path.join(dst, os.path.relpath(src_file, src))
+                    os.makedirs(os.path.dirname(dst_file), exist_ok=True)
+                    shutil.copy2(src_file, dst_file)
+
+    # Copy one-off tasks files
+    os.makedirs(one_off_tasks_dir, exist_ok=True)
+    for item in os.listdir(mock_one_off_tasks):
+        src = mock_one_off_tasks / item
+        dst = one_off_tasks_dir / item
+        if os.path.isfile(src):
+            os.makedirs(os.path.dirname(dst), exist_ok=True)
+            shutil.copy2(src, dst)
+        else:
+            os.makedirs(dst, exist_ok=True)
+            for root, _, files in os.walk(src):
+                for file in files:
+                    src_file = os.path.join(root, file)
+                    dst_file = os.path.join(dst, os.path.relpath(src_file, src))
+                    os.makedirs(os.path.dirname(dst_file), exist_ok=True)
+                    shutil.copy2(src_file, dst_file)
 
     # Update the environment variable
     monkeypatch.setenv("PROMPT_LIBRARY_DIR", str(combined_dir))
@@ -531,10 +566,10 @@ def test_prompt_library_with_one_off_tasks(
     result = pull_in_prompt_library()
 
     # Verify prompt library content
-    assert "prompt1.txt" in result
-    assert "subdir/prompt2.txt" in result
-    assert result["prompt1.txt"] == "prompt content 1"
-    assert result["subdir/prompt2.txt"] == "prompt content 2"
+    assert "prompt_lib/prompt1.txt" in result
+    assert "prompt_lib/subdir/prompt2.txt" in result
+    assert result["prompt_lib/prompt1.txt"] == "prompt content 1"
+    assert result["prompt_lib/subdir/prompt2.txt"] == "prompt content 2"
 
     # Verify one-off tasks content
     helldivers_path = "one_off_tasks/lore-writing/helldivers2/johnhelldiver"

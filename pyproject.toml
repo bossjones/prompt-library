@@ -878,7 +878,7 @@ asyncio_default_fixture_loop_scope = "function"
 addopts = [
     # Print runtimes of the slowest tests.
     '--durations=10',
-    '--durations-min=0.05',
+    '--durations-min=1.0',
     '--junitxml=junit/test-results.xml',
     '--cov-report=annotate:cov_annotate',
 ]
