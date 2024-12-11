@@ -508,6 +508,9 @@ max-complexity = 31 # C901: Recommended goal is 10
     "RUF005",  # Consider `[x] * n` instead of `[x for _ in range(n)]`
     "RUF005", # collection-literal-concatenation (RUF005)
 ]
+"pylint/plugins/marimo_cell_validator.py" = [
+    "SIM102", #  SIM102 Use a single `if` statement instead of nested `if` statements
+]
 
 
 
@@ -965,10 +968,21 @@ py-version = "3.12"
 # any too bad. Override on command line as appropriate.
 jobs = 0
 fail-on = ["I"]
+init-hook = """\
+    from pathlib import Path; \
+    import sys; \
+
+    from pylint.config import find_default_config_files; \
+
+    sys.path.append( \
+        str(Path(next(find_default_config_files())).parent.joinpath('pylint/plugins'))
+    ) \
+    """
 load-plugins = [
     "pylint.extensions.code_style",
     "pylint.extensions.typing",
     "pylint_pydantic",
+    "marimo_cell_validator",
 ]
 persistent = false
 # ignore = "lib"
