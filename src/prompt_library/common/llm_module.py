@@ -38,8 +38,8 @@ def conditional_render(
         >>> conditional_render(template, context)
         'Hello World!'
     """
-    # Ensure proper Mako syntax with colons
-    prompt = prompt.replace("% if ", "% if :")
+    # Ensure proper Mako syntax
+    prompt = prompt.replace("% if ", "% if ")
     """Render a template with conditional blocks using Mako templating.
 
     This function takes a template string containing conditional blocks and renders it using

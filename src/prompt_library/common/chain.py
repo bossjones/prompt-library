@@ -4,43 +4,60 @@ import concurrent.futures
 import json
 import re
 
-from typing import Any, Callable, Dict, List, Tuple, Union
+from typing import Any, Callable, Dict, List, Tuple, TypeVar, Union, cast
 
 from prompt_library.common.typings import FusionChainResult
 
 
+# Type variables for better type hints
+ModelType = TypeVar("ModelType")
+OutputType = TypeVar("OutputType")
+
+
 class FusionChain:
+    """A class for running competitions between multiple language models on a series of prompts.
+
+    This class provides methods to run multiple models on the same prompts and evaluate their performance,
+    either sequentially or in parallel.
+    """
+
     @staticmethod
     def run(
         context: dict[str, Any],
-        models: list[Any],
-        callable: Callable,
+        models: list[ModelType],
+        callable: Callable[[ModelType, str], str],
         prompts: list[str],
         evaluator: Callable[[list[Any]], tuple[Any, list[float]]],
-        get_model_name: Callable[[Any], str],
+        get_model_name: Callable[[ModelType], str],
     ) -> FusionChainResult:
-        """
-        Run a competition between models on a list of prompts.
+        """Run a competition between models on a list of prompts.
 
         Runs the MinimalChainable.run method for each model for each prompt and evaluates the results.
-
         The evaluator runs on the last output of each model at the end of the chain of prompts.
-
-        The eval method returns a performance score for each model from 0 to 1, giving priority to models earlier in the list.
+        The eval method returns a performance score for each model from 0 to 1.
 
         Args:
-            context (Dict[str, Any]): The context for the prompts.
-            models (List[Any]): List of models to compete.
-            callable (Callable): The function to call for each prompt.
-            prompts (List[str]): List of prompts to process.
-            evaluator (Callable[[List[str]], Tuple[Any, List[float]]]): Function to evaluate model outputs, returning the top response and the scores.
-            get_model_name (Callable[[Any], str]): Function to get the name of a model. Defaults to str(model).
+            context: The context dictionary for prompt template variables.
+            models: List of language models to compete.
+            callable: Function to call for each prompt, taking model and prompt as arguments.
+            prompts: List of prompt templates to process.
+            evaluator: Function to evaluate model outputs, returning top response and scores.
+            get_model_name: Function to get the name/identifier of a model.
 
         Returns:
-            FusionChainResult: A FusionChainResult object containing the top response, all outputs, all context-filled prompts, performance scores, and model names.
+            FusionChainResult containing top response, all outputs, prompts, scores, and model names.
+
+        Raises:
+            ValueError: If models list is empty or prompts list is empty.
+            RuntimeError: If evaluator returns invalid scores.
         """
-        all_outputs = []
-        all_context_filled_prompts = []
+        if not models:
+            raise ValueError("Models list cannot be empty")
+        if not prompts:
+            raise ValueError("Prompts list cannot be empty")
+
+        all_outputs: list[list[Any]] = []
+        all_context_filled_prompts: list[list[str]] = []
 
         for model in models:
             outputs, context_filled_prompts = MinimalChainable.run(context, model, callable, prompts)
@@ -50,6 +67,12 @@ class FusionChain:
         # Evaluate the last output of each model
         last_outputs = [outputs[-1] for outputs in all_outputs]
         top_response, performance_scores = evaluator(last_outputs)
+
+        # Validate performance scores
+        if len(performance_scores) != len(models):
+            raise RuntimeError("Evaluator returned incorrect number of scores")
+        if not all(0 <= score <= 1 for score in performance_scores):
+            raise RuntimeError("Performance scores must be between 0 and 1")
 
         model_names = [get_model_name(model) for model in models]
 
@@ -64,49 +87,66 @@ class FusionChain:
     @staticmethod
     def run_parallel(
         context: dict[str, Any],
-        models: list[Any],
-        callable: Callable,
+        models: list[ModelType],
+        callable: Callable[[ModelType, str], str],
         prompts: list[str],
         evaluator: Callable[[list[Any]], tuple[Any, list[float]]],
-        get_model_name: Callable[[Any], str],
+        get_model_name: Callable[[ModelType], str],
         num_workers: int = 4,
     ) -> FusionChainResult:
-        """
-        Run a competition between models on a list of prompts in parallel.
+        """Run a competition between models on a list of prompts in parallel.
 
-        This method is similar to the 'run' method but utilizes parallel processing
-        to improve performance when dealing with multiple models.
+        Similar to run() but utilizes parallel processing for better performance with multiple models.
 
         Args:
-            context (Dict[str, Any]): The context for the prompts.
-            models (List[Any]): List of models to compete.
-            callable (Callable): The function to call for each prompt.
-            prompts (List[str]): List of prompts to process.
-            evaluator (Callable[[List[str]], Tuple[Any, List[float]]]): Function to evaluate model outputs, returning the top response and the scores.
-            num_workers (int): Number of parallel workers to use. Defaults to 4.
-            get_model_name (Callable[[Any], str]): Function to get the name of a model. Defaults to str(model).
+            context: The context dictionary for prompt template variables.
+            models: List of language models to compete.
+            callable: Function to call for each prompt, taking model and prompt as arguments.
+            prompts: List of prompt templates to process.
+            evaluator: Function to evaluate model outputs, returning top response and scores.
+            get_model_name: Function to get the name/identifier of a model.
+            num_workers: Number of parallel workers to use, defaults to 4.
 
         Returns:
-            FusionChainResult: A FusionChainResult object containing the top response, all outputs, all context-filled prompts, performance scores, and model names.
+            FusionChainResult containing top response, all outputs, prompts, scores, and model names.
+
+        Raises:
+            ValueError: If models list is empty, prompts list is empty, or num_workers < 1.
+            RuntimeError: If evaluator returns invalid scores or parallel execution fails.
         """
+        if not models:
+            raise ValueError("Models list cannot be empty")
+        if not prompts:
+            raise ValueError("Prompts list cannot be empty")
+        if num_workers < 1:
+            raise ValueError("Number of workers must be at least 1")
 
-        def process_model(model):
-            outputs, context_filled_prompts = MinimalChainable.run(context, model, callable, prompts)
-            return outputs, context_filled_prompts
+        def process_model(model: ModelType) -> tuple[list[Any], list[str]]:
+            return MinimalChainable.run(context, model, callable, prompts)
 
-        all_outputs = []
-        all_context_filled_prompts = []
+        all_outputs: list[list[Any]] = []
+        all_context_filled_prompts: list[list[str]] = []
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=num_workers) as executor:
             future_to_model = {executor.submit(process_model, model): model for model in models}
-            for future in concurrent.futures.as_completed(future_to_model):
-                outputs, context_filled_prompts = future.result()
-                all_outputs.append(outputs)
-                all_context_filled_prompts.append(context_filled_prompts)
+
+            try:
+                for future in concurrent.futures.as_completed(future_to_model):
+                    outputs, context_filled_prompts = future.result()
+                    all_outputs.append(outputs)
+                    all_context_filled_prompts.append(context_filled_prompts)
+            except Exception as e:
+                raise RuntimeError(f"Parallel execution failed: {e!s}") from e
 
         # Evaluate the last output of each model
         last_outputs = [outputs[-1] for outputs in all_outputs]
         top_response, performance_scores = evaluator(last_outputs)
+
+        # Validate performance scores
+        if len(performance_scores) != len(models):
+            raise RuntimeError("Evaluator returned incorrect number of scores")
+        if not all(0 <= score <= 1 for score in performance_scores):
+            raise RuntimeError("Performance scores must be between 0 and 1")
 
         model_names = [get_model_name(model) for model in models]
 
@@ -120,98 +160,117 @@ class FusionChain:
 
 
 class MinimalChainable:
-    """
-    Sequential prompt chaining with context and output back-references.
+    """Sequential prompt chaining with context and output back-references.
+
+    This class provides functionality to run a sequence of prompts through a language model,
+    with support for referencing context variables and previous outputs in the prompts.
     """
 
     @staticmethod
-    def run(context: dict[str, Any], model: Any, callable: Callable, prompts: list[str]) -> tuple[list[Any], list[str]]:
-        # Initialize an empty list to store the outputs
-        output = []
-        context_filled_prompts = []
+    def run(
+        context: dict[str, Any],
+        model: ModelType,
+        callable: Callable[[ModelType, str], str],
+        prompts: list[str],
+    ) -> tuple[list[Any], list[str]]:
+        """Run a sequence of prompts through a model with context and output references.
 
-        # Iterate over each prompt with its index
+        Args:
+            context: Dictionary of variables that can be referenced in prompts.
+            model: The language model to use.
+            callable: Function to call for each prompt, taking model and prompt as arguments.
+            prompts: List of prompt templates to process.
+
+        Returns:
+            Tuple containing:
+                - List of outputs from each prompt
+                - List of context-filled prompts that were sent to the model
+
+        Raises:
+            ValueError: If prompts list is empty.
+        """
+        if not prompts:
+            raise ValueError("Prompts list cannot be empty")
+
+        output: list[Any] = []
+        context_filled_prompts: list[str] = []
+
         for i, prompt in enumerate(prompts):
-            # Iterate over each key-value pair in the context
+            # Fill context variables
             for key, value in context.items():
-                # Check if the key is in the prompt
                 if "{{" + key + "}}" in prompt:
-                    # Replace the key with its value
                     prompt = prompt.replace("{{" + key + "}}", str(value))
 
             # Replace references to previous outputs
-            # Iterate from the current index down to 1
             for j in range(i, 0, -1):
-                # Get the previous output
                 previous_output = output[i - j]
 
                 # Handle JSON (dict) output references
-                # Check if the previous output is a dictionary
                 if isinstance(previous_output, dict):
-                    # Check if the reference is in the prompt
+                    # Handle full dict reference
                     if f"{{{{output[-{j}]}}}}" in prompt:
-                        # Replace the reference with the JSON string
                         prompt = prompt.replace(f"{{{{output[-{j}]}}}}", json.dumps(previous_output))
-                    # Iterate over each key-value pair in the previous output
+                    # Handle key references
                     for key, value in previous_output.items():
-                        # Check if the key reference is in the prompt
                         key_ref = f"{{{{output[-{j}].{key}}}}}"
                         if key_ref in prompt:
-                            # Replace the key reference with its value
                             prompt = prompt.replace(key_ref, str(value))
-                # If not a dict, use the original string
                 else:
-                    # Check if the reference is in the prompt
+                    # Handle non-dict output reference
                     if f"{{{{output[-{j}]}}}}" in prompt:
-                        # Replace the reference with the previous output
                         prompt = prompt.replace(f"{{{{output[-{j}]}}}}", str(previous_output))
 
-            # Append the context filled prompt to the list
             context_filled_prompts.append(prompt)
 
-            # Call the provided callable with the processed prompt
-            # Get the result by calling the callable with the model and prompt
+            # Get model response
             result = callable(model, prompt)
 
-            print("result", result)
-
-            # Try to parse the result as JSON, handling markdown-wrapped JSON
+            # Try to parse JSON from response
             try:
-                # First, attempt to extract JSON from markdown code blocks
-                # Search for JSON in markdown code blocks
+                # First check for JSON in markdown code blocks
                 json_match = re.search(r"```(?:json)?\s*([\s\S]*?)\s*```", result)
-                # If a match is found
                 if json_match:
-                    # Parse the JSON from the match
                     result = json.loads(json_match.group(1))
                 else:
-                    # If no markdown block found, try parsing the entire result
-                    # Parse the entire result as JSON
+                    # Try parsing entire result as JSON
                     result = json.loads(result)
             except json.JSONDecodeError:
                 # Not JSON, keep as is
                 pass
 
-            # Append the result to the output list
             output.append(result)
 
-        # Return the list of outputs
         return output, context_filled_prompts
 
     @staticmethod
     def to_delim_text_file(name: str, content: list[Union[str, dict, list]]) -> str:
-        result_string = ""
-        with open(f"{name}.txt", "w") as outfile:
-            for i, item in enumerate(content, 1):
-                if isinstance(item, (dict, list)):
-                    item = json.dumps(item)
-                elif not isinstance(item, str):
-                    item = str(item)
-                chain_text_delim = f"{'🔗' * i} -------- Prompt Chain Result #{i} -------------\n\n"
-                outfile.write(chain_text_delim)
-                outfile.write(item)
-                outfile.write("\n\n")
+        """Write chain results to a delimited text file.
 
-                result_string += chain_text_delim + item + "\n\n"
+        Args:
+            name: Base name for the output file (without extension).
+            content: List of content items to write.
+
+        Returns:
+            str: The formatted content string that was written to the file.
+
+        Raises:
+            IOError: If file writing fails.
+        """
+        result_string = ""
+        try:
+            with open(f"{name}.txt", "w") as outfile:
+                for i, item in enumerate(content, 1):
+                    if isinstance(item, (dict, list)):
+                        item = json.dumps(item)
+                    elif not isinstance(item, str):
+                        item = str(item)
+                    chain_text_delim = f"{'🔗' * i} -------- Prompt Chain Result #{i} -------------\n\n"
+                    outfile.write(chain_text_delim)
+                    outfile.write(item)
+                    outfile.write("\n\n")
+
+                    result_string += chain_text_delim + item + "\n\n"
+        except OSError as e:
+            raise OSError(f"Failed to write to file {name}.txt: {e!s}") from e
 
         return result_string

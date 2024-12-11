@@ -4,7 +4,7 @@ import json
 import os
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Dict, List, Tuple
+from typing import TYPE_CHECKING, Any, Dict, List, Tuple, cast
 
 import pytest
 
@@ -34,6 +34,7 @@ class MockModel:
         self.name = name
         self._responses = responses
         self._response_index = 0
+        self.model_id = f"mock-{name}"  # Added for compatibility with real models
 
     def get_response(self, prompt: str) -> str:
         """Get next response from the model.
@@ -155,6 +156,8 @@ def test_fusion_chain_run(
     assert len(result.all_prompt_responses) == len(mock_models)
     assert len(result.performance_scores) == len(mock_models)
     assert result.llm_model_names == ["model1", "model2", "model3"]
+    assert all(0 <= score <= 1.0 for score in result.performance_scores)
+    assert isinstance(result.top_response, str)
 
 
 def test_fusion_chain_run_parallel(
@@ -183,6 +186,8 @@ def test_fusion_chain_run_parallel(
     assert len(result.all_prompt_responses) == len(mock_models)
     assert len(result.performance_scores) == len(mock_models)
     assert result.llm_model_names == ["model1", "model2", "model3"]
+    assert all(0 <= score <= 1.0 for score in result.performance_scores)
+    assert isinstance(result.top_response, str)
 
 
 def test_minimal_chainable_run(
@@ -350,3 +355,58 @@ def test_minimal_chainable_output_references() -> None:
     assert filled_prompts[0] == "First prompt"
     assert '{"key": "value1"}' in filled_prompts[1]
     assert "value1" in filled_prompts[2]
+
+
+@pytest.mark.parametrize(
+    "markdown_json,expected",
+    [
+        ('```json\n{"key": "value"}\n```', {"key": "value"}),
+        ('```\n{"key": "value"}\n```', {"key": "value"}),
+        ('```python\n{"key": "value"}\n```', '```python\n{"key": "value"}\n```'),
+    ],
+)
+def test_minimal_chainable_markdown_json_handling(markdown_json: str, expected: Any) -> None:
+    """Test MinimalChainable markdown JSON handling.
+
+    Args:
+        markdown_json: JSON string wrapped in markdown.
+        expected: Expected parsed result.
+    """
+    model = MockModel("test", [markdown_json])
+    outputs, _ = MinimalChainable.run(
+        context={},
+        model=model,
+        callable=mock_callable,
+        prompts=["test"],
+    )
+
+    assert outputs[0] == expected
+
+
+def test_fusion_chain_parallel_worker_count(
+    mock_models: list[MockModel],
+    sample_context: dict[str, Any],
+    sample_prompts: list[str],
+) -> None:
+    """Test FusionChain parallel worker count handling.
+
+    Args:
+        mock_models: List of mock models.
+        sample_context: Sample context dictionary.
+        sample_prompts: List of sample prompts.
+    """
+    # Test with different worker counts
+    for num_workers in [1, 2, 4, len(mock_models), len(mock_models) + 1]:
+        result = FusionChain.run_parallel(
+            context=sample_context,
+            models=mock_models,
+            callable=mock_callable,
+            prompts=sample_prompts,
+            evaluator=mock_evaluator,
+            get_model_name=mock_get_model_name,
+            num_workers=num_workers,
+        )
+
+        assert isinstance(result, FusionChainResult)
+        assert len(result.all_prompt_responses) == len(mock_models)
+        assert len(result.performance_scores) == len(mock_models)

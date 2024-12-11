@@ -23,8 +23,10 @@ def pull_in_dir_recursively(directory: str) -> dict[str, str]:
     Returns:
         A dictionary mapping relative file paths to their contents.
     """
-    if not os.path.exists(directory):
-        os.makedirs(directory, exist_ok=True)
+    try:
+        if not os.path.exists(directory):
+            os.makedirs(directory, exist_ok=True)
+    except (OSError, PermissionError):
         return {}
 
     result: dict[str, str] = {}
