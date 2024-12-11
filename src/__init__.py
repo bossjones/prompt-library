@@ -3,4 +3,5 @@
 from __future__ import annotations
 
 
-__all__ = []
+def main() -> None:
+    print("Hello from prompt-library!")

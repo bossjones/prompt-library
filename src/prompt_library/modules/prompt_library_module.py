@@ -8,7 +8,7 @@ from typing import List
 
 from dotenv import load_dotenv
 
-from src.prompt_library.modules.typings import ModelRanking, MultiLLMPromptExecution
+from prompt_library.modules.typings import ModelRanking, MultiLLMPromptExecution
 
 
 load_dotenv()

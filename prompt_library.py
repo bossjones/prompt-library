@@ -13,7 +13,7 @@ def __():
 
     import marimo as mo
 
-    from src.prompt_library.modules import llm_module, prompt_library_module
+    from prompt_library.modules import llm_module, prompt_library_module
 
     return llm_module, mo, prompt_library_module, re
 

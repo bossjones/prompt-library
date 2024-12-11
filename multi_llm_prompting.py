@@ -21,8 +21,8 @@ def __() -> tuple[Any, Any, Any, Any, Any]:
     import marimo as mo
     import pyperclip
 
-    import src.prompt_library.modules.llm_module as llm_module
-    import src.prompt_library.modules.prompt_library_module as prompt_library_module
+    import prompt_library.modules.llm_module as llm_module
+    import prompt_library.modules.prompt_library_module as prompt_library_module
 
     return json, llm_module, mo, prompt_library_module, pyperclip
 

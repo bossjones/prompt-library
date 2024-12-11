@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import os
 
+from typing import Any
+
 import llm
 
 from dotenv import load_dotenv
@@ -12,56 +14,161 @@ from mako.template import Template
 load_dotenv()
 
 
-def conditional_render(prompt, context, start_delim="% if", end_delim="% endif"):
+def conditional_render(
+    prompt: str, context: dict[str, Any], start_delim: str = "% if", end_delim: str = "% endif"
+) -> str:
+    """Render a template with conditional blocks using Mako templating.
+
+    This function takes a template string containing conditional blocks and renders it using
+    the provided context variables. The conditional blocks are delimited by customizable
+    start and end markers.
+
+    Args:
+        prompt: The template string containing conditional blocks
+        context: Dictionary mapping variable names to values for template rendering
+        start_delim: Starting delimiter for conditional blocks. Defaults to "% if"
+        end_delim: Ending delimiter for conditional blocks. Defaults to "% endif"
+
+    Returns:
+        str: The rendered template string with conditionals evaluated
+
+    Example:
+        >>> template = "% if show_greeting\nHello ${name}!\n% endif"
+        >>> context = {"show_greeting": True, "name": "World"}
+        >>> conditional_render(template, context)
+        'Hello World!'
+    """
     template = Template(prompt)
     return template.render(**context)
 
 
-def parse_markdown_backticks(str) -> str:
-    if "```" not in str:
-        return str.strip()
+def parse_markdown_backticks(markdown_text: str) -> str:
+    """Parse and extract code content from markdown backtick blocks.
+
+    This function extracts code content from markdown-style code blocks delimited by
+    triple backticks (```). It removes the backticks, language identifier, and any
+    excess whitespace.
+
+    Args:
+        markdown_text: Input string potentially containing markdown code blocks
+
+    Returns:
+        str: The extracted code content with whitespace trimmed. If no code blocks
+            are found, returns the input string stripped of whitespace.
+
+    Example:
+        >>> text = "```python\ndef hello():\n    print('Hello')\n```"
+        >>> parse_markdown_backticks(text)
+        "def hello():\n    print('Hello')"
+    """
+    if "```" not in markdown_text:
+        return markdown_text.strip()
     # Remove opening backticks and language identifier
-    str = str.split("```", 1)[-1].split("\n", 1)[-1]
+    markdown_text = markdown_text.split("```", 1)[-1].split("\n", 1)[-1]
     # Remove closing backticks
-    str = str.rsplit("```", 1)[0]
+    markdown_text = markdown_text.rsplit("```", 1)[0]
     # Remove any leading or trailing whitespace
-    return str.strip()
+    return markdown_text.strip()
 
 
-def prompt(model: llm.Model, prompt: str):
-    res = model.prompt(prompt, stream=False)
+def prompt(model: llm.Model, prompt_text: str) -> str:
+    """Send a basic prompt to the model and get its response.
+
+    This function sends a prompt to the specified LLM model without streaming
+    and returns the generated text response.
+
+    Args:
+        model: The LLM model instance to use for generating the response
+        prompt_text: The prompt text to send to the model
+
+    Returns:
+        str: The model's generated response text
+
+    Example:
+        >>> model = build_sonnet_3_5()
+        >>> response = prompt(model, "What is 2+2?")
+        >>> print(response)
+        '4'
+    """
+    res = model.prompt(prompt_text, stream=False)
     return res.text()
 
 
-def prompt_with_temp(model: llm.Model, prompt: str, temperature: float = 0.7):
-    """
-    Send a prompt to the model with a specified temperature.
+def prompt_with_temp(model: llm.Model, prompt_text: str, temperature: float = 0.7) -> str:
+    """Send a prompt to the model with a specified temperature setting.
+
+    This function sends a prompt to the model with temperature control for response
+    randomness. Note that for O1 and Gemini models, temperature is fixed at 1.0
+    regardless of input.
 
     Args:
-    model (llm.Model): The LLM model to use.
-    prompt (str): The prompt to send to the model.
-    temperature (float): The temperature setting for the model's response. Default is 0.7.
+        model: The LLM model instance to use for generating the response
+        prompt_text: The prompt text to send to the model
+        temperature: Controls randomness in the response. Higher values (e.g., 1.0)
+            make output more random, lower values make it more deterministic.
+            Defaults to 0.7. Note: Ignored for O1 and Gemini models.
 
     Returns:
-    str: The model's response text.
-    """
+        str: The model's generated response text
 
+    Example:
+        >>> model = build_sonnet_3_5()
+        >>> response = prompt_with_temp(model, "Write a creative story", 0.9)
+        >>> print(response)
+        'Once upon a time...'
+    """
     model_id = model.model_id
     if "o1" in model_id or "gemini" in model_id:
         temperature = 1
-        res = model.prompt(prompt, stream=False)
+        res = model.prompt(prompt_text, stream=False)
         return res.text()
 
-    res = model.prompt(prompt, stream=False, temperature=temperature)
+    res = model.prompt(prompt_text, stream=False, temperature=temperature)
     return res.text()
 
 
-def get_model_name(model: llm.Model):
+def get_model_name(model: llm.Model) -> str:
+    """Get the identifier name of the model.
+
+    This function returns the unique identifier string for the given model instance.
+    This is useful for model-specific logic and debugging.
+
+    Args:
+        model: The LLM model instance to get the identifier for
+
+    Returns:
+        str: The model's identifier string (e.g., "claude-3.5-sonnet", "gpt-4o")
+
+    Example:
+        >>> model = build_sonnet_3_5()
+        >>> print(get_model_name(model))
+        'claude-3.5-sonnet'
+    """
     return model.model_id
 
 
-def build_sonnet_3_5():
+def build_sonnet_3_5() -> llm.Model:
+    """Build and configure a Claude 3.5 Sonnet model instance.
+
+    This function creates a new Claude 3.5 Sonnet model instance and configures it
+    with the API key from environment variables. The API key must be set in the
+    environment variable ANTHROPIC_API_KEY.
+
+    Returns:
+        llm.Model: Configured Claude 3.5 Sonnet model instance ready for use
+
+    Raises:
+        TypeError: If ANTHROPIC_API_KEY environment variable is not set
+
+    Example:
+        >>> model = build_sonnet_3_5()
+        >>> response = prompt(model, "Hello!")
+        >>> print(response)
+        'Hi! How can I help you today?'
+    """
     ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
+    if ANTHROPIC_API_KEY is None:
+        raise TypeError("ANTHROPIC_API_KEY environment variable must be set")
 
     sonnet_3_5_model: llm.Model = llm.get_model("claude-3.5-sonnet")
     sonnet_3_5_model.key = ANTHROPIC_API_KEY

@@ -97,8 +97,14 @@ Documentation = "https://bossjones.github.io/prompt-library/"
 requires = ["setuptools >= 61.0"]
 build-backend = "setuptools.build_meta"
 
-[tool.setuptools]
-py-modules = ["prompt_library"]
+# [tool.setuptools]
+# py-modules = ["src"]
+
+[project.scripts]
+prompt_library = "prompt_library:main"
+
+
+# include = ["prompt_library"]
 
 
 
@@ -814,6 +820,17 @@ show_missing = true
 # (boolean, default False) Don't report files that are 100% covered. This helps you focus on files that need attention.
 skip_covered = false
 
+
+# =========================[ PYTEST-COV ]========================
+[tool.coverage.paths]
+# SOURCE: https://coverage.readthedocs.io/en/latest/config.html
+# the first path is the path on the local filesystem
+# the second path is the path as it appears within the Docker container
+source = [
+    "src/",
+    "/src",
+]
+
 [tool.coverage.run]
 parallel = true
 
@@ -826,7 +843,7 @@ omit = [
 
 
 branch = true
-source = ["src"]
+source = ["prompt_library"]
 
 [tool.coverage.html]
 directory = "htmlcov"
@@ -904,15 +921,6 @@ markers = [
 ]
 
 
-# =========================[ PYTEST-COV ]========================
-[tool.coverage.paths]
-# SOURCE: https://coverage.readthedocs.io/en/latest/config.html
-# the first path is the path on the local filesystem
-# the second path is the path as it appears within the Docker container
-source = [
-    "src/",
-    "/src",
-]
 
 # =========================[ BLACK ]========================
 [tool.black]
