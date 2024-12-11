@@ -95,14 +95,8 @@ def __(Path, mo):
     PROMPT_DIRS = ["./src/prompt_library/data/prompt_lib", "./one-off-tasks"]
 
     # Ensure directories exist
-    try:
-        Path(QUESTIONS_DIR).mkdir(parents=True, exist_ok=True)
-        Path(COMPARE_DIR).mkdir(parents=True, exist_ok=True)
-    except PermissionError:
-        mo.md("""
-        ❌ **Error**: Unable to create directories. Please check permissions.
-        """).style({"color": "red", "padding": "10px", "border-radius": "5px", "background": "#ffebee"})
-        return COMPARE_DIR, QUESTIONS_DIR, PROMPT_DIRS
+    Path(QUESTIONS_DIR).mkdir(parents=True, exist_ok=True)
+    Path(COMPARE_DIR).mkdir(parents=True, exist_ok=True)
 
     return COMPARE_DIR, QUESTIONS_DIR, PROMPT_DIRS
 
@@ -126,20 +120,10 @@ def __(mo, os, Path, prompt_library_module, styles):
         """).style(styles["warning"])
 
     # Convert to Path objects and load prompts from all directories, filtering for XML files
-    try:
-        with mo.status.spinner(title="Loading XML prompts from all directories..."):
-            map_prompt_library: dict = prompt_library_module.pull_in_multiple_prompt_libraries(
-                directories=[Path(d) for d in PROMPT_DIRS], file_type="xml"
-            )
-    except Exception as e:
-        mo.md(f"""
-        ❌ **Error**: Failed to load XML prompts:
-        ```
-        {e!s}
-        ```
-        Please check file permissions and XML validity.
-        """).style(styles["error"])
-        return None, None, None
+    with mo.status.spinner(title="Loading XML prompts from all directories..."):
+        map_prompt_library: dict = prompt_library_module.pull_in_multiple_prompt_libraries(
+            directories=[Path(d) for d in PROMPT_DIRS], file_type="xml"
+        )
 
     if not map_prompt_library:
         mo.md("""
@@ -161,34 +145,21 @@ def __(mo, os, Path, prompt_library_module, styles):
 
 @app.cell
 def __(mo, llm_module, styles):
-    try:
-        # Initialize LLM models
-        llm_o1_mini, llm_o1_preview = llm_module.build_o1_series()
-        llm_gpt_4o_latest, llm_gpt_4o_mini = llm_module.build_openai_latest_and_fastest()
+    # Initialize LLM models
+    llm_o1_mini, llm_o1_preview = llm_module.build_o1_series()
+    llm_gpt_4o_latest, llm_gpt_4o_mini = llm_module.build_openai_latest_and_fastest()
 
-        models = {
-            "gpt-4o-latest": llm_gpt_4o_latest,  # Move to top for default selection
-            "o1-mini": llm_o1_mini,
-            "o1-preview": llm_o1_preview,
-            "gpt-4o-mini": llm_gpt_4o_mini,
-        }
-        return models
-    except Exception as e:
-        mo.md(f"""
-        ❌ **Error**: Failed to initialize LLM models:
-        ```
-        {e!s}
-        ```
-        Please check:
-        1. Your API keys are properly set
-        2. You have network connectivity
-        3. The API services are available
-        """).style(styles["error"])
-        return None
+    models = {
+        "gpt-4o-latest": llm_gpt_4o_latest,  # Move to top for default selectioonly n
+        "o1-mini": llm_o1_mini,
+        "o1-preview": llm_o1_preview,
+        "gpt-4o-mini": llm_gpt_4o_mini,
+    }
+    return models
 
 
 @app.cell
-def __(QUESTIONS_DIR, glob, mo):
+def __(QUESTIONS_DIR, glob, mo, prompt_library_module):
     # Get list of markdown files in questions directory
     question_files = glob.glob(os.path.join(QUESTIONS_DIR, "*.md"))
     question_names = ["None"] + [os.path.basename(f) for f in question_files]
@@ -201,17 +172,9 @@ def __(QUESTIONS_DIR, glob, mo):
     # Create text area for question input
     question_input = mo.ui.text_area(value="", placeholder="Enter your question here...", label="Question")
 
-    # Function to read markdown file content
-    def read_question_file(filename: str) -> str:
-        if filename == "None":
-            return ""
-        file_path = os.path.join(QUESTIONS_DIR, filename)
-        with open(file_path) as f:
-            return f.read().strip()
-
     # Update text area when selection changes
     if question_selector.value != "None":
-        question_input.value = read_question_file(question_selector.value)
+        question_input.value = prompt_library_module.read_question_file(question_selector.value, QUESTIONS_DIR)
 
     mo.md("### Question Input")
     mo.hstack([question_selector, question_input])
@@ -371,159 +334,113 @@ def __(filled_values, selected_prompt_1, selected_prompt_2):
     return final_prompt_1, final_prompt_2
 
 
-@app.cell
-def __(
-    COMPARE_DIR,
-    Path,
-    datetime,
-    final_prompt_1,
-    final_prompt_2,
-    form,
-    llm_module,
-    mo,
-    models,
-    pytz,
-    question_input,
-    styles,
-):
-    # Get the selected models
-    try:
-        model_1 = models[form.value["model_dropdown_1"]]
-        model_2 = models[form.value["model_dropdown_2"]]
-        model_name_1 = form.value["model_dropdown_1"]
-        model_name_2 = form.value["model_dropdown_2"]
-    except (KeyError, AttributeError) as e:
-        mo.md(f"""
-        ❌ **Error**: Failed to get selected models:
-        ```
-        {e!s}
-        ```
-        Please ensure models are properly selected.
-        """).style(styles["error"])
-        return None
+# @app.cell
+# def __(COMPARE_DIR, Path, datetime, final_prompt_1, final_prompt_2, form, llm_module, mo, models, pytz, question_input, styles):
+#     # Get the selected models
+#     model_1 = models[form.value["model_dropdown_1"]]
+#     model_2 = models[form.value["model_dropdown_2"]]
+#     model_name_1 = form.value["model_dropdown_1"]
+#     model_name_2 = form.value["model_dropdown_2"]
 
-    # Run both prompts through their respective models
-    try:
-        with mo.status.spinner(title="Running prompts through models..."):
-            prompt_response_1 = llm_module.prompt(model_1, final_prompt_1)
-            prompt_response_2 = llm_module.prompt(model_2, final_prompt_2)
-    except Exception as e:
-        mo.md(f"""
-        ❌ **Error**: Failed to generate responses:
-        ```
-        {e!s}
-        ```
-        Please check your API keys and network connection.
-        """).style(styles["error"])
-        return None
+#     # Run both prompts through their respective models
+#     with mo.status.spinner(title="Running prompts through models..."):
+#         prompt_response_1 = llm_module.prompt(model_1, final_prompt_1)
+#         prompt_response_2 = llm_module.prompt(model_2, final_prompt_2)
 
-    # Display responses side by side
-    mo.hstack([
-        mo.vstack([
-            mo.md(f"# First Prompt Output ({model_name_1})\n\n{prompt_response_1}").style(styles["prompt_display"]),
-        ]),
-        mo.vstack([
-            mo.md(f"# Second Prompt Output ({model_name_2})\n\n{prompt_response_2}").style(styles["prompt_display"]),
-        ]),
-    ]).style(styles["container"])
+#     # Display responses side by side
+#     mo.hstack([
+#         mo.vstack([
+#             mo.md(f"# First Prompt Output ({model_name_1})\n\n{prompt_response_1}").style(styles["prompt_display"]),
+#         ]),
+#         mo.vstack([
+#             mo.md(f"# Second Prompt Output ({model_name_2})\n\n{prompt_response_2}").style(styles["prompt_display"]),
+#         ]),
+#     ]).style(styles["container"])
 
-    # Create save button and preview
-    save_button = mo.ui.button("Save Comparison", tooltip="Save the comparison to a markdown file with timestamp")
-    preview = mo.md("")
+#     # Create save button and preview
+#     save_button = mo.ui.run_button("Save Comparison", tooltip="Save the comparison to a markdown file with timestamp")
+#     preview = mo.md("")
 
-    @save_button.click
-    def save_comparison():
-        try:
-            # Get current time in EDT
-            edt = pytz.timezone("America/New_York")
-            now = datetime.now(edt)
-            timestamp = now.strftime("%Y-%m-%d-%H-%M-%S-%Z")
+#     @save_button.click
+#     def save_comparison():
+#         # Get current time in EDT
+#         edt = pytz.timezone("America/New_York")
+#         now = datetime.now(edt)
+#         timestamp = now.strftime("%Y-%m-%d-%H-%M-%S-%Z")
 
-            # Generate markdown content
-            content = f"""# Prompt Comparison - {now.strftime("%Y-%m-%d %H:%M:%S %Z")}
+#         # Generate markdown content
+#         content = f"""# Prompt Comparison - {now.strftime("%Y-%m-%d %H:%M:%S %Z")}
 
-## Original Question
-```
-{question_input.value}
-```
+# ## Original Question
+# ```
+# {question_input.value}
+# ```
 
-## First Prompt (Model: {model_name_1})
-```xml
-{final_prompt_1}
-```
+# ## First Prompt (Model: {model_name_1})
+# ```xml
+# {final_prompt_1}
+# ```
 
-### Generated Response
-```
-{prompt_response_1}
-```
+# ### Generated Response
+# ```
+# {prompt_response_1}
+# ```
 
-## Second Prompt (Model: {model_name_2})
-```xml
-{final_prompt_2}
-```
+# ## Second Prompt (Model: {model_name_2})
+# ```xml
+# {final_prompt_2}
+# ```
 
-### Generated Response
-```
-{prompt_response_2}
-```
-"""
+# ### Generated Response
+# ```
+# {prompt_response_2}
+# ```
+# """
 
-            # Update preview
-            preview.value = f"""### Preview of file to be saved:
-```markdown
-{content}
-```"""
+#         # Update preview
+#         preview.value = f"""### Preview of file to be saved:
+# ```markdown
+# {content}
+# ```"""
 
-            # Save file
-            filename = f"{timestamp}_comparison.md"
-            filepath = Path(COMPARE_DIR) / filename
+#         # Save file
+#         filename = f"{timestamp}_comparison.md"
+#         filepath = Path(COMPARE_DIR) / filename
+#         filepath.write_text(content)
 
-            try:
-                filepath.write_text(content)
-                # Show success message
-                preview.value += f"\n\n✅ Saved to: {filepath}"
-                preview.style(styles["success"])
-            except (PermissionError, OSError) as e:
-                preview.value += f"\n\n❌ **Error**: Failed to save file: {e!s}"
-                preview.style(styles["error"])
+#         # Show success message
+#         preview.value += f"\n\n✅ Saved to: {filepath}"
+#         preview.style(styles["success"])
 
-        except Exception as e:
-            preview.value = f"""### ❌ Error
-Failed to generate comparison:
-```
-{e!s}
-```"""
-            preview.style(styles["error"])
-
-    mo.md("### Save Comparison")
-    mo.vstack([save_button, preview]).style(styles["container"])
-    return save_button
+#     mo.md("### Save Comparison")
+#     mo.vstack([save_button, preview]).style(styles["container"])
+#     return save_button
 
 
-@app.cell
-def __(mo, styles):
-    mo.md("""# Prompt Analysis Tool
+# @app.cell
+# def __(mo, styles):
+#     mo.md("""# Prompt Analysis Tool
 
-This tool helps you compare different prompts using different LLM models. You can:
-1. Select a predefined question or write your own
-2. Choose two different prompts and LLM models to compare
-3. Fill in any variables required by the prompts
-4. Generate and compare responses
-5. Save the comparison with timestamps for future reference
+# This tool helps you compare different prompts using different LLM models. You can:
+# 1. Select a predefined question or write your own
+# 2. Choose two different prompts and LLM models to compare
+# 3. Fill in any variables required by the prompts
+# 4. Generate and compare responses
+# 5. Save the comparison with timestamps for future reference
 
-The saved comparisons will be stored in the `compare` directory with timestamps in EDT.
+# The saved comparisons will be stored in the `compare` directory with timestamps in EDT.
 
-### Error Handling
-- The tool will display clear error messages if something goes wrong
-- Check the error messages for:
-  - API key issues
-  - Network connection problems
-  - File permission errors
-  - Invalid prompt selections
+# ### Error Handling
+# - The tool will display clear error messages if something goes wrong
+# - Check the error messages for:
+#   - API key issues
+#   - Network connection problems
+#   - File permission errors
+#   - Invalid prompt selections
 
-### File Naming
-Saved files will use the format: `YYYY-MM-DD-HH-MM-SS-EDT_comparison.md`""").style(styles["container"])
-    return (None,)
+# ### File Naming
+# Saved files will use the format: `YYYY-MM-DD-HH-MM-SS-EDT_comparison.md`""").style(styles["container"])
+#     return (None,)
 
 
 if __name__ == "__main__":

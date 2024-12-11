@@ -16,6 +16,15 @@ from prompt_library.common.typings import ModelRanking, MultiLLMPromptExecution
 load_dotenv()
 
 
+# Function to read markdown file content
+def read_question_file(filename: str, questions_dir: str) -> str:
+    if filename == "None":
+        return ""
+    file_path = os.path.join(questions_dir, filename)
+    with open(file_path) as f:
+        return f.read().strip()
+
+
 def pull_in_dir_recursively(directory: str) -> dict[str, str]:
     """Recursively read all files in a directory and its subdirectories.
 

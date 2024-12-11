@@ -399,7 +399,7 @@ uv_pylint:
 
 # Run pylint with error-only configuration
 uv_pylint_error_only:
-	{{UV_RUN}} pylint --output-format=colorized --disable=all --max-line-length=120 --enable=F,E --rcfile pyproject.toml prompt_library tests
+	{{UV_RUN}} pylint --output-format=colorized --disable=all --max-line-length=120 --enable=F,E --rcfile pyproject.toml src/prompt_library tests
 
 # Run pylint on all files
 uv_lint_all:
