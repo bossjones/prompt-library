@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-from src.prompt_library.modules.llm_module import *
-from src.prompt_library.modules.prompt_library_module import *
+from .llm_module import *
+from .prompt_library_module import *
+from .utils import *
 
 
-__all__ = ["llm_module", "prompt_library_module"]
+__all__ = ["llm_module", "prompt_library_module", "utils"]

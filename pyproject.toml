@@ -3,7 +3,19 @@ name = "prompt-library"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
+authors = [{name = "Malcolm Jones", email = "bossjones@theblacktonystark.com"}]
+keywords = ['python']
 requires-python = ">=3.12"
+classifiers = [
+    "Intended Audience :: Developers",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
 dependencies = [
     "copier>=9.4.1",
     "llm-cmd>=0.2a0",
@@ -76,10 +88,17 @@ dev = [
     "pylint-to-ruff>=0.3.0",
 ]
 
+[project.urls]
+Homepage = "https://bossjones.github.io/democracy-exe/"
+Repository = "https://github.com/bossjones/prompt-library"
+Documentation = "https://bossjones.github.io/prompt-library/"
 
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = ["prompt_library"]
 
 
 

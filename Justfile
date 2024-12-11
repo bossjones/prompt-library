@@ -833,3 +833,5 @@ install-youtube-transcript:
 
 pylint-to-ruff:
 	{{UV_RUN}} pylint-to-ruff
+
+test-debug: uv_new_unittests_debug
