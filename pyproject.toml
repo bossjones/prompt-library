@@ -61,6 +61,8 @@ dependencies = [
     "langgraph>=0.2.56",
     "langsmith>=0.1.147",
     "asyncer>=0.0.8",
+    "codetiming>=1.4.0",
+    "uritools>=4.0.3",
 ]
 
 [dependency-groups]
@@ -787,6 +789,12 @@ omit = [
     "tests/*",
     "src/agentic/studio/*",
     "cookbook/studio/*",
+    "hello.py",
+    "marimo_*",
+    "mariomo_prompt_library.py",
+    "mariomo_multi_language_model_ranker.py",
+    "mariomo_prompt_library_test.py",
+    "mariomo_multi_llm_prompting.py"
 ]
 # fail if coverage drops below the specified percentage:
 fail_under = 10

@@ -36,7 +36,8 @@ check:
 # Test the code with pytest
 test:
 	@echo "🚀 Testing code: Running pytest"
-	{{PYTHON}} -m pytest --cov --cov-config=pyproject.toml --cov-report=xml
+	{{UV_RUN}} pytest --diff-width=60 --diff-symbols --cov-append --cov-report=term-missing --junitxml=junit/test-results.xml --cov-report=xml:cov.xml --cov-report=html:htmlcov --cov-report=annotate:cov_annotate --cov=.
+# {{PYTHON}} -m pytest --cov --cov-config=pyproject.toml --cov-report=xml
 
 # Build wheel file
 build: clean-build
@@ -543,7 +544,8 @@ uv_simple_test:
 
 # Run unit tests in debug mode with extended output
 uv_new_unittests_debug:
-	{{UV_RUN}} pytest -s --verbose --pdb --pdbcls bpdb:BPdb --showlocals --tb=short
+	# {{UV_RUN}} pytest -s --verbose --pdb --pdbcls bpdb:BPdb --showlocals --tb=short
+	{{UV_RUN}} pytest -s -vv --diff-width=60 --diff-symbols --pdb --pdbcls bpdb:BPdb --showlocals --tb=short --cov-append --cov-report=term-missing --junitxml=junit/test-results.xml --cov-report=xml:cov.xml --cov-report=html:htmlcov --cov-report=annotate:cov_annotate --cov=.
 
 # Run linting and unit tests
 uv_test:
@@ -835,4 +837,4 @@ install-youtube-transcript:
 pylint-to-ruff:
 	{{UV_RUN}} pylint-to-ruff
 
-test-debug: uv_new_unittests_debug
+test-debug: uv_new_unittests_debug open-coverage

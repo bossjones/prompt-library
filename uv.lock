@@ -644,6 +644,15 @@ wheels = [
 ]
 
 [[package]]
+name = "codetiming"
+version = "1.4.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/ad/4e/c40bf151af20ba2748bd6ea24e484d7b6196b1056ba3a1a4ee33b6939c37/codetiming-1.4.0.tar.gz", hash = "sha256:4937bf913a2814258b87eaaa43d9a1bb24711ffd3557a9ab6934fa1fe3ba0dbc", size = 14899 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/bc/91/e4a2b7c64e738beefddfa24b409d6eecb16c378bde01578918b6ea722a09/codetiming-1.4.0-py3-none-any.whl", hash = "sha256:3b80f409bef00941a9755c5524071ce2f72eaa4520f4bc35b33869cde024ccbd", size = 7165 },
+]
+
+[[package]]
 name = "colorama"
 version = "0.4.6"
 source = { registry = "https://pypi.org/simple" }
@@ -3372,6 +3381,7 @@ dependencies = [
     { name = "altair" },
     { name = "asyncer" },
     { name = "better-exceptions" },
+    { name = "codetiming" },
     { name = "copier" },
     { name = "datachain" },
     { name = "defusedxml" },
@@ -3412,6 +3422,7 @@ dependencies = [
     { name = "rich" },
     { name = "transformers" },
     { name = "typer" },
+    { name = "uritools" },
     { name = "vega-datasets" },
 ]
 
@@ -3446,6 +3457,7 @@ requires-dist = [
     { name = "altair", specifier = ">=5.5.0" },
     { name = "asyncer", specifier = ">=0.0.8" },
     { name = "better-exceptions", specifier = ">=0.3.3" },
+    { name = "codetiming", specifier = ">=1.4.0" },
     { name = "copier", specifier = ">=9.4.1" },
     { name = "datachain", specifier = ">=0.7.9" },
     { name = "defusedxml", specifier = ">=0.7.1" },
@@ -3486,6 +3498,7 @@ requires-dist = [
     { name = "rich", specifier = ">=13.9.4" },
     { name = "transformers", specifier = ">=4.47.0" },
     { name = "typer", specifier = ">=0.15.1" },
+    { name = "uritools", specifier = ">=4.0.3" },
     { name = "vega-datasets", specifier = ">=0.9.0" },
 ]
 
@@ -4973,6 +4986,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/d2/5a/4742fdba39cd02a56226815abfa72fe0aa81c33bed16ed045647d6000eba/uritemplate-4.1.1.tar.gz", hash = "sha256:4346edfc5c3b79f694bccd6d6099a322bbeb628dbf2cd86eea55a456ce5124f0", size = 273898 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/81/c0/7461b49cd25aeece13766f02ee576d1db528f1c37ce69aee300e075b485b/uritemplate-4.1.1-py2.py3-none-any.whl", hash = "sha256:830c08b8d99bdd312ea4ead05994a38e8936266f84b9a7878232db50b044e02e", size = 10356 },
+]
+
+[[package]]
+name = "uritools"
+version = "4.0.3"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/d3/43/4182fb2a03145e6d38698e38b49114ce59bc8c79063452eb585a58f8ce78/uritools-4.0.3.tar.gz", hash = "sha256:ee06a182a9c849464ce9d5fa917539aacc8edd2a4924d1b7aabeeecabcae3bc2", size = 24184 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e6/17/5a4510d9ca9cc8be217ce359eb54e693dca81cf4d442308b282d5131b17d/uritools-4.0.3-py3-none-any.whl", hash = "sha256:bae297d090e69a0451130ffba6f2f1c9477244aa0a5543d66aed2d9f77d0dd9c", size = 10304 },
 ]
 
 [[package]]
