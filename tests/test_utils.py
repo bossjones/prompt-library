@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING, Any, Dict, List
 
 import pytest
 
-from prompt_library.modules.utils import (
+from prompt_library.common.utils import (
     build_file_name_session,
     build_file_path,
     current_date_str,
@@ -74,7 +74,7 @@ def test_build_file_path_with_special_chars(tmp_path: Path) -> None:
     """
     test_name = "test/file:with*special?chars"
     result = build_file_path(test_name)
-    assert os.path.dirname(result) == "output"
+    assert os.path.dirname(result) == "output/test"
     assert test_name in result
 
 

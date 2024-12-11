@@ -2,4 +2,4 @@
 
 from __future__ import annotations
 
-from prompt_library.modules import chain, prompt_library_module, typings, utils
+from prompt_library.common import chain, prompt_library_module, typings, utils

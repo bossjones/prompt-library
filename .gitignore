@@ -666,9 +666,22 @@ database/messages.db
 typingcov/
 diditwork.webp
 temp/
-.aider*
-!.aider.conf.yml
-!.aiderignore
+# .aider*
+# .aider.chat.history.md
+# .aider.input.history
+# .aider.tags.cache.v3
+
+# !.aider.conf.yml
+# !.aider.conf.yml
+
+.aider.chat.history.md
+.aider.input.history
+# .aiderignore
+# .aider.conf.yml
+aider_configs/.env
+.aider.tags.cache.v3
+
+# !.aiderignore
 rtdocs
 notebooks/chroma_db
 notebooks/chroma
@@ -689,7 +702,7 @@ typingcov_txt
 
 # Finder (MacOS) folder config
 .DS_Store
-.aider*
+# .aider*
 
 __pycache__/
 
