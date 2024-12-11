@@ -89,26 +89,17 @@ def __():
 
 
 @app.cell
-def __(Path, mo):
+def __():
     # Define the directories to search for prompts
     QUESTIONS_DIR = "one-off-tasks/lore-writing/helldivers2/johnhelldiver/questions"
     COMPARE_DIR = "one-off-tasks/lore-writing/helldivers2/johnhelldiver/compare"
     PROMPT_DIRS = ["./src/prompt_library/data/prompt_lib", "./one-off-tasks"]
-
-    # Ensure directories exist
-    Path(QUESTIONS_DIR).mkdir(parents=True, exist_ok=True)
-    Path(COMPARE_DIR).mkdir(parents=True, exist_ok=True)
 
     return COMPARE_DIR, QUESTIONS_DIR, PROMPT_DIRS
 
 
 @app.cell
-def __(mo, prompt_library_module):
-    # Define the directories to search for prompts
-    QUESTIONS_DIR = "one-off-tasks/lore-writing/helldivers2/johnhelldiver/questions"
-    COMPARE_DIR = "one-off-tasks/lore-writing/helldivers2/johnhelldiver/compare"
-    PROMPT_DIRS = ["./src/prompt_library/data/prompt_lib", "./one-off-tasks"]
-
+def __(mo, prompt_library_module, QUESTIONS_DIR, COMPARE_DIR, PROMPT_DIRS):
     # Convert to Path objects and load prompts from all directories, filtering for XML files
     with mo.status.spinner(title="Loading XML prompts from all directories..."):
         map_prompt_library = prompt_library_module.pull_in_multiple_prompt_libraries(
@@ -119,7 +110,7 @@ def __(mo, prompt_library_module):
 
 
 @app.cell
-def __(mo, llm_module, styles):
+def __(llm_module):
     # Initialize LLM models
     llm_o1_mini, llm_o1_preview = llm_module.build_o1_series()
     llm_gpt_4o_latest, llm_gpt_4o_mini = llm_module.build_openai_latest_and_fastest()

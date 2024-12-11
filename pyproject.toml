@@ -798,11 +798,11 @@ omit = [
     "src/agentic/studio/*",
     "cookbook/studio/*",
     "hello.py",
-    "marimo_*",
-    "mariomo_prompt_library.py",
-    "mariomo_multi_language_model_ranker.py",
-    "mariomo_prompt_library_test.py",
-    "mariomo_multi_llm_prompting.py"
+    # "marimo_*",
+    # "mariomo_prompt_library.py",
+    # "mariomo_multi_language_model_ranker.py",
+    # "mariomo_prompt_library_test.py",
+    # "mariomo_multi_llm_prompting.py"
 ]
 # fail if coverage drops below the specified percentage:
 fail_under = 10
