@@ -34,6 +34,7 @@
       <standard>Add detailed comments for complex logic.</standard>
       <standard>Provide rich error context for debugging.</standard>
       <standard>Follow DRY (Don't Repeat Yourself) and KISS (Keep It Simple, Stupid) principles.</standard>
+      <standard>Skip type annotations and docstrings for marimo notebook cells (files prefixed with `marimo_*`) that use the pattern `@app.cell def __(`.</standard>
     </code_quality>
 
     <testing>

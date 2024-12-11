@@ -1,30 +1,78 @@
+# pragma: no cover
 from __future__ import annotations
 
+import glob
+import importlib
+import os
+import re
+
+from datetime import datetime
+from pathlib import Path
+
 import marimo
+import pytz
 
 
-__generated_with = "0.9.34"
-app = marimo.App(width="full")
+__generated_with = "0.8.18"
+app = marimo.App(width="full")  # Use full width for side-by-side comparison
 
 
 @app.cell
 def __():
-    """Initialize required modules and reload prompt library module."""
-    import glob
-    import importlib  # For module reloading
-    import os  # For path operations
-    import re  # For regex to extract placeholders
+    styles = {
+        "container": {
+            "max-width": "800px",
+            "margin": "0 auto",
+            "padding": "20px",
+        },
+        "card": {
+            "background": "#ffffff",
+            "border-radius": "8px",
+            "box-shadow": "0 2px 4px rgba(0,0,0,0.1)",
+            "padding": "16px",
+            "margin-bottom": "16px",
+        },
+        "error": {
+            "color": "red",
+            "padding": "10px",
+            "border-radius": "5px",
+            "background": "#ffebee",
+        },
+        "success": {
+            "color": "green",
+            "padding": "10px",
+            "border-radius": "5px",
+            "background": "#e8f5e9",
+        },
+        "warning": {
+            "color": "orange",
+            "padding": "10px",
+            "border-radius": "5px",
+            "background": "#fff3e0",
+        },
+        "prompt_display": {
+            "background": "#eee",
+            "padding": "10px",
+            "border-radius": "10px",
+            "margin-bottom": "20px",
+            "min-width": "200px",
+            "box-shadow": "2px 2px 2px #ccc",
+        },
+    }
+    return styles
 
-    from datetime import datetime
-    from pathlib import Path  # For path handling
+
+@app.cell
+def __():
+    import os  # For path operations
 
     import marimo as mo
-    import pytz
 
     from prompt_library.common import llm_module, prompt_library_module
 
     # Force reload of the module to get the latest version
     importlib.reload(prompt_library_module)
+
     return (
         Path,
         datetime,
@@ -39,39 +87,8 @@ def __():
     )
 
 
-app._unparsable_cell(
-    r"""
-    \"\"\"Set up directories and load XML prompts.\"\"\"
-
-    # Define the directories to search for prompts
-    QUESTIONS_DIR = (
-        \"one-off-tasks/lore-writing/helldivers2/johnhelldiver/questions\"
-    )
-    COMPARE_DIR = \"one-off-tasks/lore-writing/helldivers2/johnhelldiver/compare\"
-    PROMPT_DIRS = [\"./src/prompt_library/data/prompt_lib\", \"./one-off-tasks\"]
-
-    # Ensure directories exist
-    try:
-        Path(QUESTIONS_DIR).mkdir(parents=True, exist_ok=True)
-        Path(COMPARE_DIR).mkdir(parents=True, exist_ok=True)
-    except PermissionError:
-        mo.md(\"\"\"
-        ❌ **Error**: Unable to create directories. Please check permissions.
-        \"\"\").style({
-            \"color\": \"red\",
-            \"padding\": \"10px\",
-            \"border-radius\": \"5px\",
-            \"background\": \"#ffebee\",
-        })
-        return COMPARE_DIR, QUESTIONS_DIR, PROMPT_DIRS
-    """,
-    name="__",
-)
-
-
 @app.cell
-def __(Path, mo, os, prompt_library_module):
-    """Set up directories and load XML prompts."""
+def __(Path, mo):
     # Define the directories to search for prompts
     QUESTIONS_DIR = "one-off-tasks/lore-writing/helldivers2/johnhelldiver/questions"
     COMPARE_DIR = "one-off-tasks/lore-writing/helldivers2/johnhelldiver/compare"
@@ -85,6 +102,17 @@ def __(Path, mo, os, prompt_library_module):
         mo.md("""
         ❌ **Error**: Unable to create directories. Please check permissions.
         """).style({"color": "red", "padding": "10px", "border-radius": "5px", "background": "#ffebee"})
+        return COMPARE_DIR, QUESTIONS_DIR, PROMPT_DIRS
+
+    return COMPARE_DIR, QUESTIONS_DIR, PROMPT_DIRS
+
+
+@app.cell
+def __(mo, os, Path, prompt_library_module, styles):
+    # Define the directories to search for prompts
+    QUESTIONS_DIR = "one-off-tasks/lore-writing/helldivers2/johnhelldiver/questions"
+    COMPARE_DIR = "one-off-tasks/lore-writing/helldivers2/johnhelldiver/compare"
+    PROMPT_DIRS = ["./src/prompt_library/data/prompt_lib", "./one-off-tasks"]
 
     # Validate prompt directories exist
     missing_dirs = [d for d in PROMPT_DIRS if not os.path.exists(d)]
@@ -95,7 +123,7 @@ def __(Path, mo, os, prompt_library_module):
         {chr(10).join(missing_dirs)}
         ```
         Some prompts may not be available.
-        """).style({"color": "orange", "padding": "10px", "border-radius": "5px", "background": "#fff3e0"})
+        """).style(styles["warning"])
 
     # Convert to Path objects and load prompts from all directories, filtering for XML files
     try:
@@ -109,66 +137,58 @@ def __(Path, mo, os, prompt_library_module):
         ```
         {e!s}
         ```
-        """).style({"color": "red", "padding": "10px", "border-radius": "5px", "background": "#ffebee"})
+        Please check file permissions and XML validity.
+        """).style(styles["error"])
+        return None, None, None
 
     if not map_prompt_library:
         mo.md("""
         ❌ **Error**: No XML prompts were loaded. Please check that:
         1. The directories exist and are accessible
         2. They contain valid XML prompt files
-        """).style({"color": "red", "padding": "10px", "border-radius": "5px", "background": "#ffebee"})
+        3. You have proper read permissions
+        """).style(styles["error"])
     else:
         mo.md(f"""
         ✅ Successfully loaded **{len(map_prompt_library)}** XML prompts from:
         ```
         {chr(10).join(d for d in PROMPT_DIRS if os.path.exists(d))}
         ```
-        """).style({"color": "green", "padding": "10px", "border-radius": "5px", "background": "#e8f5e9"})
+        """).style(styles["success"])
 
-    return (
-        COMPARE_DIR,
-        PROMPT_DIRS,
-        QUESTIONS_DIR,
-        map_prompt_library,
-        missing_dirs,
-    )
+    return COMPARE_DIR, QUESTIONS_DIR, map_prompt_library
 
 
-app._unparsable_cell(
-    r"""
-    \"\"\"Initialize LLM models.
-
-    Returns:
-        dict[str, Any] | None: Dictionary of initialized LLM models or None if initialization fails
-    \"\"\"
+@app.cell
+def __(mo, llm_module, styles):
     try:
         # Initialize LLM models
         llm_o1_mini, llm_o1_preview = llm_module.build_o1_series()
         llm_gpt_4o_latest, llm_gpt_4o_mini = llm_module.build_openai_latest_and_fastest()
 
         models = {
-            \"gpt-4o-latest\": llm_gpt_4o_latest,  # Move to top for default selection
-            \"o1-mini\": llm_o1_mini,
-            \"o1-preview\": llm_o1_preview,
-            \"gpt-4o-mini\": llm_gpt_4o_mini,
+            "gpt-4o-latest": llm_gpt_4o_latest,  # Move to top for default selection
+            "o1-mini": llm_o1_mini,
+            "o1-preview": llm_o1_preview,
+            "gpt-4o-mini": llm_gpt_4o_mini,
         }
         return models
     except Exception as e:
-        # Create error message using mo parameter
-        mo.md(f\"\"\"
+        mo.md(f"""
         ❌ **Error**: Failed to initialize LLM models:
         ```
-        {str(e)}
+        {e!s}
         ```
-        Please check your API keys and network connection.
-        \"\"\").style({\"color\": \"red\", \"padding\": \"10px\", \"border-radius\": \"5px\", \"background\": \"#ffebee\"})
-    """,
-    name="__",
-)
+        Please check:
+        1. Your API keys are properly set
+        2. You have network connectivity
+        3. The API services are available
+        """).style(styles["error"])
+        return None
 
 
 @app.cell
-def __(QUESTIONS_DIR, glob, mo, os):
+def __(QUESTIONS_DIR, glob, mo):
     # Get list of markdown files in questions directory
     question_files = glob.glob(os.path.join(QUESTIONS_DIR, "*.md"))
     question_names = ["None"] + [os.path.basename(f) for f in question_files]
@@ -182,7 +202,7 @@ def __(QUESTIONS_DIR, glob, mo, os):
     question_input = mo.ui.text_area(value="", placeholder="Enter your question here...", label="Question")
 
     # Function to read markdown file content
-    def read_question_file(filename):
+    def read_question_file(filename: str) -> str:
         if filename == "None":
             return ""
         file_path = os.path.join(QUESTIONS_DIR, filename)
@@ -195,24 +215,17 @@ def __(QUESTIONS_DIR, glob, mo, os):
 
     mo.md("### Question Input")
     mo.hstack([question_selector, question_input])
-    return (
-        question_files,
-        question_input,
-        question_names,
-        question_selector,
-        read_question_file,
-    )
+    return question_input, question_selector
 
 
 @app.cell
-def __(map_prompt_library, mo, models):
-    """Create UI components for prompt and model selection."""
+def __(map_prompt_library, mo, models, styles):
     # Stop if no prompts were loaded
     mo.stop(
         not map_prompt_library,
         mo.md("""
     ❌ **Error**: No prompts are available to display. Please check the error messages above.
-    """).style({"color": "red", "padding": "10px", "border-radius": "5px", "background": "#ffebee"}),
+    """).style(styles["error"]),
     )
 
     # Create dropdowns for first prompt
@@ -258,20 +271,13 @@ def __(map_prompt_library, mo, models):
             model_dropdown_2=model_dropdown_2,
         )
         .form()
-    )
+    ).style(styles["container"])
     form
-    return (
-        form,
-        model_dropdown_1,
-        model_dropdown_2,
-        prompt_dropdown_1,
-        prompt_dropdown_2,
-    )
+    return form, model_dropdown_1, model_dropdown_2, prompt_dropdown_1, prompt_dropdown_2
 
 
 @app.cell
-def __(form, map_prompt_library, mo, prompt_styles):
-    """Display selected prompts side by side."""
+def __(form, map_prompt_library, mo, styles):
     mo.stop(not form.value or not len(form.value), "")
 
     # Get first prompt
@@ -286,24 +292,22 @@ def __(form, map_prompt_library, mo, prompt_styles):
     mo.hstack([
         mo.vstack([
             mo.md("# First Selected Prompt"),
-            mo.accordion({"### Click to show": mo.md(f"```xml\n{selected_prompt_1}\n```").style(prompt_styles)}),
+            mo.accordion({
+                "### Click to show": mo.md(f"```xml\n{selected_prompt_1}\n```").style(styles["prompt_display"])
+            }),
         ]),
         mo.vstack([
             mo.md("# Second Selected Prompt"),
-            mo.accordion({"### Click to show": mo.md(f"```xml\n{selected_prompt_2}\n```").style(prompt_styles)}),
+            mo.accordion({
+                "### Click to show": mo.md(f"```xml\n{selected_prompt_2}\n```").style(styles["prompt_display"])
+            }),
         ]),
-    ])
-    return (
-        selected_prompt_1,
-        selected_prompt_2,
-        selected_prompt_name_1,
-        selected_prompt_name_2,
-    )
+    ]).style(styles["container"])
+    return selected_prompt_1, selected_prompt_2, selected_prompt_name_1, selected_prompt_name_2
 
 
 @app.cell
-def __(mo, re, selected_prompt_1, selected_prompt_2):
-    """Extract and handle placeholders from both prompts."""
+def __(mo, re, selected_prompt_1, selected_prompt_2, styles):
     mo.stop(not selected_prompt_1 or not selected_prompt_2, "")
 
     # Extract placeholders from both prompts
@@ -331,20 +335,12 @@ def __(mo, re, selected_prompt_1, selected_prompt_2):
     proceed_button = mo.ui.run_button(label="Generate Both Prompts")
 
     # Display the placeholders and the 'Generate' button in a vertical stack
-    mo.vstack([mo.md("# Prompt Variables"), placeholder_array, proceed_button])
-    return (
-        all_placeholders,
-        placeholder_array,
-        placeholder_inputs,
-        placeholders_1,
-        placeholders_2,
-        proceed_button,
-    )
+    mo.vstack([mo.md("# Prompt Variables"), placeholder_array, proceed_button]).style(styles["container"])
+    return all_placeholders, placeholder_array, proceed_button
 
 
 @app.cell
-def __(all_placeholders, mo, placeholder_array, proceed_button):
-    """Validate placeholder inputs and create filled values dictionary."""
+def __(mo, placeholder_array, proceed_button, all_placeholders):
     mo.stop(not placeholder_array.value or not len(placeholder_array.value), "")
 
     # Check if any values are missing
@@ -359,12 +355,11 @@ def __(all_placeholders, mo, placeholder_array, proceed_button):
 
     # Map the placeholder names to the values
     filled_values = dict(zip(all_placeholders, placeholder_array.value, strict=False))
-    return (filled_values,)
+    return filled_values
 
 
 @app.cell
 def __(filled_values, selected_prompt_1, selected_prompt_2):
-    """Replace placeholders in both prompts with filled values."""
     # Replace placeholders in both prompts
     final_prompt_1 = selected_prompt_1
     final_prompt_2 = selected_prompt_2
@@ -372,7 +367,8 @@ def __(filled_values, selected_prompt_1, selected_prompt_2):
     for key, value in filled_values.items():
         final_prompt_1 = final_prompt_1.replace(f"{{{{{key}}}}}", value)
         final_prompt_2 = final_prompt_2.replace(f"{{{{{key}}}}}", value)
-    return final_prompt_1, final_prompt_2, key, value
+
+    return final_prompt_1, final_prompt_2
 
 
 @app.cell
@@ -388,8 +384,8 @@ def __(
     models,
     pytz,
     question_input,
+    styles,
 ):
-    """Process prompts through LLM models and handle saving functionality."""
     # Get the selected models
     try:
         model_1 = models[form.value["model_dropdown_1"]]
@@ -403,7 +399,8 @@ def __(
         {e!s}
         ```
         Please ensure models are properly selected.
-        """).style({"color": "red", "padding": "10px", "border-radius": "5px", "background": "#ffebee"})
+        """).style(styles["error"])
+        return None
 
     # Run both prompts through their respective models
     try:
@@ -417,27 +414,18 @@ def __(
         {e!s}
         ```
         Please check your API keys and network connection.
-        """).style({"color": "red", "padding": "10px", "border-radius": "5px", "background": "#ffebee"})
+        """).style(styles["error"])
+        return None
 
     # Display responses side by side
     mo.hstack([
         mo.vstack([
-            mo.md(f"# First Prompt Output ({model_name_1})\n\n{prompt_response_1}").style({
-                "background": "#eee",
-                "padding": "10px",
-                "border-radius": "10px",
-                "width": "50%",
-            }),
+            mo.md(f"# First Prompt Output ({model_name_1})\n\n{prompt_response_1}").style(styles["prompt_display"]),
         ]),
         mo.vstack([
-            mo.md(f"# Second Prompt Output ({model_name_2})\n\n{prompt_response_2}").style({
-                "background": "#eee",
-                "padding": "10px",
-                "border-radius": "10px",
-                "width": "50%",
-            }),
+            mo.md(f"# Second Prompt Output ({model_name_2})\n\n{prompt_response_2}").style(styles["prompt_display"]),
         ]),
-    ])
+    ]).style(styles["container"])
 
     # Create save button and preview
     save_button = mo.ui.button("Save Comparison", tooltip="Save the comparison to a markdown file with timestamp")
@@ -454,37 +442,37 @@ def __(
             # Generate markdown content
             content = f"""# Prompt Comparison - {now.strftime("%Y-%m-%d %H:%M:%S %Z")}
 
-    ## Original Question
-    ```
-    {question_input.value}
-    ```
+## Original Question
+```
+{question_input.value}
+```
 
-    ## First Prompt (Model: {model_name_1})
-    ```xml
-    {final_prompt_1}
-    ```
+## First Prompt (Model: {model_name_1})
+```xml
+{final_prompt_1}
+```
 
-    ### Generated Response
-    ```
-    {prompt_response_1}
-    ```
+### Generated Response
+```
+{prompt_response_1}
+```
 
-    ## Second Prompt (Model: {model_name_2})
-    ```xml
-    {final_prompt_2}
-    ```
+## Second Prompt (Model: {model_name_2})
+```xml
+{final_prompt_2}
+```
 
-    ### Generated Response
-    ```
-    {prompt_response_2}
-    ```
-    """
+### Generated Response
+```
+{prompt_response_2}
+```
+"""
 
             # Update preview
             preview.value = f"""### Preview of file to be saved:
-    ```markdown
-    {content}
-    ```"""
+```markdown
+{content}
+```"""
 
             # Save file
             filename = f"{timestamp}_comparison.md"
@@ -494,56 +482,48 @@ def __(
                 filepath.write_text(content)
                 # Show success message
                 preview.value += f"\n\n✅ Saved to: {filepath}"
+                preview.style(styles["success"])
             except (PermissionError, OSError) as e:
                 preview.value += f"\n\n❌ **Error**: Failed to save file: {e!s}"
+                preview.style(styles["error"])
 
         except Exception as e:
             preview.value = f"""### ❌ Error
-    Failed to generate comparison:
-    ```
-    {e!s}
-    ```"""
+Failed to generate comparison:
+```
+{e!s}
+```"""
+            preview.style(styles["error"])
 
     mo.md("### Save Comparison")
-    mo.vstack([save_button, preview])
-    return (
-        model_1,
-        model_2,
-        model_name_1,
-        model_name_2,
-        preview,
-        prompt_response_1,
-        prompt_response_2,
-        save_button,
-        save_comparison,
-    )
+    mo.vstack([save_button, preview]).style(styles["container"])
+    return save_button
 
 
 @app.cell
-def __(mo):
-    """Display tool documentation and instructions."""
+def __(mo, styles):
     mo.md("""# Prompt Analysis Tool
 
-    This tool helps you compare different prompts using different LLM models. You can:
-    1. Select a predefined question or write your own
-    2. Choose two different prompts and LLM models to compare
-    3. Fill in any variables required by the prompts
-    4. Generate and compare responses
-    5. Save the comparison with timestamps for future reference
+This tool helps you compare different prompts using different LLM models. You can:
+1. Select a predefined question or write your own
+2. Choose two different prompts and LLM models to compare
+3. Fill in any variables required by the prompts
+4. Generate and compare responses
+5. Save the comparison with timestamps for future reference
 
-    The saved comparisons will be stored in the `compare` directory with timestamps in EDT.
+The saved comparisons will be stored in the `compare` directory with timestamps in EDT.
 
-    ### Error Handling
-    - The tool will display clear error messages if something goes wrong
-    - Check the error messages for:
-    - API key issues
-    - Network connection problems
-    - File permission errors
-    - Invalid prompt selections
+### Error Handling
+- The tool will display clear error messages if something goes wrong
+- Check the error messages for:
+  - API key issues
+  - Network connection problems
+  - File permission errors
+  - Invalid prompt selections
 
-    ### File Naming
-    Saved files will use the format: `YYYY-MM-DD-HH-MM-SS-EDT_comparison.md`""")
-    return
+### File Naming
+Saved files will use the format: `YYYY-MM-DD-HH-MM-SS-EDT_comparison.md`""").style(styles["container"])
+    return (None,)
 
 
 if __name__ == "__main__":

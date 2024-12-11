@@ -673,31 +673,31 @@ uv_deploy_docs:
 
 # Add bespoke adobe concepts to cursor context
 add-cursor-context:
-	mkdir -p prompt_library/vendored || true
-	gh repo clone universityofprofessorex/cerebro-bot prompt_library/vendored/cerebro-bot || true && cd prompt_library/vendored/cerebro-bot && git checkout feature-discord-utils && cd ../../..
-	gh repo clone bossjones/prompt_library prompt_library/vendored/prompt_library || true
-	gh repo clone langchain-ai/retrieval-agent-template prompt_library/vendored/retrieval-agent-template || true
-	gh repo clone langchain-ai/rag-research-agent-template prompt_library/vendored/rag-research-agent-template || true
-	gh repo clone langchain-ai/memory-template prompt_library/vendored/memory-template || true
-	gh repo clone langchain-ai/react-agent prompt_library/vendored/react-agent || true
-	gh repo clone langchain-ai/chat-langchain prompt_library/vendored/chat-langchain || true
-	gh repo clone bossjones/goob_ai prompt_library/vendored/goob_ai || true
-	gh repo clone langchain-ai/langchain prompt_library/vendored/langchain || true
-	gh repo clone langchain-ai/langgraph prompt_library/vendored/langgraph || true
-	gh repo clone CraftSpider/dpytest prompt_library/vendored/dpytest || true
+	mkdir -p vendored || true
+	gh repo clone universityofprofessorex/cerebro-bot vendored/cerebro-bot || true && cd vendored/cerebro-bot && git checkout feature-discord-utils && cd ../../..
+	gh repo clone langchain-ai/retrieval-agent-template vendored/retrieval-agent-template || true
+	gh repo clone langchain-ai/rag-research-agent-template vendored/rag-research-agent-template || true
+	gh repo clone langchain-ai/memory-template vendored/memory-template || true
+	gh repo clone langchain-ai/react-agent vendored/react-agent || true
+	gh repo clone langchain-ai/chat-langchain vendored/chat-langchain || true
+	gh repo clone bossjones/goob_ai vendored/goob_ai || true
+	gh repo clone langchain-ai/langchain vendored/langchain || true
+	gh repo clone langchain-ai/langgraph vendored/langgraph || true
+	gh repo clone CraftSpider/dpytest vendored/dpytest || true
+	gh repo clone marimo-team/marimo vendored/marimo || true
 
-	rm -rf prompt_library/vendored/cerebro-bot/.git
-	rm -rf prompt_library/vendored/prompt_library/.git
-	rm -rf prompt_library/vendored/retrieval-agent-template/.git
-	rm -rf prompt_library/vendored/rag-research-agent-template/.git
-	rm -rf prompt_library/vendored/memory-template/.git
-	rm -rf prompt_library/vendored/react-agent/.git
-	rm -rf prompt_library/vendored/chat-langchain/.git
-	rm -rf prompt_library/vendored/goob_ai/.git
-	rm -rf prompt_library/vendored/langchain/.git
-	rm -rf prompt_library/vendored/langgraph/.git
-	rm -rf prompt_library/vendored/langchain-academy/.git
-	rm -rf prompt_library/vendored/dpytest/.git
+	rm -rf vendored/cerebro-bot/.git
+	rm -rf vendored/retrieval-agent-template/.git
+	rm -rf vendored/rag-research-agent-template/.git
+	rm -rf vendored/memory-template/.git
+	rm -rf vendored/react-agent/.git
+	rm -rf vendored/chat-langchain/.git
+	rm -rf vendored/goob_ai/.git
+	rm -rf vendored/langchain/.git
+	rm -rf vendored/langgraph/.git
+	rm -rf vendored/langchain-academy/.git
+	rm -rf vendored/dpytest/.git
+	rm -rf vendored/marimo/.git
 
 # List outdated packages
 outdated:
