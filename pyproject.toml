@@ -187,12 +187,12 @@ extend-exclude = [
     "typings",
     "contrib",
     # Marimo notebook exclusions
-    "marimo_prompt_analysis.py",
-    "marimo_prompt_library.py",
-    "marimo_adhoc_prompting.py",
-    "marimo_is_awesome_demo.py",
-    "marimo_multi_llm_prompting.py",
-    "marimo_multi_language_model_ranker.py",
+    # "marimo_prompt_analysis.py",
+    # "marimo_prompt_library.py",
+    # "marimo_adhoc_prompting.py",
+    # "marimo_is_awesome_demo.py",
+    # "marimo_multi_llm_prompting.py",
+    # "marimo_multi_language_model_ranker.py",
     ".marimo",
 ]
 
@@ -254,6 +254,7 @@ select = [
 # SOURCE: https://github.com/ansible-collections/cloud-content-handbook/blob/9be137d78af4d1cc140b210f3058977164021c9d/proposals/ruff_transition.md - end
 # Conflicts with the formatter
 ignore = [
+    "N807",
     "C408",  # Checks for unnecessary calls to dict(), list(), or tuple() that can be rewritten as empty literals
     "UP031", # Checks for unnecessary format string usage
     "UP040", # Checks for unnecessary use of typing.TypeAlias in Python 3.12+
@@ -496,6 +497,14 @@ max-complexity = 31 # C901: Recommended goal is 10
 "test/*" = ["D"]
 "tests/conftest.py" = ["D", "F811"]
 "*.pyi" = ["D", "E501", "E701", "I002"]
+"marimo_*" = [
+    "D",
+    "N807",  # Function name should not start and end with `__`
+    "N803",  # Argument name should be lowercase
+    "N806",  # Variable in function should be lowercase
+    "F811",  # Redefinition of unused name
+    "RUF005" # collection-literal-concatenation (RUF005)
+]
 
 # ===========================[ ISORT ]========================
 # SOURCE: https://github.com/zulip/zulip/blob/f4d109c289f614273b43b411cbd8d1fad128842e/pyproject.toml#L199

@@ -458,29 +458,23 @@ prompt-library/
       <example>
         <![CDATA[
         # ✅ Correct Pattern
+        from prompt_library_module import process_data
+
         @app.cell
-        def __(previous_cell_output: str) -> tuple[str]:
-            """Process the output from previous cell and return formatted result.
-
-            Args:
-                previous_cell_output: The string output from previous cell
-
-            Returns:
-                tuple[str]: Processed result wrapped in a tuple
-            """
-            result = process_data(previous_cell_output)
-            return (result,)  # Note the comma for single-item tuple
+        def __(previous_output):
+            result = process_data(previous_output)
+            return (result,)
 
         # ❌ Common Errors
         @app.cell
-        def __():  # Missing type hints
-            result = process_data()
+        def __(unused_param):  # Don't include unused parameters
+            def local_func():  # Don't define functions in cells
+                pass
+            try:  # Don't do error handling in cells
+                result = process()
+            except Exception:
+                pass
             return result  # Missing tuple wrapping
-
-        @app.cell
-        def __():
-            # Missing docstring
-            return (result)  # Missing comma for single-item tuple
         ]]>
       </example>
     </cell_definition>
@@ -492,27 +486,20 @@ prompt-library/
       <example>
         <![CDATA[
         # ✅ Correct Pattern
+        from prompt_library_module import transform_data
+
         @app.cell
-        def __(data: pd.DataFrame, config: dict[str, Any]) -> tuple[pd.DataFrame]:
-            """Transform input data based on configuration.
-
-            Args:
-                data: Input DataFrame to transform
-                config: Configuration dictionary with transform parameters
-
-            Returns:
-                tuple[pd.DataFrame]: Transformed DataFrame in a tuple
-            """
+        def __(data, config):
             transformed = transform_data(data, config)
             return (transformed,)
 
         # ❌ Common Errors
-        global_var = []  # Avoid global state
-
         @app.cell
-        def __():
-            global_var.append(1)  # Mutating global state
-            return ()  # Empty tuple return
+        def __(data, unused_param):  # Remove unused param
+            result = []  # Don't create mutable state
+            for item in data:
+                result.append(item)  # Use transform_data from module instead
+            return (result,)
         ]]>
       </example>
     </state_management>

@@ -64,6 +64,7 @@ def __():
 
 @app.cell
 def __():
+    import importlib
     import os  # For path operations
 
     import marimo as mo
@@ -102,43 +103,17 @@ def __(Path, mo):
 
 
 @app.cell
-def __(mo, os, Path, prompt_library_module, styles):
+def __(mo, prompt_library_module):
     # Define the directories to search for prompts
     QUESTIONS_DIR = "one-off-tasks/lore-writing/helldivers2/johnhelldiver/questions"
     COMPARE_DIR = "one-off-tasks/lore-writing/helldivers2/johnhelldiver/compare"
     PROMPT_DIRS = ["./src/prompt_library/data/prompt_lib", "./one-off-tasks"]
 
-    # Validate prompt directories exist
-    missing_dirs = [d for d in PROMPT_DIRS if not os.path.exists(d)]
-    if missing_dirs:
-        mo.md(f"""
-        ⚠️ **Warning**: The following directories were not found:
-        ```
-        {chr(10).join(missing_dirs)}
-        ```
-        Some prompts may not be available.
-        """).style(styles["warning"])
-
     # Convert to Path objects and load prompts from all directories, filtering for XML files
     with mo.status.spinner(title="Loading XML prompts from all directories..."):
-        map_prompt_library: dict = prompt_library_module.pull_in_multiple_prompt_libraries(
-            directories=[Path(d) for d in PROMPT_DIRS], file_type="xml"
+        map_prompt_library = prompt_library_module.pull_in_multiple_prompt_libraries(
+            directories=PROMPT_DIRS, file_type="xml"
         )
-
-    if not map_prompt_library:
-        mo.md("""
-        ❌ **Error**: No XML prompts were loaded. Please check that:
-        1. The directories exist and are accessible
-        2. They contain valid XML prompt files
-        3. You have proper read permissions
-        """).style(styles["error"])
-    else:
-        mo.md(f"""
-        ✅ Successfully loaded **{len(map_prompt_library)}** XML prompts from:
-        ```
-        {chr(10).join(d for d in PROMPT_DIRS if os.path.exists(d))}
-        ```
-        """).style(styles["success"])
 
     return COMPARE_DIR, QUESTIONS_DIR, map_prompt_library
 
@@ -159,20 +134,15 @@ def __(mo, llm_module, styles):
 
 
 @app.cell
-def __(QUESTIONS_DIR, glob, mo, prompt_library_module):
-    # Get list of markdown files in questions directory
-    question_files = glob.glob(os.path.join(QUESTIONS_DIR, "*.md"))
-    question_names = ["None"] + [os.path.basename(f) for f in question_files]
+def __(QUESTIONS_DIR, mo, prompt_library_module):
+    question_names = ["None"] + prompt_library_module.get_question_files(QUESTIONS_DIR)
 
-    # Create dropdown for question selection
     question_selector = mo.ui.dropdown(
         options=question_names, value="None", label="Select a predefined question (or None to write your own)"
     )
 
-    # Create text area for question input
     question_input = mo.ui.text_area(value="", placeholder="Enter your question here...", label="Question")
 
-    # Update text area when selection changes
     if question_selector.value != "None":
         question_input.value = prompt_library_module.read_question_file(question_selector.value, QUESTIONS_DIR)
 

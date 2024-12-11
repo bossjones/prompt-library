@@ -195,6 +195,22 @@ def reset_rankings(model_ids: list[str]) -> list[ModelRanking]:
     return new_rankings
 
 
+def get_question_files(questions_dir: str) -> list[str]:
+    """Get list of markdown files in questions directory.
+
+    Args:
+        questions_dir: Path to questions directory
+
+    Returns:
+        List of markdown filenames without path
+    """
+    import glob
+    import os
+
+    question_files = glob.glob(os.path.join(questions_dir, "*.md"))
+    return [os.path.basename(f) for f in question_files]
+
+
 def pull_in_multiple_prompt_libraries(
     directories: list[Union[str, Path]], file_type: Optional[str] = None
 ) -> dict[str, str]:
