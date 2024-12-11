@@ -448,9 +448,13 @@ prompt-library/
 
   <marimo_standards>
     <cell_definition>
-      <standard>All cells must be decorated with @app.cell and contain proper docstrings.</standard>
+      <standard>All cells must be decorated with @app.cell.</standard>
       <standard>Always use explicit tuple returns, even for single values.</standard>
-      <standard>Include proper type hints for all parameters and return values.</standard>
+      <standard>No function definitions allowed in marimo notebook files (prefix: marimo_*).</standard>
+      <standard>All functions must be imported from prompt_library_module.py.</standard>
+      <standard>No error handling in notebook cells - handle errors in imported functions.</standard>
+      <standard>Cell parameters should only include variables actually used in the cell.</standard>
+      <standard>Skip type annotations and docstrings for marimo notebook cells.</standard>
       <example>
         <![CDATA[
         # ✅ Correct Pattern
