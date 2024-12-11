@@ -1,14 +1,17 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
 import shutil
+import sys
 
 from datetime import datetime
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Dict, Generator, List
 
 from _pytest.monkeypatch import MonkeyPatch
+from loguru import logger
 
 import pytest
 
@@ -30,6 +33,38 @@ if TYPE_CHECKING:
     from _pytest.logging import LogCaptureFixture
 
     from pytest_mock.plugin import MockerFixture
+
+
+@pytest.fixture(autouse=True)
+def setup_logger(caplog: LogCaptureFixture) -> Generator[None, None, None]:
+    """Configure loguru to use pytest's logging handler.
+
+    Args:
+        caplog: Pytest fixture for capturing log messages.
+
+    Yields:
+        None
+    """
+    # Remove default handler
+    logger.remove()
+
+    # Add handler that writes to pytest's caplog
+    logger.add(
+        lambda msg: caplog.handler.emit(
+            logging.LogRecord(
+                name=msg.record["name"],
+                level=msg.record["level"].no,
+                pathname=msg.record["file"].name,
+                lineno=msg.record["line"],
+                msg=msg.record["message"],
+                args=(),
+                exc_info=None,
+            )
+        ),
+        format="{message}",
+    )
+    yield
+    logger.remove()
 
 
 @pytest.fixture
@@ -74,6 +109,96 @@ def mock_env_paths(monkeypatch: MonkeyPatch, tmp_path: Path) -> dict[str, Path]:
         path.parent.mkdir(parents=True, exist_ok=True)
 
     return paths
+
+
+def test_pull_in_dir_recursively_with_logging(temp_dir_with_files: Path, caplog: LogCaptureFixture) -> None:
+    """Test pull_in_dir_recursively with logging verification.
+
+    Args:
+        temp_dir_with_files: Fixture providing temporary directory with test files.
+        caplog: Pytest fixture for capturing log messages.
+    """
+    result = pull_in_dir_recursively(str(temp_dir_with_files))
+
+    assert len(result) == 3
+    assert "file1.txt" in result
+    assert os.path.join("subdir1", "file2.txt") in result
+    assert os.path.join("subdir1", "subdir2", "file3.txt") in result
+
+    # Verify logging messages
+    assert "Attempting to read directory recursively" in caplog.text
+    assert "Successfully read 3 files" in caplog.text
+
+
+def test_pull_in_dir_recursively_nonexistent_dir(tmp_path: Path, caplog: LogCaptureFixture) -> None:
+    """Test pull_in_dir_recursively with a nonexistent directory.
+
+    Args:
+        tmp_path: Pytest fixture providing temporary directory path.
+        caplog: Pytest fixture for capturing log messages.
+    """
+    nonexistent_dir = tmp_path / "nonexistent"
+    result = pull_in_dir_recursively(str(nonexistent_dir))
+
+    assert result == {}
+    assert "Directory does not exist" in caplog.text
+    assert "Creating directory" in caplog.text
+
+
+def test_pull_in_dir_recursively_with_unreadable_file(temp_dir_with_files: Path, caplog: LogCaptureFixture) -> None:
+    """Test pull_in_dir_recursively with an unreadable file.
+
+    Args:
+        temp_dir_with_files: Fixture providing temporary directory with test files.
+        caplog: Pytest fixture for capturing log messages.
+    """
+    # Create an unreadable file
+    unreadable_file = temp_dir_with_files / "unreadable.txt"
+    unreadable_file.write_text("test")
+    os.chmod(str(unreadable_file), 0o000)
+
+    try:
+        result = pull_in_dir_recursively(str(temp_dir_with_files))
+
+        assert len(result) == 3  # Original 3 files should still be read
+        assert "unreadable.txt" not in result
+        assert "Failed to read file" in caplog.text
+    finally:
+        os.chmod(str(unreadable_file), 0o644)  # Restore permissions for cleanup
+
+
+def test_pull_in_prompt_library_with_files(mock_env_paths: dict[str, Path], caplog: LogCaptureFixture) -> None:
+    """Test pull_in_prompt_library with existing files.
+
+    Args:
+        mock_env_paths: Fixture providing mock environment paths.
+        caplog: Pytest fixture for capturing log messages.
+    """
+    # Create some test prompt files
+    prompt_dir = mock_env_paths["PROMPT_LIBRARY_DIR"]
+    prompt_dir.mkdir(parents=True, exist_ok=True)
+    (prompt_dir / "test1.xml").write_text("test1 content")
+    (prompt_dir / "test2.xml").write_text("test2 content")
+
+    result = pull_in_prompt_library()
+
+    assert len(result) == 2
+    assert "test1.xml" in result
+    assert "test2.xml" in result
+    assert "Successfully loaded 2 prompt library files" in caplog.text
+
+
+def test_pull_in_prompt_library_empty_dir(mock_env_paths: dict[str, Path], caplog: LogCaptureFixture) -> None:
+    """Test pull_in_prompt_library with an empty directory.
+
+    Args:
+        mock_env_paths: Fixture providing mock environment paths.
+        caplog: Pytest fixture for capturing log messages.
+    """
+    result = pull_in_prompt_library()
+
+    assert result == {}
+    assert "No prompt library files found" in caplog.text
 
 
 @pytest.fixture
@@ -307,12 +432,6 @@ def test_pull_in_dir_recursively(temp_dir_with_files: Path) -> None:
     assert result["file1.txt"] == "content1"
     assert result[os.path.join("subdir1", "file2.txt")] == "content2"
     assert result[os.path.join("subdir1", "subdir2", "file3.txt")] == "content3"
-
-
-def test_pull_in_dir_recursively_nonexistent_dir() -> None:
-    """Test handling of nonexistent directory."""
-    result = pull_in_dir_recursively("/nonexistent/directory")
-    assert result == {}
 
 
 def test_pull_in_prompt_library(mock_env_paths: dict[str, Path]) -> None:

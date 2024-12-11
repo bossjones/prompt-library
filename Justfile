@@ -861,55 +861,6 @@ pyright-verify-types:
 
 	echo "Verification complete."
 
-pyright-createstubs:
-	#!/bin/bash
-
-	# Function to run pyright-verify-types and capture output
-	run_pyright_verify() {
-	    packages=$(uv run pyright | cut -d '=' -f 1)
-	    output=""
-
-	    for package in $packages; do
-	        output+="Checking package: $package\n"
-	        output+="----------------------------------------\n"
-	        output+=$(pyright --verifytypes "$package")
-	        output+="\n----------------------------------------\n"
-	    done
-
-	    echo "$output"
-	}
-
-	# Run pyright-verify-types and store the output
-	current_output=$(run_pyright_verify)
-
-	# Check if previous output file exists
-	if [ -f "previous_output.log" ]; then
-	    previous_output=$(cat previous_output.log)
-
-	    # Compare current and previous outputs
-	    if [ "$current_output" != "$previous_output" ]; then
-	        echo "Changes detected. Updating typestubs..."
-
-	        # Update typestubs for each package
-	        packages=$(uv run pip freeze | cut -d '=' -f 1)
-	        for package in $packages; do
-	            echo "Updating typestubs for $package"
-	            pyright --createstub "$package"
-	        done
-
-	        echo "Typestubs updated successfully."
-	    else
-	        echo "No changes detected. Typestubs are up to date."
-	    fi
-	else
-	    echo "No previous output found. Creating initial output file."
-	fi
-
-	# Save current output for future comparison
-	echo "$current_output" > previous_output.log
-
-	echo "Script execution completed."
-
 pyright-createstubs-missing:
 	#!/bin/bash
 	# Run pyright and capture output

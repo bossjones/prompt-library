@@ -4,6 +4,7 @@ import json
 import os
 
 from datetime import datetime
+from pathlib import Path
 from typing import List
 
 from dotenv import load_dotenv
@@ -24,29 +25,49 @@ def pull_in_dir_recursively(directory: str) -> dict[str, str]:
     Returns:
         A dictionary mapping relative file paths to their contents.
     """
+    logger.info(f"Attempting to read directory recursively: {directory}")
+
     if not os.path.exists(directory):
+        logger.warning(f"Directory does not exist: {directory}")
         try:
+            logger.info(f"Creating directory: {directory}")
             os.makedirs(directory, exist_ok=True)
-        except (OSError, PermissionError):
+        except (OSError, PermissionError) as e:
+            logger.error(f"Failed to create directory {directory}: {e!s}")
             return {}
 
     result: dict[str, str] = {}
 
     def recursive_read(current_dir: str, prefix: str = "") -> None:
-        for item in os.listdir(current_dir):
-            item_path = os.path.join(current_dir, item)
-            if os.path.isfile(item_path):
-                if prefix:
-                    relative_path = os.path.join(prefix, item)
-                else:
-                    relative_path = os.path.relpath(item_path, directory)
-                with open(item_path, encoding="utf-8") as f:
-                    result[relative_path] = f.read()
-            elif os.path.isdir(item_path):
-                new_prefix = os.path.join(prefix, item) if prefix else item
-                recursive_read(item_path, new_prefix)
+        try:
+            items = os.listdir(current_dir)
+            logger.info(f"Reading {len(items)} items in {current_dir}")
+
+            for item in items:
+                item_path = os.path.join(current_dir, item)
+                if os.path.isfile(item_path):
+                    if prefix:
+                        relative_path = os.path.join(prefix, item)
+                    else:
+                        relative_path = os.path.relpath(item_path, directory)
+
+                    try:
+                        with open(item_path, encoding="utf-8") as f:
+                            logger.info(f"Reading file: {item_path}")
+                            result[relative_path] = f.read()
+                    except Exception as e:
+                        logger.error(f"Failed to read file {item_path}: {e!s}")
+                        continue
+
+                elif os.path.isdir(item_path):
+                    new_prefix = os.path.join(prefix, item) if prefix else item
+                    recursive_read(item_path, new_prefix)
+
+        except (OSError, PermissionError) as e:
+            logger.error(f"Failed to read directory {current_dir}: {e!s}")
 
     recursive_read(directory)
+    logger.info(f"Successfully read {len(result)} files from {directory}")
     return result
 
 
@@ -57,7 +78,19 @@ def pull_in_prompt_library() -> dict[str, str]:
         A dictionary mapping relative file paths to their contents.
     """
     prompt_library_dir = os.getenv("PROMPT_LIBRARY_DIR", "./src/prompt_library/data/prompt_lib")
-    return pull_in_dir_recursively(prompt_library_dir)
+    logger.info(f"Loading prompt library from: {prompt_library_dir}")
+
+    try:
+        result = pull_in_dir_recursively(prompt_library_dir)
+        if not result:
+            logger.warning("No prompt library files found")
+        else:
+            logger.info(f"Successfully loaded {len(result)} prompt library files")
+            logger.debug(f"Loaded files: {list(result.keys())}")
+        return result
+    except Exception as e:
+        logger.error(f"Failed to load prompt library: {e!s}")
+        return {}
 
 
 def pull_in_testable_prompts() -> dict[str, str]:
