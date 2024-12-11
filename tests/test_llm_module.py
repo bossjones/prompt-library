@@ -115,12 +115,12 @@ def mock_llm(mocker: MockerFixture) -> Generator[MockerFixture, None, None]:
 
 def test_conditional_render() -> None:
     """Test conditional template rendering."""
-    template = """% if show_greeting
+    template = """% if show_greeting:
 Hello ${name}!
-% endif
-% if show_farewell
+% endif:
+% if show_farewell:
 Goodbye ${name}!
-% endif"""
+% endif:"""
 
     # Test with both conditions true
     context = {"show_greeting": True, "show_farewell": True, "name": "World"}

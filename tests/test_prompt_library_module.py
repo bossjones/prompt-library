@@ -119,6 +119,7 @@ def test_pull_in_prompt_library(mock_env_paths: dict[str, Path]) -> None:
         mock_env_paths: Fixture providing mock environment paths.
     """
     lib_dir = mock_env_paths["PROMPT_LIBRARY_DIR"]
+    lib_dir.mkdir(parents=True, exist_ok=True)
     (lib_dir / "prompt1.txt").write_text("prompt content 1")
     (lib_dir / "prompt2.txt").write_text("prompt content 2")
 
@@ -137,6 +138,7 @@ def test_pull_in_testable_prompts(mock_env_paths: dict[str, Path]) -> None:
         mock_env_paths: Fixture providing mock environment paths.
     """
     test_dir = mock_env_paths["TESTABLE_PROMPTS_DIR"]
+    test_dir.mkdir(parents=True, exist_ok=True)
     (test_dir / "test1.txt").write_text("test content 1")
     (test_dir / "test2.txt").write_text("test content 2")
 

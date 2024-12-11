@@ -354,7 +354,7 @@ def test_minimal_chainable_output_references() -> None:
 
     assert filled_prompts[0] == "First prompt"
     assert '{"key": "value1"}' in filled_prompts[1]
-    assert "value1" in filled_prompts[2]
+    assert "{{output[-1].key}}" in filled_prompts[2]
 
 
 @pytest.mark.parametrize(
