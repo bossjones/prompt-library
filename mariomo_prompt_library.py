@@ -1,11 +1,6 @@
 # pragma: no cover
 from __future__ import annotations
 
-import importlib
-import os
-
-from pathlib import Path
-
 import marimo
 
 
@@ -15,7 +10,11 @@ app = marimo.App(width="medium")
 
 @app.cell
 def __():
+    import importlib
+    import os
     import re  # For regex to extract placeholders
+
+    from pathlib import Path
 
     import marimo as mo
 
@@ -24,7 +23,7 @@ def __():
     # Force reload of the module to get the latest version
     importlib.reload(prompt_library_module)
 
-    return llm_module, mo, os, Path, prompt_library_module, re
+    return llm_module, mo, os, Path, prompt_library_module, re, os
 
 
 @app.cell

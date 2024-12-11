@@ -121,7 +121,7 @@ def __(llm_module):
         "o1-preview": llm_o1_preview,
         "gpt-4o-mini": llm_gpt_4o_mini,
     }
-    return models
+    return (models,)
 
 
 @app.cell
@@ -279,7 +279,7 @@ def __(mo, placeholder_array, proceed_button, all_placeholders):
 
     # Map the placeholder names to the values
     filled_values = dict(zip(all_placeholders, placeholder_array.value, strict=False))
-    return filled_values
+    return (filled_values,)
 
 
 @app.cell

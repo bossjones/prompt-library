@@ -447,6 +447,31 @@ prompt-library/
   </prompt_engineering_standards>
 
   <marimo_standards>
+    <imports>
+      <standard>All external imports must be in the first cell of marimo_* files.</standard>
+      <standard>First cell should import and return all modules needed by subsequent cells.</standard>
+      <standard>Use importlib.reload() for development modules that may change.</standard>
+      <standard>Return all imported modules as a tuple for use by other cells.</standard>
+      <example>
+        <![CDATA[
+        @app.cell
+        def __():
+            """Global imports cell - no type hints or docstring needed for marimo cells."""
+            import re
+            import os
+            import importlib
+            import marimo as mo
+            from pathlib import Path
+            from prompt_library.common import llm_module, prompt_library_module
+
+            # Reload development modules
+            importlib.reload(prompt_library_module)
+
+            return llm_module, mo, os, Path, prompt_library_module, re
+        ]]>
+      </example>
+    </imports>
+
     <cell_definition>
       <standard>All cells must be decorated with @app.cell.</standard>
       <standard>Always use explicit tuple returns, even for single values.</standard>

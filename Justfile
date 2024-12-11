@@ -876,3 +876,9 @@ pyright-createstubs-missing:
 		echo "Creating stub for package: $package"
 		uv run pyright --createstub "$package"
 	done
+
+copy-rules:
+	@echo "🚀 Starting the copy process..."
+	cp -av cursorrules.xml .cursorrules
+	cp -av cursorrules.xml aider_configs/aider_rules
+	@echo "✅ Copy completed successfully!"
