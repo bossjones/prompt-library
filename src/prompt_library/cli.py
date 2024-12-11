@@ -38,7 +38,8 @@ import typer
 from langchain.globals import set_debug, set_verbose
 from langchain_chroma import Chroma as ChromaVectorStore
 from loguru import logger
-from rich import print, print_json
+from rich import print as rich_print
+from rich import print_json
 from rich.console import Console
 from rich.pretty import pprint
 from rich.prompt import Prompt

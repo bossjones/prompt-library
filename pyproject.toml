@@ -60,6 +60,7 @@ dependencies = [
     "langgraph-sdk>=0.1.43",
     "langgraph>=0.2.56",
     "langsmith>=0.1.147",
+    "asyncer>=0.0.8",
 ]
 
 [dependency-groups]
