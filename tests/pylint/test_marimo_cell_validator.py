@@ -50,6 +50,9 @@ def test_missing_cell_decorator(linter: UnittestLinter, marimo_checker: BaseChec
     walker = ASTWalker(linter)
     walker.add_checker(marimo_checker)
 
+    # Register the message with the linter
+    linter.register_message(marimo_checker.msgs["W9001"])
+
     with assert_adds_messages(
         linter,
         MessageTest(
@@ -80,6 +83,9 @@ def test_invalid_cell_name(linter: UnittestLinter, marimo_checker: BaseChecker) 
     root_node = astroid.parse(code, "marimo_test.py")
     walker = ASTWalker(linter)
     walker.add_checker(marimo_checker)
+
+    # Register the message with the linter
+    linter.register_message(marimo_checker.msgs["W9003"])
 
     with assert_adds_messages(
         linter,
@@ -113,6 +119,9 @@ def test_nested_function_definition(linter: UnittestLinter, marimo_checker: Base
     root_node = astroid.parse(code, "marimo_test.py")
     walker = ASTWalker(linter)
     walker.add_checker(marimo_checker)
+
+    # Register the message with the linter
+    linter.register_message(marimo_checker.msgs["W9002"])
 
     with assert_adds_messages(
         linter,
