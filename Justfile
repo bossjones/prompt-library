@@ -40,8 +40,11 @@ test:
 
 test-marimo:
 	@echo "🚀 Testing code: Running pytest"
-	{{UV_RUN}} pytest --diff-width=60 --diff-symbols --cov-append --cov-report=term-missing --junitxml=junit/test-results.xml --cov-report=xml:cov.xml --cov-report=html:htmlcov --cov-report=annotate:cov_annotate --cov=. tests/pylint/test_marimo_cell_params_validator.py
+	PYTHONPATH=pylint/plugins {{UV_RUN}} pytest -v --diff-width=60 --diff-symbols --cov-append --cov-report=term-missing --junitxml=junit/test-results.xml --cov-report=xml:cov.xml --cov-report=html:htmlcov --cov-report=annotate:cov_annotate --cov=. tests/pylint/test_marimo_cell_params_validator.py
 
+test-marimo-debug:
+	@echo "🚀 Testing code: Running pytest"
+	PYTHONPATH=pylint/plugins {{UV_RUN}} pytest -s -vv --diff-width=60 --diff-symbols --pdb --pdbcls bpdb:BPdb --showlocals --tb=short --cov-append --cov-report=term-missing --junitxml=junit/test-results.xml --cov-report=xml:cov.xml --cov-report=html:htmlcov --cov-report=annotate:cov_annotate --cov=. tests/pylint/test_marimo_cell_params_validator.py
 
 # Build wheel file
 build: clean-build
@@ -904,6 +907,7 @@ pylint-plugin-debug-good:
 test-pylint-plugin: test pylint-plugin-debug-bad
 
 hass-files-to-prompt:
+	@echo "🚀 Running files-to-promt for hass pylint plugin example"
 	uv run files-to-prompt \
 	/Users/malcolm/dev/home-assistant/core/pyproject.toml \
 	/Users/malcolm/dev/home-assistant/core/pylint/plugins/hass_decorator.py \
@@ -915,3 +919,24 @@ hass-files-to-prompt:
 	-o \
 	/Users/malcolm/dev/bossjones/prompt-library/ai_docs/hass_example_pylint_plugin/hass_pylint_plugin_output.xml
 	bat --theme=Nord /Users/malcolm/dev/bossjones/prompt-library/ai_docs/hass_example_pylint_plugin/hass_pylint_plugin_output.xml
+	@echo "🚀 Running files-to-promt for prompt-library pylint plugin example"
+	uv run files-to-prompt \
+	/Users/malcolm/dev/bossjones/prompt-library/pyproject.toml \
+	/Users/malcolm/dev/bossjones/prompt-library/Justfile \
+	/Users/malcolm/dev/bossjones/prompt-library/pylint/plugins/marimo_cell_params_validator.py \
+	/Users/malcolm/dev/bossjones/prompt-library/pylint/ruff.toml \
+	/Users/malcolm/dev/bossjones/prompt-library/tests/pylint/__init__.py \
+	/Users/malcolm/dev/bossjones/prompt-library/tests/pylint/conftest.py \
+	/Users/malcolm/dev/bossjones/prompt-library/tests/pylint/test_marimo_cell_params_validator.py \
+	--cxml \
+	-o \
+	/Users/malcolm/dev/bossjones/prompt-library/ai_docs/hass_example_pylint_plugin/prompt_library_pylint_plugin_output.xml
+	bat --theme=Nord /Users/malcolm/dev/bossjones/prompt-library/ai_docs/hass_example_pylint_plugin/prompt_library_pylint_plugin_output.xml
+
+functional-test:
+	{{UV_RUN}} python tests/test_functional.py -s -vv --diff-width=60 --diff-symbols --pdb --pdbcls bpdb:BPdb --showlocals --tb=short --cov-append --cov-report=term-missing --junitxml=junit/test-results.xml --cov-report=xml:cov.xml --cov-report=html:htmlcov --cov-report=annotate:cov_annotate --cov=.
+
+
+# ytest -s -vv --diff-width=60 --diff-symbols --pdb --pdbcls bpdb:BPdb --showlocals --tb=short --cov-append --cov-report=term-missing --junitxml=junit/test-results.xml --cov-report=xml:cov.xml --cov-report=html:htmlcov --cov-report=annotate:cov_annotate --cov=. tests/pylint/test_marimo_cell_params_validator.py
+pylint-smoke-test:
+	uv run python pylint/plugins/marimo_cell_params_validator.py

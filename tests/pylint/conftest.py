@@ -97,17 +97,17 @@ def marimo_cell_validator_fixture() -> ModuleType:
 #     )
 
 
-# @pytest.fixture(name="marimo_cell_params_validator", scope="package")
-# def marimo_cell_params_validator_fixture() -> ModuleType:
-#     """Fixture to provide the Marimo cell parameters validator module.
+@pytest.fixture(name="marimo_cell_params_validator", scope="package")
+def marimo_cell_params_validator_fixture() -> ModuleType:
+    """Fixture to provide the Marimo cell parameters validator module.
 
-#     Returns:
-#         ModuleType: The loaded Marimo cell parameters validator module
-#     """
-#     return _load_plugin_from_file(
-#         "marimo_cell_params_validator",
-#         "pylint/plugins/marimo_cell_params_validator.py",
-#     )
+    Returns:
+        ModuleType: The loaded Marimo cell parameters validator module
+    """
+    return _load_plugin_from_file(
+        "marimo_cell_params_validator",
+        "pylint/plugins/marimo_cell_params_validator.py",
+    )
 
 
 # @pytest.fixture(name="marimo_checker")

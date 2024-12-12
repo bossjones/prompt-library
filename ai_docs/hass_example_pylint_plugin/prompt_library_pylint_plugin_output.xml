@@ -1,3 +1,7 @@
+<documents>
+<document index="1">
+<source>/Users/malcolm/dev/bossjones/prompt-library/pyproject.toml</source>
+<document_content>
 [project]
 name = "prompt-library"
 version = "0.1.0"
@@ -1053,6 +1057,10 @@ init-hook = """\
 load-plugins = [
     "pylint.extensions.code_style",
     "pylint.extensions.typing",
+    # "pylint_pydantic",
+    # "marimo_cell_validator",
+    # "marimo_imports_validator",
+    # "marimo_function_validator",
     "marimo_cell_params_validator"
 ]
 persistent = false
@@ -1468,3 +1476,1763 @@ blacken-docs = true
 
 [tool.nbqa.shell]
 flake8heavened = true
+
+</document_content>
+</document>
+<document index="2">
+<source>/Users/malcolm/dev/bossjones/prompt-library/Justfile</source>
+<document_content>
+set shell := ["zsh", "-cu"]
+
+# just manual: https://github.com/casey/just/#readme
+
+# Ignore the .env file that is only used by the web service
+set dotenv-load := false
+
+CURRENT_DIR := "$(pwd)"
+
+base64_cmd := if "{{os()}}" == "macos" { "base64 -w 0 -i cert.pem -o ca.pem" } else { "base64 -w 0 -i cert.pem > ca.pem" }
+grep_cmd := if "{{os()}}" =~ "macos" { "ggrep" } else { "grep" }
+
+# Variables
+PYTHON := "uv run python"
+UV_RUN := "uv run"
+
+# Recipes
+# Install the virtual environment and install the pre-commit hooks
+install:
+	@echo "🚀 Creating virtual environment using uv"
+	uv sync
+	uv tool upgrade pyright
+	uv run pre-commit install
+
+# Run code quality tools.
+check:
+	@echo "🚀 Checking lock file consistency with 'pyproject.toml'"
+	uv lock --locked
+	@echo "🚀 Linting code: Running pre-commit"
+	uv run pre-commit run -a
+	@echo "🚀 Static type checking: Running mypy"
+	uv run mypy
+	@echo "🚀 Checking for obsolete dependencies: Running deptry"
+	uv run deptry .
+
+# Test the code with pytest
+test:
+	@echo "🚀 Testing code: Running pytest"
+	{{UV_RUN}} pytest --diff-width=60 --diff-symbols --cov-append --cov-report=term-missing --junitxml=junit/test-results.xml --cov-report=xml:cov.xml --cov-report=html:htmlcov --cov-report=annotate:cov_annotate --cov=.
+
+test-marimo:
+	@echo "🚀 Testing code: Running pytest"
+	{{UV_RUN}} pytest --diff-width=60 --diff-symbols --cov-append --cov-report=term-missing --junitxml=junit/test-results.xml --cov-report=xml:cov.xml --cov-report=html:htmlcov --cov-report=annotate:cov_annotate --cov=. tests/pylint/test_marimo_cell_params_validator.py
+
+
+# Build wheel file
+build: clean-build
+	@echo "🚀 Creating wheel file"
+	uvx --from build pyproject-build --installer uv
+
+# Clean build artifacts
+clean-build:
+	@echo "🚀 Removing build artifacts"
+	{{PYTHON}} -c "import shutil; import os; shutil.rmtree('dist') if os.path.exists('dist') else None"
+
+# Publish a release to PyPI.
+publish:
+	@echo "🚀 Publishing."
+	uvx twine upload --repository-url https://upload.pypi.org/legacy/ dist/*
+
+# Build and publish.
+build-and-publish: build publish
+
+# Test if documentation can be built without warnings or errors
+docs-test:
+	uv run mkdocs build -s
+
+# Build and serve the documentation
+docs:
+	uv run mkdocs serve
+
+help:
+	@just --list
+
+default: help
+
+
+# Print the current operating system
+info:
+		print "OS: {{os()}}"
+
+# Display system information
+system-info:
+	@echo "CPU architecture: {{ arch() }}"
+	@echo "Operating system type: {{ os_family() }}"
+	@echo "Operating system: {{ os() }}"
+
+# verify python is running under pyenv
+which-python:
+		python -c "import sys;print(sys.executable)"
+
+# when developing, you can use this to watch for changes and restart the server
+autoreload-code:
+	uv run watchmedo auto-restart --pattern "*.py" --recursive --signal SIGTERM uv run goobctl go
+
+# Open the HTML coverage report in the default
+local-open-coverage:
+	./scripts/open-browser.py file://${PWD}/htmlcov/index.html
+
+# Open the HTML coverage report in the default
+open-coverage: local-open-coverage
+
+# Run unit tests and open the coverage report
+local-unittest:
+	bash scripts/unittest-local
+	./scripts/open-browser.py file://${PWD}/htmlcov/index.html
+
+# Run all pre-commit hooks on all files
+pre-commit-run-all:
+	uv run pre-commit run --all-files
+
+# Install pre-commit hooks
+pre-commit-install:
+	uv run pre-commit install
+
+# Display the dependency tree of the project
+pipdep-tree:
+	pipdeptree --python .venv/bin/python3
+
+# install uv tools globally
+uv-tool-install:
+	uv install invoke
+	uv install pipdeptree
+	uv install click
+
+# Lint GitHub Actions workflow files
+lint-github-actions:
+	actionlint
+
+# check that taplo is installed to lint/format TOML
+check-taplo-installed:
+	@command -v taplo >/dev/null 2>&1 || { echo >&2 "taplo is required but it's not installed. run 'brew install taplo'"; exit 1; }
+
+# Format Python files using pre-commit
+fmt-python:
+	git ls-files '*.py' '*.ipynb' | xargs uv run pre-commit run --files
+
+# Format Markdown files using pre-commit
+fmt-markdown-pre-commit:
+	git ls-files '*.md' | xargs uv run pre-commit run --files
+
+# format pyproject.toml using taplo
+fmt-toml:
+	uv run pre-commit run taplo-format --all-files
+
+# SOURCE: https://github.com/PovertyAction/ipa-data-tech-handbook/blob/ed81492f3917ee8c87f5d8a60a92599a324f2ded/Justfile
+
+# Format all markdown and config files
+fmt-markdown:
+	git ls-files '*.md' | xargs uv run mdformat
+
+# Format a single markdown file, "f"
+fmt-md f:
+	uv run mdformat {{ f }}
+
+# format all code using pre-commit config
+fmt: fmt-python fmt-toml fmt-markdown fmt-markdown fmt-markdown-pre-commit
+
+# lint python files using ruff
+lint-python:
+	pre-commit run ruff --all-files
+
+# lint TOML files using taplo
+lint-toml: check-taplo-installed
+	echo "noop"
+# pre-commit run taplo-lint --all-files
+
+# lint yaml files using yamlfix
+lint-yaml:
+	pre-commit run yamlfix --all-files
+
+# lint pyproject.toml and detect log_cli = true
+lint-check-log-cli:
+	pre-commit run detect-pytest-live-log --all-files
+
+# Check format of all markdown files
+lint-check-markdown:
+	uv run mdformat --check .
+
+# Lint all files in the current directory (and any subdirectories).
+lint: lint-python lint-check-log-cli
+
+# generate type stubs for the project
+createstubs:
+	./scripts/createstubs.sh
+
+# sweep init
+sweep-init:
+	uv run sweep init
+
+# TODO: We should try out trunk
+# By default, we use the following config that runs Trunk, an opinionated super-linter that installs all the common formatters and linters for your codebase. You can set up and configure Trunk for yourself by following https://docs.trunk.io/get-started.
+# sandbox:
+#   install:
+#     - trunk init
+#   check:
+#     - trunk fmt {file_path}
+#     - trunk check {file_path}
+
+# Download AI models from Dropbox
+download-models:
+	curl -L 'https://www.dropbox.com/s/im6ytahqgbpyjvw/ScreenNetV1.pth?dl=1' > data/ScreenNetV1.pth
+
+# Perform a dry run of dependency upgrades
+upgrade-dry-run:
+	uv lock --update-all --all-features
+
+# Upgrade all dependencies and sync the environment
+sync-upgrade-all:
+	uv sync --update-all --all-features
+
+# Start a background HTTP server for test fixtures
+http-server-background:
+	#!/bin/bash
+	# _PID=$(pgrep -f " -m http.server --bind localhost 19000 -d ./tests/fixtures")
+	pkill -f " -m http.server --bind localhost 19000 -d ./tests/fixtures"
+	python3 -m http.server --bind localhost 19000 -d ./tests/fixtures &
+	echo $! > PATH.PID
+
+# Start an HTTP server for test fixtures
+http-server:
+	#!/bin/bash
+	# _PID=$(pgrep -f " -m http.server --bind localhost 19000 -d ./tests/fixtures")
+	pkill -f " -m http.server --bind localhost 19000 -d ./tests/fixtures"
+	python3 -m http.server --bind localhost 19000 -d ./tests/fixtures
+	echo $! > PATH.PID
+
+# Bump the version by major
+major-version-bump:
+	uv version
+	uv version --bump major
+
+# Bump the version by minor
+minor-version-bump:
+	uv version
+	uv version --bump minor
+
+# Bump the version by patch
+patch-version-bump:
+	uv version
+	uv version --bump patch
+
+# Bump the version by major
+version-bump-major: major-version-bump
+
+# Bump the version by minor
+version-bump-minor: minor-version-bump
+
+# Bump the version by patch
+version-bump-patch: patch-version-bump
+
+# Serve the documentation locally for preview
+docs_preview:
+	uv run mkdocs serve
+
+# Build the documentation
+docs_build:
+	uv run mkdocs build
+
+# Deploy the documentation to GitHub Pages
+docs_deploy:
+	uv run mkdocs gh-deploy --clean
+
+# Generate a draft changelog
+changelog:
+	uv run towncrier build --version main --draft
+
+# Checkout main branch and pull latest changes
+gco:
+	gco main
+	git pull --rebase
+
+# Show diff for LangChain migration
+langchain-migrate-diff:
+	langchain-cli migrate --include-ipynb --diff prompt_library
+
+# Perform LangChain migration
+langchain-migrate:
+	langchain-cli migrate --include-ipynb prompt_library
+
+# Get the ruff config
+get-ruff-config:
+	uv run ruff check --show-settings --config pyproject.toml -v -o ruff_config.toml >> ruff.log 2>&1
+
+# Run lint and test
+ci:
+	uv run lint
+	uv run test
+
+# Open a manhole shell
+manhole-shell:
+	./scripts/manhole-shell
+
+# Find the cassettes directories
+find-cassettes-dirs:
+	fd -td cassettes
+
+# Delete the cassettes directories
+delete-cassettes:
+	fd -td cassettes -X rm -ri
+
+# Install brew dependencies
+brew-deps:
+	brew install libmagic poppler tesseract pandoc qpdf tesseract-lang
+	brew install --cask libreoffice
+
+# install aicommits and configure it
+init-aicommits:
+	npm install -g aicommits
+	aicommits config set OPENAI_KEY=$OCO_OPENAI_API_KEY type=conventional model=gpt-4o max-length=100
+	aicommits hook install
+
+# Run aider
+aider:
+	uv run aider -c .aider.conf.yml --aiderignore .aiderignore
+
+aider-o1-preview:
+	uv run aider -c .aider.conf.yml --aiderignore .aiderignore --o1-preview --architect --edit-format whole --model o1-mini --no-stream
+
+aider-sonnet:
+	uv run aider -c .aider.conf.yml --aiderignore .aiderignore --sonnet --architect --map-tokens 2048 --cache-prompts --edit-format diff
+
+# Run aider with Claude
+aider-claude:
+	uv run aider -c .aider.conf.yml --aiderignore .aiderignore --model 'anthropic/claude-3-5-sonnet-20241022'
+
+
+# SOURCE: https://github.com/RobertCraigie/prisma-client-py/blob/da53c4280756f1a9bddc3407aa3b5f296aa8cc10/Makefile#L77
+# Remove all generated files and caches
+clean:
+	#!/bin/bash
+	rm -rf .cache
+	rm -rf `find . -name __pycache__`
+	rm -rf .tests_cache
+	rm -rf .mypy_cache
+	rm -rf htmlcov
+	rm -rf *.egg-info
+	rm -f .coverage
+	rm -f .coverage.*
+	rm -rf build
+	rm -rf dist
+	rm -f coverage.xml
+
+# Create a token for authentication
+uv_create_token:
+	{{PYTHON}} -c "from prompt_library.cli import create_token; create_token()"
+
+# Show current database state
+uv_db_current:
+	{{PYTHON}} -c "from prompt_library.cli import db_current; db_current()"
+
+# Upgrade database to latest version
+uv_db_upgrade:
+	{{PYTHON}} -c "from prompt_library.cli import db_upgrade; db_upgrade()"
+
+# Downgrade database to previous version
+uv_db_downgrade:
+	{{PYTHON}} -c "from prompt_library.cli import db_downgrade; db_downgrade()"
+
+# Export a collection of data
+uv_export_collection:
+	{{PYTHON}} -c "from prompt_library.cli import export_collection; export_collection()"
+
+# Import a collection of data
+uv_import_collection:
+	{{PYTHON}} -c "from prompt_library.cli import import_collection; import_collection()"
+
+# Import a single file
+uv_import_file:
+	{{PYTHON}} -c "from prompt_library.cli import import_file; import_file()"
+
+# Lint markdown files
+uv_lint_markdown:
+	{{UV_RUN}} pymarkdownlnt --disable-rules=MD013,MD034 scan README.md
+
+# Serve documentation locally
+uv_serve_docs:
+	{{UV_RUN}} mkdocs serve
+
+# Convert pylint configuration to ruff
+uv_pylint_to_ruff:
+	{{UV_RUN}} pylint-to-ruff
+
+# Start a simple HTTP server
+uv_http:
+	{{UV_RUN}} -m http.server 8008
+
+# Display current user
+uv_whoami:
+	whoami
+
+# Install missing mypy type stubs
+uv_mypy_missing:
+	{{UV_RUN}} mypy --install-types
+
+# Run pre-commit hooks on all files
+uv_fmt:
+	{{UV_RUN}} pre-commit run --all-files
+
+# Run pylint checks
+uv_pylint:
+	{{PYTHON}} -m invoke ci.pylint --everything
+
+# Run pylint with error-only configuration
+uv_pylint_error_only:
+	{{UV_RUN}} pylint --output-format=colorized --disable=all --max-line-length=120 --enable=F,E --rcfile pyproject.toml src/prompt_library tests
+
+# Run pylint on all files
+uv_lint_all:
+	{{PYTHON}} -m pylint -j4 --output-format=colorized --rcfile pyproject.toml tests prompt_library
+
+# Run ruff linter
+uv_lint:
+	{{PYTHON}} -m ruff check --fix . --config=pyproject.toml
+
+# Run all typecheck tasks
+uv_typecheck:
+	just uv_typecheck_pyright
+	just uv_typecheck_mypy
+
+# Run Pyright type checker
+uv_typecheck_pyright:
+	{{UV_RUN}} pyright -p pyproject.toml .
+
+# Verify types using Pyright, ignoring external packages
+uv_typecheck_verify_types:
+	{{UV_RUN}} pyright --verifytypes prompt_library --ignoreexternal --verbose
+
+# Run MyPy type checker and open coverage report
+uv_typecheck_mypy:
+	just uv_ci_mypy
+	just uv_open_mypy_coverage
+
+# Generate changelog draft
+uv_docs_changelog:
+	{{UV_RUN}} towncrier build --version main --draft
+
+# Run MyPy with various report formats
+uv_ci_mypy:
+	{{UV_RUN}} mypy --config-file=pyproject.toml --html-report typingcov --cobertura-xml-report typingcov_cobertura --xml-report typingcov_xml --txt-report typingcov_txt .
+
+# Open MyPy coverage report
+uv_open_mypy_coverage:
+	open typingcov/index.html
+
+# Open Zipkin UI
+uv_open_zipkin:
+	open http://127.0.0.1:9411
+
+# Open OpenTelemetry endpoint
+uv_open_otel:
+	open http://127.0.0.1:4317
+
+# Open test coverage report
+uv_open_coverage:
+	just local-open-coverage
+
+# Open pgAdmin
+uv_open_pgadmin:
+	open http://127.0.0.1:4000
+
+# Open Prometheus UI
+uv_open_prometheus:
+	open http://127.0.0.1:9999
+
+# Open Grafana UI
+uv_open_grafana:
+	open http://127.0.0.1:3333
+
+# Open Chroma UI
+uv_open_chroma:
+	open http://127.0.0.1:9010
+
+# Open ChromaDB Admin UI
+uv_open_chromadb_admin:
+	open http://127.0.0.1:4001
+
+# Open all UIs and reports
+uv_open_all:
+	just uv_open_mypy_coverage
+	just uv_open_chroma
+	just uv_open_zipkin
+	just uv_open_otel
+	just uv_open_pgadmin
+	just uv_open_prometheus
+	just uv_open_grafana
+	just uv_open_chromadb_admin
+	just uv_open_coverage
+
+
+# Run simple unit tests with coverage
+uv_unittests_simple:
+	{{UV_RUN}} pytest --diff-width=60 --diff-symbols --cov-append --cov-report=term-missing --junitxml=junit/test-results.xml --cov-report=xml:cov.xml --cov-report=html:htmlcov --cov-report=annotate:cov_annotate --cov=.
+
+# Run unit tests in debug mode with extended output
+uv_unittests_debug:
+	{{UV_RUN}} pytest -s -vv --diff-width=60 --diff-symbols --pdb --pdbcls bpdb:BPdb --showlocals --tb=short --cov-append --cov-report=term-missing --junitxml=junit/test-results.xml --cov-report=xml:cov.xml --cov-report=html:htmlcov --cov-report=annotate:cov_annotate --cov=.
+
+# Run service-related unit tests in debug mode
+uv_unittests_debug_services:
+	{{UV_RUN}} pytest -m services -s -vv --diff-width=60 --diff-symbols --pdb --pdbcls bpdb:BPdb --showlocals --tb=short --cov-append --cov-report=term-missing --junitxml=junit/test-results.xml --cov-report=xml:cov.xml --cov-report=html:htmlcov --cov-report=annotate:cov_annotate --cov=.
+
+# Run asynciotyper-related unit tests in debug mode
+uv_unittests_debug_asynciotyper:
+	{{UV_RUN}} pytest -s -vv --diff-width=60 --diff-symbols --showlocals --tb=short --cov-append --cov-report=term-missing --junitxml=junit/test-results.xml --cov-report=xml:cov.xml --cov-report=html:htmlcov --cov-report=annotate:cov_annotate --cov=. -m asynciotyper
+
+# Run pgvector-related unit tests in debug mode
+uv_unittests_debug_pgvector:
+	{{UV_RUN}} pytest -m pgvectoronly -s -vv --diff-width=60 --diff-symbols --pdb --pdbcls bpdb:BPdb --showlocals --tb=short --cov-append --cov-report=term-missing --junitxml=junit/test-results.xml --cov-report=xml:cov.xml --cov-report=html:htmlcov --cov-report=annotate:cov_annotate --cov=.
+
+# Profile unit tests in debug mode using pyinstrument
+uv_profile_unittests_debug:
+	{{UV_RUN}} pyinstrument -m pytest -s -vv --diff-width=60 --diff-symbols --pdb --pdbcls bpdb:BPdb --showlocals --tb=short --cov-append --cov-report=term-missing --junitxml=junit/test-results.xml --cov-report=xml:cov.xml --cov-report=html:htmlcov --cov-report=annotate:cov_annotate --cov=.
+
+# Profile unit tests in debug mode using py-spy
+uv_spy_unittests_debug:
+	{{UV_RUN}} py-spy top -- python -m pytest -s -vv --diff-width=60 --diff-symbols --pdb --pdbcls bpdb:BPdb --showlocals --tb=short --cov-append --cov-report=term-missing --junitxml=junit/test-results.xml --cov-report=xml:cov.xml --cov-report=html:htmlcov --cov-report=annotate:cov_annotate --cov=.
+
+# Run standard unit tests with coverage
+uv_unittests:
+	{{UV_RUN}} pytest --verbose --showlocals --tb=short --cov-append --cov-report=term-missing --junitxml=junit/test-results.xml --cov-report=xml:cov.xml --cov-report=html:htmlcov --cov-report=annotate:cov_annotate --cov=.
+
+# Run unit tests with VCR in record mode
+uv_unittests_vcr_record:
+	{{UV_RUN}} pytest --record-mode=all --verbose --showlocals --tb=short --cov-append --cov-report=term-missing --junitxml=junit/test-results.xml --cov-report=xml:cov.xml --cov-report=html:htmlcov --cov-report=annotate:cov_annotate --cov=.
+
+# Run unit tests with VCR in rewrite mode
+uv_unittests_vcr_record_rewrite:
+	{{UV_RUN}} pytest --record-mode=rewrite --verbose --showlocals --tb=short --cov-append --cov-report=term-missing --junitxml=junit/test-results.xml --cov-report=xml:cov.xml --cov-report=html:htmlcov --cov-report=annotate:cov_annotate --cov=.
+
+# Run unit tests with VCR in once mode
+uv_unittests_vcr_record_once:
+	{{UV_RUN}} pytest --record-mode=once --verbose --showlocals --tb=short --cov-append --cov-report=term-missing --junitxml=junit/test-results.xml --cov-report=xml:cov.xml --cov-report=html:htmlcov --cov-report=annotate:cov_annotate --cov=.
+
+# Run all VCR recording tests
+uv_unittests_vcr_record_all: uv_unittests_vcr_record
+
+# Run final VCR recording tests (NOTE: this is the only one that works)
+uv_unittests_vcr_record_final: uv_unittests_vcr_record
+
+# Run simple tests without warnings
+uv_test_simple:
+	{{UV_RUN}} pytest -p no:warnings
+
+# Alias for simple tests without warnings
+uv_simple_test:
+	{{UV_RUN}} pytest -p no:warnings
+
+# Run unit tests in debug mode with extended output
+uv_new_unittests_debug:
+	# {{UV_RUN}} pytest -s --verbose --pdb --pdbcls bpdb:BPdb --showlocals --tb=short
+	{{UV_RUN}} pytest -s -vv --diff-width=60 --diff-symbols --pdb --pdbcls bpdb:BPdb --showlocals --tb=short --cov-append --cov-report=term-missing --junitxml=junit/test-results.xml --cov-report=xml:cov.xml --cov-report=html:htmlcov --cov-report=annotate:cov_annotate --cov=.
+
+# Run linting and unit tests
+uv_test:
+	just uv_lint
+	just uv_unittests
+
+# Combine coverage data
+uv_coverage_combine:
+	{{UV_RUN}} python -m coverage combine
+
+# Generate HTML coverage report
+uv_coverage_html:
+	{{UV_RUN}} python -m coverage html --skip-covered --skip-empty
+
+# Run pytest with coverage
+uv_coverage_pytest:
+	{{UV_RUN}} coverage run --rcfile=pyproject.toml -m pytest tests
+
+# Run pytest with coverage in debug mode
+uv_coverage_pytest_debug:
+	{{UV_RUN}} coverage run --rcfile=pyproject.toml -m pytest --verbose -vvv --pdb --pdbcls bpdb:BPdb --showlocals --tb=short --capture=no tests
+
+# Run pytest with coverage for evals in debug mode
+uv_coverage_pytest_evals_debug:
+	{{UV_RUN}} coverage run --rcfile=pyproject.toml -m pytest --verbose -vv --pdb --pdbcls bpdb:BPdb --showlocals --tb=short --capture=no -m evals --slow tests
+
+# Run pytest with coverage and memray in debug mode
+uv_memray_coverage_pytest_debug:
+	{{UV_RUN}} coverage run --rcfile=pyproject.toml -m pytest --verbose -vvv --memray --pdb --pdbcls bpdb:BPdb --showlocals --tb=short --capture=no tests
+
+# Run pytest with coverage and memray for evals in debug mode
+uv_memray_coverage_pytest_evals_debug:
+	{{UV_RUN}} coverage run --rcfile=pyproject.toml -m pytest --verbose --memray -vv --pdb --pdbcls bpdb:BPdb --showlocals --tb=short --capture=no -m evals --slow tests
+
+# Generate and view coverage report
+uv_coverage_report:
+	just uv_coverage_pytest
+	just uv_coverage_combine
+	just uv_coverage_show
+	just uv_coverage_html
+	just uv_coverage_open
+
+# Generate and view coverage report in debug mode
+uv_coverage_report_debug:
+	just uv_coverage_pytest_debug
+	just uv_coverage_combine
+	just uv_coverage_show
+	just uv_coverage_html
+	just uv_coverage_open
+
+# Generate and view coverage report for evals in debug mode
+uv_coverage_report_debug_evals:
+	just uv_coverage_pytest_debug
+	just uv_coverage_pytest_evals_debug
+	just uv_coverage_combine
+	just uv_coverage_show
+	just uv_coverage_html
+	just uv_coverage_open
+
+# Run end-to-end tests with coverage in debug mode
+uv_e2e_coverage_pytest_debug:
+	{{UV_RUN}} coverage run --rcfile=pyproject.toml -m pytest --verbose --pdb --pdbcls bpdb:BPdb --showlocals --tb=short --capture=no tests -m e2e
+
+# Generate and view end-to-end coverage report in debug mode
+uv_e2e_coverage_report_debug:
+	just uv_e2e_coverage_pytest_debug
+	just uv_coverage_combine
+	just uv_coverage_show
+	just uv_coverage_html
+	just uv_coverage_open
+
+# Show coverage report
+uv_coverage_show:
+	{{UV_RUN}} python -m coverage report --fail-under=5
+
+# Open coverage report
+uv_coverage_open:
+	just local-open-coverage
+
+# Run linting and tests (CI)
+uv_ci:
+	just uv_lint
+	just uv_test
+
+# Run debug unit tests and open coverage report (CI debug)
+uv_ci_debug:
+	just uv_unittests_debug
+	just uv_coverage_open
+
+# Run simple unit tests and open coverage report (CI simple)
+uv_ci_simple:
+	just uv_unittests_simple
+	just uv_coverage_open
+
+# Run CI with evals
+uv_ci_with_evals:
+	just uv_coverage_pytest_debug
+	just uv_coverage_pytest_evals_debug
+	just uv_coverage_combine
+	just uv_coverage_show
+	just uv_coverage_html
+	just uv_coverage_open
+
+# Run CI with evals and memray
+uv_ci_with_evals_memray:
+	just uv_memray_coverage_pytest_debug
+	just uv_memray_coverage_pytest_evals_debug
+	just uv_coverage_combine
+	just uv_coverage_show
+	just uv_coverage_html
+	just uv_coverage_open
+
+# Deploy documentation to GitHub Pages
+uv_gh_deploy:
+	{{UV_RUN}} mkdocs gh-deploy --force --message '[skip ci] Docs updates'
+
+# Create site directory
+uv_mkdir_site:
+	mkdir site
+
+# Deploy documentation
+uv_deploy_docs:
+	just uv_mkdir_site
+	just uv_gh_deploy
+
+# Add bespoke adobe concepts to cursor context
+add-cursor-context:
+	mkdir -p vendored || true
+	gh repo clone universityofprofessorex/cerebro-bot vendored/cerebro-bot || true && cd vendored/cerebro-bot && git checkout feature-discord-utils && cd ../../..
+	gh repo clone langchain-ai/retrieval-agent-template vendored/retrieval-agent-template || true
+	gh repo clone langchain-ai/rag-research-agent-template vendored/rag-research-agent-template || true
+	gh repo clone langchain-ai/memory-template vendored/memory-template || true
+	gh repo clone langchain-ai/react-agent vendored/react-agent || true
+	gh repo clone langchain-ai/chat-langchain vendored/chat-langchain || true
+	gh repo clone bossjones/goob_ai vendored/goob_ai || true
+	gh repo clone langchain-ai/langchain vendored/langchain || true
+	gh repo clone langchain-ai/langgraph vendored/langgraph || true
+	gh repo clone CraftSpider/dpytest vendored/dpytest || true
+	gh repo clone marimo-team/marimo vendored/marimo || true
+
+	rm -rf vendored/cerebro-bot/.git
+	rm -rf vendored/retrieval-agent-template/.git
+	rm -rf vendored/rag-research-agent-template/.git
+	rm -rf vendored/memory-template/.git
+	rm -rf vendored/react-agent/.git
+	rm -rf vendored/chat-langchain/.git
+	rm -rf vendored/goob_ai/.git
+	rm -rf vendored/langchain/.git
+	rm -rf vendored/langgraph/.git
+	rm -rf vendored/langchain-academy/.git
+	rm -rf vendored/dpytest/.git
+	rm -rf vendored/marimo/.git
+
+# List outdated packages
+outdated:
+	{{UV_RUN}} pip list --outdated
+
+install-llm-cli-plugins:
+	uv add llm
+	uv add llm-cmd llm-clip llm-sentence-transformers llm-replicate llm-perplexity llm-claude-3 llm-python llm-gemini llm-jq
+# {{UV_RUN}} llm install llm-cmd
+# {{UV_RUN}} llm install llm-clip
+# {{UV_RUN}} llm install llm-sentence-transformers
+# {{UV_RUN}} llm install llm-replicate
+# {{UV_RUN}} llm install llm-perplexity
+# {{UV_RUN}} llm install llm-claude-3
+# {{UV_RUN}} llm install llm-python
+# {{UV_RUN}} llm install llm-json
+# {{UV_RUN}} llm install llm-markdown
+# {{UV_RUN}} llm install llm-sql
+
+smoke-test:
+	cd prompt_library/agentic/studio/react && {{UV_RUN}} python -m memory_agent
+
+# Commitizen commands
+# commit using commitizen
+commit:
+	{{UV_RUN}} cz commit
+
+commit-help:
+	{{UV_RUN}} cz commit -h
+
+# bump version using commitizen
+bump:
+	{{UV_RUN}} cz bump
+
+# tag using commitizen
+tag:
+	{{UV_RUN}} cz tag
+
+# release using commitizen
+release:
+	{{UV_RUN}} cz release
+
+# bump patch version using commitizen
+bump-patch:
+	{{UV_RUN}} cz bump --patch
+
+# bump minor version using commitizen
+bump-minor:
+	{{UV_RUN}} cz bump --minor
+
+# bump major version using commitizen
+bump-major:
+	{{UV_RUN}} cz bump --major
+
+# bump prerelease version using commitizen
+bump-prerelease:
+	{{UV_RUN}} cz bump --prerelease
+
+# bump postrelease version using commitizen
+bump-postrelease:
+	{{UV_RUN}} cz bump --postrelease
+
+# Generate AI commit messages
+ai-commit:
+	aicommits --generate 3 --type conventional
+
+# Run the bot
+run:
+	{{UV_RUN}} democracyctl run-bot
+
+# https://github.com/langchain-ai/langchain/blob/fbf0704e48273d40a9068ee2078ffe4374185338/docs/docs/integrations/document_loaders/readthedocs_documentation.ipynb#L36
+
+# Download the read the docs
+download-read-the-docs:
+	wget -r -A.html -P rtdocs https://python.langchain.com/en/latest/
+
+# Marimo Notebook Commands
+
+# Edit the marimo demo notebook
+marimo-demo-edit:
+	{{UV_RUN}} marimo edit marimo_is_awesome_demo.py
+
+# Run the marimo demo notebook
+marimo-demo-run:
+	{{UV_RUN}} marimo run marimo_is_awesome_demo.py
+
+# Edit the ad-hoc prompting notebook
+marimo-adhoc-edit:
+	{{UV_RUN}} marimo edit marimo_adhoc_prompting.py
+
+# Run the ad-hoc prompting notebook
+marimo-adhoc-run:
+	{{UV_RUN}} marimo run marimo_adhoc_prompting.py
+
+# Edit the prompt library notebook
+marimo-library-edit:
+	{{UV_RUN}} marimo edit marimo_prompt_library.py
+
+# Run the prompt library notebook
+marimo-library-run:
+	{{UV_RUN}} marimo run marimo_prompt_library.py
+
+# Edit the multi-LLM prompting notebook
+marimo-multi-llm-edit:
+	{{UV_RUN}} marimo edit marimo_multi_llm_prompting.py
+
+# Run the multi-LLM prompting notebook
+marimo-multi-llm-run:
+	{{UV_RUN}} marimo run marimo_multi_llm_prompting.py
+
+# Edit the multi language model ranker notebook
+marimo-ranker-edit:
+	{{UV_RUN}} marimo edit marimo_multi_language_model_ranker.py
+
+# Run the multi language model ranker notebook
+marimo-ranker-run:
+	{{UV_RUN}} marimo run marimo_multi_language_model_ranker.py
+
+# Edit the prompt analysis notebook
+marimo-analysis-edit:
+	{{UV_RUN}} marimo edit marimo_prompt_analysis.py
+
+# Run the prompt analysis notebook
+marimo-analysis-run:
+	{{UV_RUN}} marimo run marimo_prompt_analysis.py
+
+# Run all marimo notebooks
+marimo-run-all:
+	{{UV_RUN}} marimo run marimo_is_awesome_demo.py marimo_adhoc_prompting.py marimo_prompt_library.py marimo_multi_llm_prompting.py marimo_multi_language_model_ranker.py marimo_prompt_analysis.py
+
+
+
+# Tree the project while respecting .gitignore
+tree:
+	tree -C -I '__pycache__|*.py[cod]|*$$py.class|*.so|build|develop-eggs|dist|downloads|eggs|.eggs|lib|lib64|parts|sdist|var|wheels|share/python-wheels|*.egg-info|.installed.cfg|*.egg|MANIFEST|*.manifest|*.spec|pip-log.txt|pip-delete-this-directory.txt|htmlcov|.tox|.nox|.coverage|.coverage.*|.cache|nosetests.xml|coverage.xml|*.cover|*.py,cover|.hypothesis|.pytest_cache|cover|*.mo|*.pot|*.log|local_settings.py|db.sqlite3|db.sqlite3-journal|instance|.webassets-cache|.scrapy|docs/_build|.pybuilder|target|.ipynb_checkpoints|profile_default|ipython_config.py|__pypackages__|celerybeat-schedule|celerybeat.pid|*.sage.py|.env|.venv|env|venv|ENV|env.bak|venv.bak|.spyderproject|.spyproject|.ropeproject|site|.mypy_cache|.dmypy.json|dmypy.json|.pyre|.pytype|cython_debug|.idea|.vscode|*.swp|.DS_Store|.sass-cache|*.css.map|*.pyc|database.db|messages.db|*.avi|*.hdf5|*.h5|*.pth|*.zip|.virtual_documents|chroma|file.out|*.sqlite|.env.langraph|datasets|.envrc'
+
+
+# Getting corefiles
+corefiles:
+	{{UV_RUN}} files-to-prompt -e rs -e py -e toml --ignore "node_modules|__pycache__|scripts|debug|.o|deps|release|target|inputs" . | pbcopy
+
+install-youtube-transcript:
+	cargo install youtube-transcript
+
+pylint-to-ruff:
+	{{UV_RUN}} pylint-to-ruff
+
+test-debug: uv_new_unittests_debug open-coverage
+
+pyright-verify-types:
+	#!/bin/bash
+	# Get the list of installed packages
+	packages=$(uv run pip freeze | cut -d '=' -f 1)
+
+	rm -f pyright-verify-types.log
+	touch pyright-verify-types.log
+
+	# Iterate through each package
+	for package in $packages; do
+			echo "Checking package: $package"
+			echo "----------------------------------------"
+
+			# Run pyright and print the output
+			# uv run pyright --verifytypes "$package" --verbose
+			uv run pyright --verifytypes "$package" | tee -a pyright-verify-types.log
+
+			echo "----------------------------------------"
+	done
+
+	echo "Verification complete."
+
+pyright-createstubs-missing:
+	#!/bin/bash
+	# Run pyright and capture output
+	uv run pyright . | grep -E "warning: Stub file not found for \"[^\"]+\"" | sed -E 's/.*"([^"]+)".*/\1/' | sort -u | while read package; do
+		echo "Creating stub for package: $package"
+		uv run pyright --createstub "$package"
+	done
+
+copy-rules:
+	@echo "🚀 Starting the copy process..."
+	cp -av cursorrules.xml .cursorrules
+	cp -av cursorrules.xml aider_configs/aider_rules
+	@echo "✅ Copy completed successfully!"
+
+# PYTHONPATH=. uv run pylint --load-plugins=marimo_cell_params_validator --disable=all --enable=marimo_cell_params_validator ../../mariomo_prompt_library.py
+
+pylint-plugin-debug:
+	PYTHONPATH=pylint/plugins/. {{UV_RUN}} pylint --load-plugins=marimo_cell_params_validator --disable=all --enable=marimo_cell_params_validator mariomo_prompt_library.py
+
+
+# run pylint with the marimo cell params validator plugin
+pylint-plugin-debug-bad:
+	PYTHONPATH=pylint/plugins/. {{UV_RUN}} pylint --verbose --load-plugins=marimo_cell_params_validator --disable=all --enable=marimo_cell_params_validator marimo_bad.py
+
+# run pylint with the marimo cell params validator plugin
+pylint-plugin-debug-good:
+	PYTHONPATH=pylint/plugins/. {{UV_RUN}} pylint --load-plugins=marimo_cell_params_validator --disable=all --enable=marimo_cell_params_validator marimo_prompt_library.py
+
+test-pylint-plugin: test pylint-plugin-debug-bad
+
+hass-files-to-prompt:
+	@echo "🚀 Running files-to-promt for hass pylint plugin example"
+	uv run files-to-prompt \
+	/Users/malcolm/dev/home-assistant/core/pyproject.toml \
+	/Users/malcolm/dev/home-assistant/core/pylint/plugins/hass_decorator.py \
+	/Users/malcolm/dev/home-assistant/core/pylint/ruff.toml \
+	/Users/malcolm/dev/home-assistant/core/tests/pylint/__init__.py \
+	/Users/malcolm/dev/home-assistant/core/tests/pylint/conftest.py \
+	/Users/malcolm/dev/home-assistant/core/tests/pylint/test_decorator.py \
+	--cxml \
+	-o \
+	/Users/malcolm/dev/bossjones/prompt-library/ai_docs/hass_example_pylint_plugin/hass_pylint_plugin_output.xml
+	bat --theme=Nord /Users/malcolm/dev/bossjones/prompt-library/ai_docs/hass_example_pylint_plugin/hass_pylint_plugin_output.xml
+	@echo "🚀 Running files-to-promt for prompt-library pylint plugin example"
+	uv run files-to-prompt \
+	/Users/malcolm/dev/bossjones/prompt-library/pyproject.toml \
+	/Users/malcolm/dev/bossjones/prompt-library/Justfile \
+	/Users/malcolm/dev/bossjones/prompt-library/pylint/plugins/marimo_cell_params_validator.py \
+	/Users/malcolm/dev/bossjones/prompt-library/pylint/ruff.toml \
+	/Users/malcolm/dev/bossjones/prompt-library/tests/pylint/__init__.py \
+	/Users/malcolm/dev/bossjones/prompt-library/tests/pylint/conftest.py \
+	/Users/malcolm/dev/bossjones/prompt-library/tests/pylint/test_marimo_cell_params_validator.py \
+	--cxml \
+	-o \
+	/Users/malcolm/dev/bossjones/prompt-library/ai_docs/hass_example_pylint_plugin/prompt_library_pylint_plugin_output.xml
+	bat --theme=Nord /Users/malcolm/dev/bossjones/prompt-library/ai_docs/hass_example_pylint_plugin/prompt_library_pylint_plugin_output.xml
+
+</document_content>
+</document>
+<document index="3">
+<source>/Users/malcolm/dev/bossjones/prompt-library/pylint/plugins/marimo_cell_params_validator.py</source>
+<document_content>
+"""Pylint plugin for checking Marimo cell parameter usage.
+
+This module provides a custom pylint checker for enforcing Marimo cell parameter standards.
+It ensures that cell parameters are actually used within the cell.
+"""
+
+# pyright: reportAttributeAccessIssue=false
+from __future__ import annotations
+
+import copy
+import fnmatch
+import linecache
+import re
+import tokenize
+
+
+# import pdb
+# pdb.set_trace()
+from typing import Any, Dict, Final, Generator, List, Optional, Pattern, Set, Tuple, TypedDict, cast
+
+import astroid
+import pysnooper
+
+from astroid import nodes
+from astroid.nodes import AssignName, Attribute, Name, NodeNG
+from loguru import logger
+
+from pylint import lint
+from pylint import utils as pylint_utils
+from pylint.checkers import BaseChecker
+from pylint.lint import PyLinter
+
+
+# NOTE: borrowing from https://github.com/oppia/oppia/blob/develop/scripts/linters/pylint_extensions.py
+# List of punctuation symbols that can be used at the end of
+# comments and docstrings.
+ALLOWED_TERMINATING_PUNCTUATIONS: Final = ['.', '?', '}', ']', ')']
+
+# If any of these phrases are found inside a docstring or comment,
+# the punctuation and capital letter checks will be skipped for that
+# comment or docstring.
+EXCLUDED_PHRASES: Final = [
+    'coding:', 'pylint:', 'http://', 'https://', 'scripts/', 'extract_node'
+]
+
+ALLOWED_PRAGMAS_FOR_INLINE_COMMENTS: Final = [
+    'pylint:', 'isort:', 'type: ignore', 'pragma:', 'https:', 'docker:'
+]
+
+ALLOWED_LINES_OF_GAP_IN_COMMENT: Final = 15
+
+from pylint import checkers  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
+from pylint import interfaces  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
+from pylint.checkers import utils as checker_utils  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
+from pylint.extensions import _check_docs_utils # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
+
+
+def read_from_node(node: astroid.scoped_nodes.Module) -> list[str]:
+    """Returns the data read from the ast node in unicode form.
+
+    Args:
+        node: astroid.scoped_nodes.Module. Node to access module content.
+
+    Returns:
+        list(str). The data read from the ast node.
+    """
+    # Readlines returns bytes, thus we need to decode them to string.
+    return [line.decode('utf-8') for line in node.stream().readlines()]
+
+
+# @pysnooper.snoop(thread_info=True, max_variable_length=None, depth=10)
+class MarimoCellParamsChecker(BaseChecker):  # type: ignore[misc]
+    """Checker for enforcing Marimo cell parameter usage standards.
+
+    This checker ensures that:
+    1. All cell parameters are actually used within the cell
+    2. No unused parameters in cell function definitions
+    3. Only necessary dependencies are declared
+
+    Attributes:
+        name: The name of the checker
+        priority: The priority level of the checker
+        msgs: Dictionary of warning messages and their descriptions
+        linter: The pylint linter instance
+    """
+
+
+    name = "marimo_cell_params_validator"
+    priority = -1
+    msgs = {
+        # Each message has a code, a message that the user will see,
+        # a unique symbol that identifies the message,
+        # and a detailed help message
+        # that will be included in the documentation.
+
+        "W9301": (
+            "Unused cell parameter '%s'",
+            "unused-cell-parameter",
+            "Cell parameters should only include variables that are actually used in the cell. "
+            "Remove unused parameters.",
+        ),
+    }
+
+    # This class variable declares the options
+    # that are configurable by the user.
+
+    options = (
+        # Each option definition has a name which is used on the command line
+        # and in config files, and a dictionary of arguments
+        # (similar to argparse.ArgumentParser.add_argument).
+        (
+            "ignore-marimo-unused-params",
+            {
+                "default": False,
+                "type": "yn",
+                "metavar": "<y or n>",
+                "help": "Force checking of unused parameters even in non-marimo files",
+            },
+        ),
+    )
+
+    def __init__(self, linter: Optional[PyLinter] = None) -> None:
+        """Initialize the checker.
+
+        Args:
+            linter: The pylint linter instance
+        """
+        super().__init__(linter if linter is not None else PyLinter())
+        self._used_names: set[str] = set()
+        self._current_cell_params: set[str] = set()
+
+    def _is_marimo_notebook(self) -> bool:
+        """Check if the current file is a marimo notebook.
+
+        Returns:
+            bool: True if the file is a marimo notebook (starts with 'marimo_'),
+                 False otherwise.
+        """
+        try:
+            current_file = cast(Any, self.linter.current_file)
+            filename = getattr(current_file, 'name', '')
+            return (
+                filename.startswith("marimo_") or
+                "marimo" in filename or
+                filename.endswith("_notebook.py") or
+                filename.endswith("_test.py")
+            )
+        except AttributeError:
+            return False
+
+    def _has_app_cell_decorator(self, node: nodes.FunctionDef | nodes.AsyncFunctionDef) -> bool:
+        """Check if a function has the @app.cell decorator.
+
+        Args:
+            node: The function definition node to check.
+
+        Returns:
+            bool: True if the function has the @app.cell decorator, False otherwise.
+        """
+        try:
+            if not hasattr(node, "decorators") or not node.decorators:
+                return False
+
+            for decorator in node.decorators.nodes:
+                if isinstance(decorator, (Name, Attribute)) and decorator.as_string() == "app.cell":
+                    return True
+            return False
+        except AttributeError:
+            return False
+
+    # @pysnooper.snoop(output='/Users/malcolm/dev/bossjones/prompt-library/pylint-debug.log', thread_info=True, max_variable_length=None, depth=10)
+    def visit_functiondef(self, node: nodes.FunctionDef | nodes.AsyncFunctionDef) -> None:
+        """Visit and check a function definition node.
+
+        Args:
+            node: The function definition node to visit.
+        """
+
+        if not self._is_marimo_notebook():
+            return
+
+        if not self._has_app_cell_decorator(node):
+            return
+
+        # import bpdb
+        # bpdb.set_trace()
+
+        # Reset state for new cell
+        self._used_names = set()
+        self._current_cell_params = set()
+
+        # Collect parameter names
+        for arg in node.args.args:
+            self._current_cell_params.add(arg.name)
+
+        # Walk the function body to collect used names
+        for child in node.body:
+            child.accept(self)
+
+        # Check for unused parameters immediately
+        for param in self._current_cell_params:
+            if param not in self._used_names:
+                self.add_message(
+                    "unused-cell-parameter",
+                    node=node,
+                    args=(param,),
+                )
+
+    def leave_functiondef(self, node: nodes.FunctionDef) -> None:
+        """Leave a function definition node and check for unused parameters.
+
+        Args:
+            node: The function definition node to leave.
+        """
+        if not self._is_marimo_notebook():
+            return
+
+        if not self._has_app_cell_decorator(node):
+            return
+
+        # Check for unused parameters
+        for param in self._current_cell_params:
+            if param not in self._used_names:
+                self.add_message(
+                    "unused-cell-parameter",
+                    node=node,
+                    args=(param,),
+                )
+
+    def visit_name(self, node: nodes.Name) -> None:
+        """Visit and check a name node.
+
+        Args:
+            node: The name node to visit.
+        """
+        if not self._is_marimo_notebook():
+            return
+
+        # Track name usage in load context (when variable is used)
+        if isinstance(node, nodes.Name):
+            ctx_name = getattr(node.ctx, "name", "")
+            if ctx_name == "Load":
+                self._used_names.add(node.name)
+
+
+def register(linter: PyLinter) -> None:
+    """Register the MarimoCellParamsChecker with pylint.
+
+    Args:
+        linter: The pylint linter instance to register the checker with.
+    """
+    linter.register_checker(MarimoCellParamsChecker(linter))
+
+</document_content>
+</document>
+<document index="4">
+<source>/Users/malcolm/dev/bossjones/prompt-library/pylint/ruff.toml</source>
+<document_content>
+# This extend our general Ruff rules specifically for tests
+extend = "../pyproject.toml"
+
+[lint]
+extend-ignore = [
+    "INP001", # File is part of an implicit namespace package. Add an `__init__.py`.
+]
+
+[lint.isort]
+known-third-party = [
+    "pylint",
+]
+
+</document_content>
+</document>
+<document index="5">
+<source>/Users/malcolm/dev/bossjones/prompt-library/tests/pylint/__init__.py</source>
+<document_content>
+"""Tests for pylint."""
+
+from __future__ import annotations
+
+import contextlib
+
+import pysnooper
+
+from loguru import logger
+
+from pylint.testutils.unittest_linter import UnittestLinter
+
+
+# @pysnooper.snoop(thread_info=True, max_variable_length=None, depth=10)
+@contextlib.contextmanager
+def assert_no_messages(linter: UnittestLinter):
+    """Assert that no messages are added by the given method."""
+    with assert_adds_messages(linter):
+        yield
+
+
+@contextlib.contextmanager
+def assert_adds_messages(linter: UnittestLinter, *messages):
+    """Assert that exactly the given method adds the given messages.
+
+    The list of messages must exactly match *all* the messages added by the
+    method. Additionally, we check to see whether the args in each message can
+    actually be substituted into the message string.
+    """
+    yield
+    # import bpdb
+
+    # bpdb.set_trace()
+    got = linter.release_messages()
+    no_msg = "No message."
+    expected = "\n".join(repr(m) for m in messages) or no_msg
+    got_str = "\n".join(repr(m) for m in got) or no_msg
+    msg = f"Expected messages did not match actual.\n\nExpected:\n{expected}\n\nGot:\n{got_str}\n"
+    assert got == list(messages), msg
+
+</document_content>
+</document>
+<document index="6">
+<source>/Users/malcolm/dev/bossjones/prompt-library/tests/pylint/conftest.py</source>
+<document_content>
+"""Configuration for pylint tests."""
+
+from __future__ import annotations
+
+import sys
+
+from importlib.util import module_from_spec, spec_from_file_location
+from pathlib import Path
+from types import ModuleType
+from typing import TYPE_CHECKING
+
+import pytest
+
+from pylint.checkers import BaseChecker
+from pylint.testutils.unittest_linter import UnittestLinter
+
+
+if TYPE_CHECKING:
+    from _pytest.capture import CaptureFixture
+    from _pytest.fixtures import FixtureRequest
+    from _pytest.logging import LogCaptureFixture
+    from _pytest.monkeypatch import MonkeyPatch
+
+    from pytest_mock.plugin import MockerFixture
+
+BASE_PATH = Path(__file__).resolve().parents[2]
+if not (BASE_PATH / "pylint" / "plugins").is_dir():
+    raise RuntimeError(f"Could not find pylint plugins directory in {BASE_PATH}")
+
+
+def _load_plugin_from_file(module_name: str, file: str) -> ModuleType:
+    """Load plugin from file path.
+
+    Args:
+        module_name: Name of the module to load
+        file: Path to the file relative to BASE_PATH
+
+    Returns:
+        ModuleType: The loaded module
+
+    Raises:
+        AssertionError: If the module spec or loader is not found
+    """
+    full_path = BASE_PATH.joinpath(file)
+    if not full_path.exists():
+        raise FileNotFoundError(f"Plugin file not found: {full_path}")
+
+    spec = spec_from_file_location(
+        module_name,
+        str(full_path),
+    )
+    if not spec or not spec.loader:
+        raise ImportError(f"Could not load module {module_name} from {file}")
+
+    module = module_from_spec(spec)
+    sys.modules[module_name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+@pytest.fixture(name="marimo_cell_validator", scope="package")
+def marimo_cell_validator_fixture() -> ModuleType:
+    """Fixture to provide the Marimo cell validator module.
+
+    Returns:
+        ModuleType: The loaded Marimo cell validator module
+    """
+    return _load_plugin_from_file(
+        "marimo_cell_validator",
+        "pylint/plugins/marimo_cell_validator.py",
+    )
+
+
+# @pytest.fixture(name="marimo_imports_validator", scope="package")
+# def marimo_imports_validator_fixture() -> ModuleType:
+#     """Fixture to provide the Marimo imports validator module.
+
+#     Returns:
+#         ModuleType: The loaded Marimo imports validator module
+#     """
+#     return _load_plugin_from_file(
+#         "marimo_imports_validator",
+#         "pylint/plugins/marimo_imports_validator.py",
+#     )
+
+
+# @pytest.fixture(name="marimo_function_validator", scope="package")
+# def marimo_function_validator_fixture() -> ModuleType:
+#     """Fixture to provide the Marimo function validator module.
+
+#     Returns:
+#         ModuleType: The loaded Marimo function validator module
+#     """
+#     return _load_plugin_from_file(
+#         "marimo_function_validator",
+#         "pylint/plugins/marimo_function_validator.py",
+#     )
+
+
+# @pytest.fixture(name="marimo_cell_params_validator", scope="package")
+# def marimo_cell_params_validator_fixture() -> ModuleType:
+#     """Fixture to provide the Marimo cell parameters validator module.
+
+#     Returns:
+#         ModuleType: The loaded Marimo cell parameters validator module
+#     """
+#     return _load_plugin_from_file(
+#         "marimo_cell_params_validator",
+#         "pylint/plugins/marimo_cell_params_validator.py",
+#     )
+
+
+# @pytest.fixture(name="marimo_checker")
+# def marimo_checker_fixture() -> ModuleType:
+#     """Fixture to provide the Marimo cell validator module.
+
+#     Returns:
+#         ModuleType: The loaded Marimo cell validator module
+#     """
+#     return _load_plugin_from_file(
+#         "marimo_cell_validator",
+#         "pylint/plugins/marimo_cell_validator.py",
+#     )
+
+
+# @pytest.fixture(name="marimo_imports_checker")
+# def marimo_imports_checker_fixture() -> ModuleType:
+#     """Fixture to provide the Marimo imports validator module.
+
+#     Returns:
+#         ModuleType: The loaded Marimo imports validator module
+#     """
+#     return _load_plugin_from_file(
+#         "marimo_imports_validator",
+#         "pylint/plugins/marimo_imports_validator.py",
+#     )
+
+
+# @pytest.fixture(name="marimo_function_checker")
+# def marimo_function_checker_fixture() -> ModuleType:
+#     """Fixture to provide the Marimo function validator module.
+
+#     Returns:
+#         ModuleType: The loaded Marimo function validator module
+#     """
+#     return _load_plugin_from_file(
+#         "marimo_function_validator",
+#         "pylint/plugins/marimo_function_validator.py",
+#     )
+
+
+@pytest.fixture(name="marimo_cell_params_checker")
+def marimo_cell_params_checker_fixture() -> ModuleType:
+    """Fixture to provide the Marimo cell parameters validator module.
+
+    Returns:
+        ModuleType: The loaded Marimo cell parameters validator module
+    """
+    return _load_plugin_from_file(
+        "marimo_cell_params_validator",
+        "pylint/plugins/marimo_cell_params_validator.py",
+    )
+
+
+@pytest.fixture(name="linter")
+def linter_fixture() -> UnittestLinter:
+    """Fixture to provide a pylint linter instance.
+
+    Returns:
+        UnittestLinter: A configured pylint linter instance
+    """
+    return UnittestLinter()
+
+
+# @pytest.fixture(name="hass_enforce_type_hints", scope="package")
+# def hass_enforce_type_hints_fixture() -> ModuleType:
+#     """Fixture to provide the Home Assistant type hints checker module.
+
+#     Returns:
+#         ModuleType: The loaded type hints checker module
+#     """
+#     return _load_plugin_from_file(
+#         "hass_enforce_type_hints",
+#         "pylint/plugins/hass_enforce_type_hints.py",
+#     )
+
+
+# @pytest.fixture(name="type_hint_checker")
+# def type_hint_checker_fixture(hass_enforce_type_hints: ModuleType, linter: UnittestLinter) -> BaseChecker:
+#     """Fixture to provide a type hint checker instance.
+
+#     Args:
+#         hass_enforce_type_hints: The type hint checker module
+#         linter: The pylint linter instance
+
+#     Returns:
+#         BaseChecker: An instance of the type hint checker
+#     """
+#     checker = hass_enforce_type_hints.HassTypeHintChecker(linter)
+#     checker.module = "homeassistant.components.pylint_test"
+#     return checker
+
+</document_content>
+</document>
+<document index="7">
+<source>/Users/malcolm/dev/bossjones/prompt-library/tests/pylint/test_marimo_cell_params_validator.py</source>
+<document_content>
+"""Tests for the Marimo cell parameters validator."""
+
+from __future__ import annotations
+
+from types import ModuleType
+
+import astroid
+import pysnooper
+
+from _pytest.logging import LogCaptureFixture
+from astroid.builder import parse as astroid_parse
+from astroid.nodes import Module
+from loguru import logger
+
+import pytest
+
+from pylint.checkers import BaseChecker
+from pylint.interfaces import UNDEFINED
+from pylint.testutils import MessageTest
+from pylint.testutils.unittest_linter import UnittestLinter
+from pylint.utils.ast_walker import ASTWalker
+
+from . import assert_adds_messages, assert_no_messages
+
+
+def test_good_cell_params(linter: UnittestLinter, marimo_cell_params_checker: ModuleType) -> None:
+    """Test that properly used cell parameters are not flagged.
+
+    Args:
+        linter: The pylint linter instance
+        marimo_cell_params_checker: The cell parameter checker
+    """
+    code = """
+    @app.cell
+    def __():
+        import os, sys
+        return (os, sys)
+
+    @app.cell
+    def __(os, sys):
+        result = os.path.join(sys.path[0])
+        return (result,)
+    """
+    root_node = astroid_parse(code, "marimo_test.py")
+    walker = ASTWalker(linter)
+    walker.add_checker(marimo_cell_params_checker)
+
+    with assert_no_messages(linter):
+        walker.walk(root_node)
+
+
+# @pysnooper.snoop(thread_info=True, max_variable_length=None, depth=10)
+@pytest.mark.parametrize(
+    ("code", "param_name", "line_num", "path"),
+    [
+        (
+            """
+            @app.cell
+            def __():
+                import os
+                return (os,)
+
+            @app.cell
+            def __(os, unused_param):
+                result = os.path.join("/tmp")
+                return (result,)
+            """,
+            "unused_param",
+            8,
+            "marimo_test.py",
+        ),
+        (
+            """
+            @app.cell
+            def __():
+                import os, sys
+                return (os, sys)
+
+            @app.cell
+            def __(os, unused1, sys, unused2):
+                result = os.path.join(sys.path[0])
+                return (result,)
+            """,
+            "unused1",
+            8,
+            "marimo_test.py",
+        ),
+        (
+            """
+            @app.cell
+            def __():
+                import pandas as pd
+                return (pd,)
+
+            @app.cell
+            def __(pd, extra):
+                df = pd.DataFrame()
+                return (df,)
+            """,
+            "extra",
+            8,
+            "marimo_test.py",
+        ),
+        (
+            """
+            @app.cell
+            def __():
+                import numpy as np
+                return (np,)
+
+            @app.cell
+            def __(np, unused_config):
+                arr = np.array([1, 2, 3])
+                return (arr,)
+            """,
+            "unused_config",
+            8,
+            "marimo_notebook.py",
+        ),
+    ],
+)
+def test_bad_cell_params(
+    linter: UnittestLinter,
+    marimo_cell_params_checker: ModuleType,
+    code: str,
+    param_name: str,
+    line_num: int,
+    path: str,
+    caplog: LogCaptureFixture,
+) -> None:
+    """Test that unused cell parameters are properly detected and reported.
+
+    Args:
+        linter: The pylint linter instance
+        marimo_cell_params_checker: The cell parameter checker
+        code: The test code to analyze
+        param_name: The name of the parameter expected to be flagged
+        line_num: The line number where the error should be reported
+        path: The file path to use for the test
+    """
+    logger.info(f"Running test_bad_cell_params with code: {code}")
+    logger.info(f"Path: {path}")
+    logger.info(f"Line num: {line_num}")
+    logger.info(f"Param name: {param_name}")
+
+    # import bpdb
+    # bpdb.set_trace()
+
+    root_node: Module = astroid_parse(code, path)
+    walker = ASTWalker(linter)
+    walker.add_checker(marimo_cell_params_checker)
+
+    with assert_adds_messages(
+        linter,
+        MessageTest(
+            msg_id="unused-cell-parameter",
+            line=line_num,
+            node=next(
+                node
+                for node in root_node.body
+                if isinstance(node, astroid.nodes.FunctionDef)
+                and node.name == "__"
+                and any(
+                    isinstance(dec, (astroid.nodes.Name, astroid.nodes.Attribute)) and dec.as_string() == "app.cell"
+                    for dec in node.decorators.nodes
+                )
+            ),
+            args=(param_name,),
+            confidence=UNDEFINED,
+            col_offset=0,
+            end_line=line_num,
+            end_col_offset=13,
+        ),
+    ):
+        walker.walk(root_node)
+
+
+@pytest.mark.parametrize(
+    ("code", "path"),
+    [
+        (
+            """
+            def regular_function(unused_param):
+                return 42
+            """,
+            "marimo_test.py",
+        ),
+        (
+            """
+            class TestClass:
+                def method(self, unused_param):
+                    pass
+            """,
+            "marimo_test.py",
+        ),
+        (
+            """
+            @some_other_decorator
+            def decorated_func(unused_param):
+                return True
+            """,
+            "marimo_test.py",
+        ),
+        (
+            """
+            def __init__(self, unused_param):
+                pass
+            """,
+            "marimo_test.py",
+        ),
+    ],
+)
+def test_non_cell_functions(
+    linter: UnittestLinter,
+    marimo_cell_params_checker: ModuleType,
+    code: str,
+    path: str,
+) -> None:
+    """Test that non-cell functions are properly ignored.
+
+    Args:
+        linter: The pylint linter instance
+        marimo_cell_params_checker: The cell parameter checker
+        code: The test code to analyze
+        path: The file path to use for the test
+    """
+    root_node = astroid_parse(code, path)
+    walker = ASTWalker(linter)
+    walker.add_checker(marimo_cell_params_checker)
+
+    with assert_no_messages(linter):
+        walker.walk(root_node)
+
+
+@pytest.mark.parametrize(
+    ("code", "path"),
+    [
+        (
+            """
+            @app.cell
+            def __(unused_param):
+                return (42,)
+            """,
+            "regular_file.py",
+        ),
+        (
+            """
+            @app.cell
+            def __(x, y, unused):
+                return (x + y,)
+            """,
+            "not_marimo.py",
+        ),
+        (
+            """
+            @app.cell
+            def __(data, config):
+                # Config is used in a string context
+                print(f"Using config: {config}")
+                return (data,)
+            """,
+            "marimo_test.py",
+        ),
+    ],
+)
+def test_non_marimo_files_and_special_cases(
+    linter: UnittestLinter,
+    marimo_cell_params_checker: ModuleType,
+    code: str,
+    path: str,
+) -> None:
+    """Test that non-marimo files and special parameter cases are properly handled.
+
+    Args:
+        linter: The pylint linter instance
+        marimo_cell_params_checker: The cell parameter checker
+        code: The test code to analyze
+        path: The file path to use for the test
+    """
+    root_node = astroid_parse(code, path)
+    walker = ASTWalker(linter)
+    walker.add_checker(marimo_cell_params_checker)
+
+    with assert_no_messages(linter):
+        walker.walk(root_node)
+
+</document_content>
+</document>
+</documents>

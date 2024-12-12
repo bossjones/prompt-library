@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import logging
+
 from types import ModuleType
 
 import astroid
@@ -138,6 +140,7 @@ def test_bad_cell_params(
         line_num: The line number where the error should be reported
         path: The file path to use for the test
     """
+    caplog.set_level(logging.DEBUG)
     logger.info(f"Running test_bad_cell_params with code: {code}")
     logger.info(f"Path: {path}")
     logger.info(f"Line num: {line_num}")

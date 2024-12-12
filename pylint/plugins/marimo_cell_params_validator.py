@@ -10,6 +10,7 @@ from __future__ import annotations
 import copy
 import fnmatch
 import linecache
+import logging
 import re
 import tokenize
 
@@ -28,6 +29,7 @@ from loguru import logger
 from pylint import lint
 from pylint import utils as pylint_utils
 from pylint.checkers import BaseChecker
+from pylint.checkers.base.name_checker import NameChecker
 from pylint.lint import PyLinter
 
 
@@ -129,6 +131,84 @@ class MarimoCellParamsChecker(BaseChecker):  # type: ignore[misc]
         self._used_names: set[str] = set()
         self._current_cell_params: set[str] = set()
 
+
+
+    def _get_pytest_fixture_node(self, node: nodes.FunctionDef) -> nodes.Call | None:
+        for decorator in node.decorators.nodes:
+            if (
+                isinstance(decorator, nodes.Call)
+                and decorator.func.as_string() == "pytest.fixture"
+            ):
+                return decorator
+
+        return None
+
+    def _get_pytest_fixture_node_keyword(
+        self, decorator: nodes.Call, search_arg: str
+    ) -> nodes.Keyword | None:
+        for keyword in decorator.keywords:
+            if keyword.arg == search_arg:
+                return keyword
+
+        return None
+
+    def _check_pytest_fixture(
+        self, node: nodes.FunctionDef, decoratornames: set[str]
+    ) -> None:
+        if (
+            "_pytest.fixtures.FixtureFunctionMarker" not in decoratornames
+            or not (root_name := node.root().name).startswith("tests.")
+            or (decorator := self._get_pytest_fixture_node(node)) is None
+            or not (
+                scope_keyword := self._get_pytest_fixture_node_keyword(
+                    decorator, "scope"
+                )
+            )
+            or not isinstance(scope_keyword.value, nodes.Const)
+            or not (scope := scope_keyword.value.value)
+        ):
+            return
+
+        parts = root_name.split(".")
+        test_component: str | None = None
+        if root_name.startswith("tests.components.") and parts[2] != "conftest":
+            test_component = parts[2]
+
+        if scope == "session":
+            if test_component:
+                self.add_message(
+                    "hass-pytest-fixture-decorator",
+                    node=decorator,
+                    args=("scope `session`", "use `package` or lower"),
+                )
+                return
+            if not (
+                autouse_keyword := self._get_pytest_fixture_node_keyword(
+                    decorator, "autouse"
+                )
+            ) or (
+                isinstance(autouse_keyword.value, nodes.Const)
+                and not autouse_keyword.value.value
+            ):
+                self.add_message(
+                    "hass-pytest-fixture-decorator",
+                    node=decorator,
+                    args=(
+                        "scope/autouse combination",
+                        "set `autouse=True` or reduce scope",
+                    ),
+                )
+            return
+
+        test_module = parts[3] if len(parts) > 3 else ""
+
+        if test_component and scope == "package" and test_module != "conftest":
+            self.add_message(
+                "hass-pytest-fixture-decorator",
+                node=decorator,
+                args=("scope `package`", "use `module` or lower"),
+            )
+
     def _is_marimo_notebook(self) -> bool:
         """Check if the current file is a marimo notebook.
 
@@ -139,13 +219,21 @@ class MarimoCellParamsChecker(BaseChecker):  # type: ignore[misc]
         try:
             current_file = cast(Any, self.linter.current_file)
             filename = getattr(current_file, 'name', '')
-            return (
+            logger.debug(f"current_file: {current_file}")
+            logger.debug(f"Checking if file is marimo notebook: {filename}")
+
+            is_marimo = (
                 filename.startswith("marimo_") or
                 "marimo" in filename or
                 filename.endswith("_notebook.py") or
                 filename.endswith("_test.py")
             )
-        except AttributeError:
+
+            logger.debug(f"File {filename} {'is' if is_marimo else 'is not'} a marimo notebook")
+            return is_marimo
+
+        except AttributeError as e:
+            logger.debug(f"AttributeError while checking marimo notebook: {e!s}")
             return False
 
     def _has_app_cell_decorator(self, node: nodes.FunctionDef | nodes.AsyncFunctionDef) -> bool:
@@ -158,69 +246,60 @@ class MarimoCellParamsChecker(BaseChecker):  # type: ignore[misc]
             bool: True if the function has the @app.cell decorator, False otherwise.
         """
         try:
+            logger.debug(f"Checking decorators for function: {node.name}")
+
             if not hasattr(node, "decorators") or not node.decorators:
+                logger.debug(f"No decorators found for function: {node.name}")
                 return False
 
             for decorator in node.decorators.nodes:
+                logger.debug(f"Found decorator: {decorator.as_string()}")
                 if isinstance(decorator, (Name, Attribute)) and decorator.as_string() == "app.cell":
+                    logger.debug(f"Found app.cell decorator for function: {node.name}")
                     return True
+            logger.debug(f"No app.cell decorator found for function: {node.name}")
             return False
-        except AttributeError:
+        except AttributeError as e:
+            logger.debug(f"AttributeError while checking decorators: {e!s}")
             return False
 
     # @pysnooper.snoop(output='/Users/malcolm/dev/bossjones/prompt-library/pylint-debug.log', thread_info=True, max_variable_length=None, depth=10)
-    def visit_functiondef(self, node: nodes.FunctionDef | nodes.AsyncFunctionDef) -> None:
+    def visit_functiondef(self, node: nodes.FunctionDef) -> None:
         """Visit and check a function definition node.
 
         Args:
             node: The function definition node to visit.
         """
+        logger.debug(f"Visiting function definition: {node.name}")
 
         if not self._is_marimo_notebook():
+            logger.debug(f"Skipping non-marimo notebook function: {node.name}")
             return
 
         if not self._has_app_cell_decorator(node):
+            logger.debug(f"Skipping function without app.cell decorator: {node.name}")
             return
 
-        # import bpdb
-        # bpdb.set_trace()
-
         # Reset state for new cell
+        logger.debug(f"Processing marimo cell function: {node.name}")
         self._used_names = set()
         self._current_cell_params = set()
 
         # Collect parameter names
         for arg in node.args.args:
+            logger.debug(f"Found parameter: {arg.name}")
             self._current_cell_params.add(arg.name)
+
+        logger.debug(f"Cell parameters: {self._current_cell_params}")
 
         # Walk the function body to collect used names
         for child in node.body:
             child.accept(self)
 
-        # Check for unused parameters immediately
-        for param in self._current_cell_params:
-            if param not in self._used_names:
-                self.add_message(
-                    "unused-cell-parameter",
-                    node=node,
-                    args=(param,),
-                )
-
-    def leave_functiondef(self, node: nodes.FunctionDef) -> None:
-        """Leave a function definition node and check for unused parameters.
-
-        Args:
-            node: The function definition node to leave.
-        """
-        if not self._is_marimo_notebook():
-            return
-
-        if not self._has_app_cell_decorator(node):
-            return
-
         # Check for unused parameters
         for param in self._current_cell_params:
             if param not in self._used_names:
+                logger.debug(f"Found unused parameter: {param}")
                 self.add_message(
                     "unused-cell-parameter",
                     node=node,
@@ -237,10 +316,21 @@ class MarimoCellParamsChecker(BaseChecker):  # type: ignore[misc]
             return
 
         # Track name usage in load context (when variable is used)
-        if isinstance(node, nodes.Name):
+        if isinstance(node, nodes.Name) and node.name in self._current_cell_params:
             ctx_name = getattr(node.ctx, "name", "")
+            logger.debug(f"Checking name node: {node.name} with context: {ctx_name}")
             if ctx_name == "Load":
+                logger.debug(f"Found usage of parameter: {node.name}")
                 self._used_names.add(node.name)
+
+    # def load_configuration(self, linter: PyLinter) -> None:
+
+    #     name_checker: NameChecker = linter.get_checker(NameChecker)
+    #     # We consider as good names of variables Hello and World
+    #     name_checker.config.good_names += ('Hello', 'World')
+
+    #     # We ignore bin directory
+    #     linter.config.black_list += ('bin',)
 
 
 def register(linter: PyLinter) -> None:
@@ -250,3 +340,95 @@ def register(linter: PyLinter) -> None:
         linter: The pylint linter instance to register the checker with.
     """
     linter.register_checker(MarimoCellParamsChecker(linter))
+
+if __name__ == "__main__":
+    import sys
+
+    from pathlib import Path
+
+    import astroid
+    import bpdb
+    import rich
+
+    from astroid import nodes
+    from astroid.builder import parse as astroid_parse
+    from astroid.nodes import Module
+    from loguru import logger
+
+    from prompt_library.bot_logger import get_logger, global_log_config
+    from pylint.checkers import BaseChecker
+    from pylint.checkers.base_checker import BaseChecker
+    from pylint.checkers.utils import only_required_for_messages
+    from pylint.interfaces import UNDEFINED
+    from pylint.testutils import MessageTest
+    from pylint.utils import ASTWalker
+    # SOURCE: https://github.com/Delgan/loguru/blob/420704041797daf804b505e5220805528fe26408/docs/resources/recipes.rst#L1083
+    global_log_config(
+        log_level=logging.getLevelName("DEBUG"),
+        json=False,
+    )
+
+    # """Decorator to store messages that are handled by a checker method as an
+    # attribute of the function object.
+
+    # This information is used by ``ASTWalker`` to decide whether to call the decorated
+    # method or not. If none of the messages is enabled, the method will be skipped.
+    # Therefore, the list of messages must be well maintained at all times!
+    # This decorator only has an effect on ``visit_*`` and ``leave_*`` methods
+    # of a class inheriting from ``BaseChecker``.
+    # """
+
+    class MockLinter:
+        def __init__(self, msgs: dict[str, bool]) -> None:
+            self._msgs = msgs
+
+        def is_message_enabled(self, msgid: str) -> bool:
+            return self._msgs.get(msgid, True)
+
+    class Checker(BaseChecker):
+        # pylint: disable-next=super-init-not-called
+        def __init__(self) -> None:
+            self.called: set[str] = set()
+
+        @only_required_for_messages("first-message")
+        def visit_module(
+            self, module: nodes.Module  # pylint: disable=unused-argument
+        ) -> None:
+            self.called.add("module")
+            logger.debug(f"module: {module}")
+
+        @only_required_for_messages("second-message")
+        def visit_call(self, module: nodes.Call) -> None:
+            raise NotImplementedError
+
+        @only_required_for_messages("second-message", "third-message")
+        def visit_assignname(
+            self, module: nodes.AssignName  # pylint: disable=unused-argument
+        ) -> None:
+            self.called.add("assignname")
+            logger.debug(f"assignname: {module}")
+        @only_required_for_messages("second-message")
+        def leave_assignname(self, module: nodes.AssignName) -> None:
+            raise NotImplementedError
+
+    # Read the file content
+    file_path = Path("marimo_bad.py")
+    file_content = file_path.read_text()
+
+    # Extract nodes from the file content
+    module: Module = astroid.parse(file_content, "marimo_bad.py")
+    rich.inspect(module, all=True)
+    rich.print(module.repr_tree())
+    rich.print(module.as_string())
+
+    linter = MockLinter(
+        {"first-message": True, "second-message": False, "third-message": True}
+    )
+    walker = ASTWalker(linter)
+    checker = MarimoCellParamsChecker()
+    walker.add_checker(MarimoCellParamsChecker)
+
+    bpdb.set_trace()
+    walker.walk(module)
+    # walker.walk(astroid.parse(file_content, "marimo_bad.py"))
+    walker.walk(astroid.parse(file_content))
