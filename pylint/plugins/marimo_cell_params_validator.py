@@ -11,6 +11,9 @@ from typing import Any, Set, cast
 
 import astroid
 
+# from loguru import logger
+import pysnooper
+
 from astroid import nodes
 from astroid.nodes import AssignName, Attribute, Name, NodeNG
 
@@ -18,6 +21,7 @@ from pylint.checkers import BaseChecker
 from pylint.lint import PyLinter
 
 
+@pysnooper.snoop(thread_info=True, max_variable_length=None, depth=10)
 class MarimoCellParamsChecker(BaseChecker):
     """Checker for enforcing Marimo cell parameter usage standards.
 
@@ -116,6 +120,15 @@ class MarimoCellParamsChecker(BaseChecker):
         # Walk the function body to collect used names
         for child in node.body:
             child.accept(self)
+
+        # Check for unused parameters immediately
+        for param in self._current_cell_params:
+            if param not in self._used_names:
+                self.add_message(
+                    "unused-cell-parameter",
+                    node=node,
+                    args=(param,),
+                )
 
     def leave_functiondef(self, node: nodes.FunctionDef) -> None:
         """Leave a function definition node and check for unused parameters.
