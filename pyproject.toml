@@ -499,7 +499,8 @@ max-complexity = 31 # C901: Recommended goal is 10
 "test/*" = ["D"]
 "tests/conftest.py" = ["D", "F811"]
 "*.pyi" = ["D", "E501", "E701", "I002"]
-"marimo_*" = [
+
+"marimo_fix.py" = [
     "B005",  # Using .strip() with multi-character strings is misleading
     "D",  # pydocstyle (D)
     "F811",  # Redefinition of unused name
@@ -510,6 +511,72 @@ max-complexity = 31 # C901: Recommended goal is 10
     "RUF005",  # Consider `[x] * n` instead of `[x for _ in range(n)]`
     "RUF005", # collection-literal-concatenation (RUF005)
 ]
+
+"marimo_prompt_analysis.py" = [
+    "B005",  # Using .strip() with multi-character strings is misleading
+    "D",  # pydocstyle (D)
+    "F811",  # Redefinition of unused name
+    "N803",  # Argument name should be lowercase
+    "N806",  # Variable in function should be lowercase
+    "N807",  # Function name should not start and end with `__`
+    "N815",  # Variable in class scope should not be mixedCase
+    "RUF005",  # Consider `[x] * n` instead of `[x for _ in range(n)]`
+    "RUF005", # collection-literal-concatenation (RUF005)
+]
+
+"marimo_prompt_library.py" = [
+    "B005",  # Using .strip() with multi-character strings is misleading
+    "D",  # pydocstyle (D)
+    "F811",  # Redefinition of unused name
+    "N803",  # Argument name should be lowercase
+    "N806",  # Variable in function should be lowercase
+    "N807",  # Function name should not start and end with `__`
+    "N815",  # Variable in class scope should not be mixedCase
+    "RUF005",  # Consider `[x] * n` instead of `[x for _ in range(n)]`
+    "RUF005", # collection-literal-concatenation (RUF005)
+]
+
+
+
+"mariomo_multi_language_model_ranker.py" = [
+    "B005",  # Using .strip() with multi-character strings is misleading
+    "D",  # pydocstyle (D)
+    "F811",  # Redefinition of unused name
+    "N803",  # Argument name should be lowercase
+    "N806",  # Variable in function should be lowercase
+    "N807",  # Function name should not start and end with `__`
+    "N815",  # Variable in class scope should not be mixedCase
+    "RUF005",  # Consider `[x] * n` instead of `[x for _ in range(n)]`
+    "RUF005", # collection-literal-concatenation (RUF005)
+]
+
+"mariomo_multi_llm_prompting.py" = [
+    "B005",  # Using .strip() with multi-character strings is misleading
+    "D",  # pydocstyle (D)
+    "F811",  # Redefinition of unused name
+    "N803",  # Argument name should be lowercase
+    "N806",  # Variable in function should be lowercase
+    "N807",  # Function name should not start and end with `__`
+    "N815",  # Variable in class scope should not be mixedCase
+    "RUF005",  # Consider `[x] * n` instead of `[x for _ in range(n)]`
+    "RUF005", # collection-literal-concatenation (RUF005)
+]
+
+
+
+
+"mariomo_prompt_library.py" = [
+    "B005",  # Using .strip() with multi-character strings is misleading
+    "D",  # pydocstyle (D)
+    "F811",  # Redefinition of unused name
+    "N803",  # Argument name should be lowercase
+    "N806",  # Variable in function should be lowercase
+    "N807",  # Function name should not start and end with `__`
+    "N815",  # Variable in class scope should not be mixedCase
+    "RUF005",  # Consider `[x] * n` instead of `[x for _ in range(n)]`
+    "RUF005", # collection-literal-concatenation (RUF005)
+]
+
 "pylint/plugins/*.py" = [
     "SIM102", #  SIM102 Use a single `if` statement instead of nested `if` statements
 
