@@ -882,3 +882,8 @@ copy-rules:
 	cp -av cursorrules.xml .cursorrules
 	cp -av cursorrules.xml aider_configs/aider_rules
 	@echo "✅ Copy completed successfully!"
+
+pylint-plugin-debug:
+	PYTHONPATH=. {{UV_RUN}} pylint --load-plugins=marimo_cell_params_validator --disable=all --enable=marimo_cell_params_validator mariomo_prompt_library.py
+
+	# PYTHONPATH=. uv run pylint --load-plugins=marimo_cell_params_validator --disable=all --enable=marimo_cell_params_validator ../../mariomo_prompt_library.py

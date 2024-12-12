@@ -91,6 +91,7 @@ dev = [
     "ruff>=0.8.2",
     "tox-uv>=1.16.1",
     "pylint-to-ruff>=0.3.0",
+    "pylint>=3.3.2",
 ]
 
 [project.urls]
@@ -1038,6 +1039,7 @@ py-version = "3.12"
 # any too bad. Override on command line as appropriate.
 jobs = 0
 fail-on = ["I"]
+# PosixPath('/Users/malcolm/dev/bossjones/prompt-library/pylint/plugins')
 init-hook = """\
     from pathlib import Path; \
     import sys; \
@@ -1045,7 +1047,7 @@ init-hook = """\
     from pylint.config import find_default_config_files; \
 
     sys.path.append( \
-        str(Path(next(find_default_config_files())).parent.joinpath('pylint/plugins'))
+        str(Path(next(find_default_config_files())).parent.joinpath('pylint/plugins')) + "/."
     ) \
     """
 load-plugins = [
