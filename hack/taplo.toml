@@ -1,0 +1,155 @@
+[formatting]
+align_entries = true
+align_comments = true
+array_trailing_comma = true
+array_auto_expand = true
+array_auto_collapse = false
+compact_arrays = true
+compact_inline_tables = false
+inline_table_expand = true
+compact_entries = false
+column_width = 120
+indent_tables = true
+indent_entries = true
+indent_string = "    "
+trailing_newline = true
+reorder_keys = false
+reorder_arrays = false
+reorder_inline_tables = false
+allowed_blank_lines = 2
+crlf = false
+
+[[rule]]
+include = ["**/pyproject.toml"]
+
+[rule.formatting]
+align_entries = true
+reorder_keys = false
+array_auto_expand = true
+array_auto_collapse = false
+compact_arrays = true
+compact_inline_tables = false
+inline_table_expand = true
+compact_entries = false
+column_width = 120
+indent_tables = true
+indent_entries = true
+indent_string = "    "
+trailing_newline = true
+
+[[rule.keys]]
+key = "project"
+position = 0
+implicit_table = true
+
+[[rule.keys]]
+key = "project.name"
+position = 1
+
+[[rule.keys]]
+key = "project.version"
+position = 2
+
+[[rule.keys]]
+key = "project.description"
+position = 3
+
+[[rule.keys]]
+key = "project.readme"
+position = 4
+
+[[rule.keys]]
+key = "project.authors"
+position = 5
+
+[[rule.keys]]
+key = "project.keywords"
+position = 6
+
+[[rule.keys]]
+key = "project.requires-python"
+position = 7
+
+[[rule.keys]]
+key = "project.classifiers"
+position = 8
+
+[[rule.keys]]
+key = "project.dependencies"
+position = 9
+
+[[rule.keys]]
+key = "project.urls"
+position = 10
+
+[[rule.keys]]
+key = "build-system"
+position = 20
+
+[[rule.keys]]
+key = "tool"
+position = 30
+implicit_table = true
+
+[[rule.keys]]
+key = "tool.ruff"
+position = 31
+
+[[rule.keys]]
+key = "tool.ruff.lint"
+position = 32
+
+[[rule.keys]]
+key = "tool.coverage"
+position = 40
+
+[[rule.keys]]
+key = "tool.pytest"
+position = 50
+
+[[rule.keys]]
+key = "tool.black"
+position = 60
+
+[[rule.tables]]
+key = "project"
+position = 0
+
+[[rule.tables]]
+key = "build-system"
+position = 10
+
+[[rule.tables]]
+key = "tool"
+position = 20
+
+[[rule.tables]]
+key = "tool.ruff"
+position = 21
+
+[[rule.tables]]
+key = "tool.ruff.lint"
+position = 22
+
+[[rule.tables]]
+key = "tool.coverage"
+position = 30
+
+[[rule.tables]]
+key = "tool.pytest"
+position = 40
+
+[[rule.tables]]
+key = "tool.black"
+position = 50
+
+[[rule]]
+include = ["**/pyproject.toml"]
+keys = [
+    "project",
+    "build-system",
+    "tool.ruff",
+    "tool.coverage",
+    "tool.pytest",
+    "tool.black",
+]

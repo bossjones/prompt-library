@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <cursorrules>
   <purpose>
-    You are an AI assistant responsible for helping a developer create a LLM prompt library.
+    You are an AI assistant responsible for helping a developer create a LLM prompt library and maintain Python code quality.
   </purpose>
 
   <instructions>
@@ -14,6 +14,191 @@
     <instruction>Create a `templates` folder to store reusable prompt structures.</instruction>
     <instruction>Include a comprehensive README.md file at the root level.</instruction>
   </instructions>
+
+  <python_standards>
+    <project_structure>
+      <standard>Maintain clear project structure with separate directories for source code, tests (`tests/`), and documentation (`docs/`).</standard>
+      <standard>Use modular design with distinct files for models, services, controllers, and utilities.</standard>
+      <standard>Create separate files for AI components (chat models, prompts, output parsers, chat history, documents/loaders, stores, retrievers, tools)</standard>
+      <standard>Follow modular design patterns for LangChain/LangGraph components</standard>
+      <standard>Use UV (https://docs.astral.sh/uv) for dependency management and virtual environments</standard>
+      <standard>Follow composition over inheritance principle.</standard>
+      <standard>Use design patterns like Adapter, Decorator, and Bridge when appropriate.</standard>
+    </project_structure>
+
+    <code_quality>
+      <standard>Add typing annotations to ALL functions and classes with return types.</standard>
+      <standard>Include PEP 257-compliant docstrings in Google style for all functions and classes.</standard>
+      <standard>Implement robust error handling and logging using loguru with context capture.</standard>
+      <standard>Use descriptive variable and function names.</standard>
+      <standard>Add detailed comments for complex logic.</standard>
+      <standard>Provide rich error context for debugging.</standard>
+      <standard>Follow DRY (Don't Repeat Yourself) and KISS (Keep It Simple, Stupid) principles.</standard>
+      <standard>Skip type annotations and docstrings for marimo notebook cells (files prefixed with `marimo_*`) that use the pattern `@app.cell def __(`.</standard>
+    </code_quality>
+
+    <testing>
+      <standard>Use pytest exclusively for all testing (no unittest module).</standard>
+      <standard>Place all tests in `./tests/` directory.</standard>
+      <standard>Include `__init__.py` files in all test directories.</standard>
+      <standard>Add type annotations and docstrings to all tests.</standard>
+      <standard>Use pytest markers to categorize tests (e.g., `@pytest.mark.unit`, `@pytest.mark.integration`).</standard>
+      <standard>Mark cursor-generated code with `@pytest.mark.cursor`.</standard>
+      <standard>Strive for 100% unit test code coverage.</standard>
+      <standard>Use pytest-recording for tests involving Langchain runnables (limited to unit/integration tests)</standard>
+      <standard>Implement proper Discord.py testing using discord.ext.test</standard>
+      <standard>Use typer.testing.CliRunner for CLI application testing</standard>
+      <standard>For file-based tests, use tmp_path fixture to handle test files.</standard>
+      <standard>Avoid context managers for pytest mocks, use mocker.patch instead.</standard>
+    </testing>
+
+    <dependency_management>
+      <standard>Use uv (https://docs.astral.sh/uv) for dependency management.</standard>
+      <standard>Use `uv sync` to install dependencies, avoid `uv pip install`.</standard>
+      <standard>Use Ruff for code style consistency.</standard>
+      <standard>Document Ruff rules in pyproject.toml with stability indicators.</standard>
+      <standard>Use UV for all package management operations</standard>
+      <standard>Prefer `uv sync` over `uv pip install` for dependency installation</standard>
+      <standard>Maintain clear dependency specifications in pyproject.toml</standard>
+    </dependency_management>
+
+    <langchain_standards>
+      <standard>Mark tests involving Langchain runnables with @pytest.mark.vcr (except evaluation tests).</standard>
+      <standard>Use proper VCR.py configuration for HTTP interaction recording.</standard>
+      <standard>Implement proper typing for all Langchain components.</standard>
+      <standard>Follow Langchain's component structure guidelines.</standard>
+    </langchain_standards>
+
+    <langchain_integration>
+      <standard>Implement proper typing for all LangChain components</standard>
+      <standard>Follow component structure guidelines from LangChain documentation</standard>
+      <standard>Use VCR.py for recording HTTP interactions in tests</standard>
+      <standard>Create distinct files for different LangChain component types</standard>
+      <reference>https://python.langchain.com/v0.2/docs/concepts/#few-shot-prompting</reference>
+    </langchain_integration>
+
+    <design_patterns>
+      <pattern>
+        <name>Composition Over Inheritance</name>
+        <description>Favor object composition over class inheritance to avoid subclass explosion and enhance flexibility</description>
+      </pattern>
+      <pattern>
+        <name>Decorator Pattern</name>
+        <description>Use for dynamically adjusting behavior of objects without modifying their structure</description>
+      </pattern>
+      <pattern>
+        <name>Adapter Pattern</name>
+        <description>Allow incompatible interfaces to work together, promoting flexibility and reusability</description>
+      </pattern>
+      <pattern>
+        <name>Global Object Pattern</name>
+        <description>Use for creating module-level objects that provide methods for actions</description>
+      </pattern>
+    </design_patterns>
+  </python_standards>
+
+  <configuration_standards>
+    <ruff_rules>
+      <standard>Document all Ruff rules in pyproject.toml with inline comments.</standard>
+      <standard>Include stability indicators for each rule:
+        - ✔️ (stable)
+        - 🧪 (unstable/preview)
+        - ⚠️ (deprecated)
+        - ❌ (removed)
+        - 🛠️ (auto-fixable)
+      </standard>
+      <standard>Keep rule descriptions under 160 characters when possible.</standard>
+      <standard>Reference Ruff version from .pre-commit-config.yaml.</standard>
+      <example>
+        <![CDATA[
+        [tool.ruff.lint]
+        select = [
+            "D200", # fits-on-one-line: One-line docstring should fit on one line (stable)
+            "E226", # missing-whitespace-around-arithmetic-operator: Missing whitespace around arithmetic operator (unstable)
+        ]
+        ]]>
+      </example>
+    </ruff_rules>
+
+    <tool_configurations>
+      <standard>Document configuration options for:
+        - pylint (reference: pylint.pycqa.org)
+        - pyright (reference: microsoft.github.io/pyright)
+        - mypy (reference: mypy.readthedocs.io)
+        - commitizen (reference: commitizen-tools.github.io)
+      </standard>
+      <standard>Include descriptive comments for each configuration option.</standard>
+    </tool_configurations>
+
+    <test_imports>
+      <standard>Import necessary pytest types in TYPE_CHECKING block:
+        - CaptureFixture
+        - FixtureRequest
+        - LogCaptureFixture
+        - MonkeyPatch
+        - MockerFixture
+        - VCRRequest (when using pytest-recording)
+      </standard>
+    </test_imports>
+  </configuration_standards>
+
+  <testing_practices>
+    <fixtures>
+      <standard>Use pytest fixtures for reusable test components.</standard>
+      <standard>Utilize tmp_path fixture for file-based tests.</standard>
+      <example>
+        <![CDATA[
+        @pytest.fixture()
+        def mock_pdf_file(tmp_path: Path) -> Path:
+            """Create a mock PDF file for testing purposes.
+
+            This fixture creates a temporary directory and copies a test PDF file into it.
+
+            Args:
+                tmp_path (Path): The temporary path provided by pytest.
+
+            Returns:
+                Path: Path to the mock PDF file.
+            """
+            test_pdf_path: Path = tmp_path / "test.pdf"
+            shutil.copy("fixtures/test.pdf", test_pdf_path)
+            return test_pdf_path
+        ]]>
+      </example>
+    </fixtures>
+
+    <test_organization>
+      <standard>Mirror source code directory structure in tests directory.</standard>
+      <standard>Use appropriate pytest markers for test categorization.</standard>
+      <standard>Include comprehensive docstrings for all test functions.</standard>
+      <example>
+        <![CDATA[
+        @pytest.mark.slow()
+        @pytest.mark.services()
+        @pytest.mark.vcr(
+            allow_playback_repeats=True,
+            match_on=["method", "scheme", "port", "path", "query"],
+            ignore_localhost=False
+        )
+        def test_load_documents(
+            mocker: MockerFixture,
+            mock_pdf_file: Path,
+            vcr: Any
+        ) -> None:
+            """Test the loading of documents from a PDF file.
+
+            Verifies that the load_documents function correctly processes PDF files.
+
+            Args:
+                mocker: The pytest-mock fixture
+                mock_pdf_file: Path to test PDF
+                vcr: VCR.py fixture
+            """
+            # Test implementation
+        ]]>
+      </example>
+    </test_organization>
+  </testing_practices>
 
   <examples>
     <example>
@@ -29,7 +214,7 @@ prompt-library/
 │   │   └── quote-generation/
 │   │
 │   └── engineering/
-│       ├── code-generation/
+│       ├ code-generation/
 │       ├── code-review/
 │       ├── bug-finding/
 │       └── style-enforcement/
@@ -192,4 +377,468 @@ prompt-library/
     <point>Templates folder promotes consistency in prompt creation.</point>
     <point>README file provides clear documentation for all users.</point>
   </reasoning>
+
+  <prompt_engineering_standards>
+    <xml_structure>
+      <standard>Use clear, descriptive tag names that are self-explanatory (e.g., &lt;context&gt;, &lt;task&gt;, &lt;examples&gt;).</standard>
+      <standard>Organize content hierarchically with proper nesting of tags.</standard>
+      <standard>Maintain consistent tag usage throughout prompts.</standard>
+      <standard>Use line breaks and indentation for readability.</standard>
+    </xml_structure>
+
+    <component_organization>
+      <standard>Separate different components with distinct tags.</standard>
+      <standard>Use &lt;context&gt; for background information.</standard>
+      <standard>Use &lt;instructions&gt; for specific directives.</standard>
+      <standard>Use &lt;examples&gt; for sample inputs and outputs.</standard>
+      <standard>Use &lt;output_format&gt; to define response structure.</standard>
+      <standard>Use &lt;reflection&gt; for AI thinking steps.</standard>
+    </component_organization>
+
+    <best_practices>
+      <standard>Include only necessary information in each tag.</standard>
+      <standard>Number or bullet point instructions for clarity.</standard>
+      <standard>Use variables with descriptive names (e.g., &lt;variable_name&gt;{{value}}&lt;/variable_name&gt;).</standard>
+      <standard>Combine XML tags with other prompt engineering techniques when appropriate.</standard>
+      <standard>Include validation using XSD schemas for prompt structure.</standard>
+    </best_practices>
+
+    <reflection_patterns>
+      <standard>Include explicit thinking steps in prompts using &lt;reflection&gt; tags.</standard>
+      <standard>Break down complex tasks into clear steps.</standard>
+      <standard>Use chain-of-thought prompting for complex reasoning.</standard>
+      <example>
+        <![CDATA[
+        <prompt>
+          <context>Analyzing a complex codebase for refactoring.</context>
+          <reflection>
+            1. First, I'll identify the main components and their relationships
+            2. Then, I'll analyze each component for SOLID principles
+            3. Finally, I'll propose specific refactoring steps
+          </reflection>
+          <output_format>
+            Provide a structured analysis with:
+            - Component relationships
+            - SOLID violations
+            - Refactoring proposals
+          </output_format>
+        </prompt>
+        ]]>
+      </example>
+    </reflection_patterns>
+
+    <variable_handling>
+      <standard>Use descriptive variable names in XML tags.</standard>
+      <standard>Include type hints and validation rules for variables.</standard>
+      <standard>Document expected formats and constraints.</standard>
+      <example>
+        <![CDATA[
+        <prompt>
+          <variables>
+            <code_snippet type="python" max_length="500">{{code_to_review}}</code_snippet>
+            <style_guide type="url">{{style_guide_link}}</style_guide>
+            <severity_level type="enum" values="high,medium,low">{{severity}}</severity_level>
+          </variables>
+          <task>Review the code according to the style guide at the specified severity level.</task>
+        </prompt>
+        ]]>
+      </example>
+    </variable_handling>
+  </prompt_engineering_standards>
+
+  <marimo_standards>
+    <imports>
+      <standard>All external imports must be in the first cell of marimo_* files.</standard>
+      <standard>First cell should import and return all modules needed by subsequent cells.</standard>
+      <standard>Use importlib.reload() for development modules that may change.</standard>
+      <standard>Return all imported modules as a tuple for use by other cells.</standard>
+      <example>
+        <![CDATA[
+        @app.cell
+        def __():
+            """Global imports cell - no type hints or docstring needed for marimo cells."""
+            import re
+            import os
+            import importlib
+            import marimo as mo
+            from pathlib import Path
+            from prompt_library.common import llm_module, prompt_library_module
+
+            # Reload development modules
+            importlib.reload(prompt_library_module)
+
+            return llm_module, mo, os, Path, prompt_library_module, re
+        ]]>
+      </example>
+    </imports>
+
+    <cell_definition>
+      <standard>All cells must be decorated with @app.cell.</standard>
+      <standard>Always use explicit tuple returns, even for single values.</standard>
+      <standard>No function definitions allowed in marimo notebook files (prefix: marimo_*).</standard>
+      <standard>All functions must be imported from prompt_library_module.py.</standard>
+      <standard>No error handling in notebook cells - handle errors in imported functions.</standard>
+      <standard>Cell parameters should only include variables actually used in the cell.</standard>
+      <standard>Skip type annotations and docstrings for marimo notebook cells.</standard>
+      <example>
+        <![CDATA[
+        # ✅ Correct Pattern
+        from prompt_library_module import process_data
+
+        @app.cell
+        def __(previous_output):
+            result = process_data(previous_output)
+            return (result,)
+
+        # ❌ Common Errors
+        @app.cell
+        def __(unused_param):  # Don't include unused parameters
+            def local_func():  # Don't define functions in cells
+                pass
+            try:  # Don't do error handling in cells
+                result = process()
+            except Exception:
+                pass
+            return result  # Missing tuple wrapping
+        ]]>
+      </example>
+    </cell_definition>
+
+    <state_management>
+      <standard>All cell dependencies must be explicitly declared as parameters.</standard>
+      <standard>Avoid mutating shared state between cells.</standard>
+      <standard>Use proper typing for all state variables.</standard>
+      <example>
+        <![CDATA[
+        # ✅ Correct Pattern
+        from prompt_library_module import transform_data
+
+        @app.cell
+        def __(data, config):
+            transformed = transform_data(data, config)
+            return (transformed,)
+
+        # ❌ Common Errors
+        @app.cell
+        def __(data, unused_param):  # Remove unused param
+            result = []  # Don't create mutable state
+            for item in data:
+                result.append(item)  # Use transform_data from module instead
+            return (result,)
+        ]]>
+      </example>
+    </state_management>
+
+    <ui_components>
+      <standard>UI components should be created and modified through the reactive system.</standard>
+      <standard>Use proper typing for all UI components.</standard>
+      <standard>Include descriptive labels and help text.</standard>
+      <example>
+        <![CDATA[
+        # ✅ Correct Pattern
+        @app.cell
+        def __() -> tuple[mo.ui.Select, mo.ui.Slider]:
+            """Create UI components for model selection and temperature control.
+
+            Returns:
+                tuple[mo.ui.Select, mo.ui.Slider]: Model selector and temperature slider
+            """
+            model_select = mo.ui.Select(
+                options=["gpt-4", "gpt-3.5-turbo"],
+                value="gpt-3.5-turbo",
+                label="Select Model",
+                help="Choose the model to use for generation"
+            )
+
+            temp_slider = mo.ui.Slider(
+                value=0.7,
+                min=0.0,
+                max=1.0,
+                step=0.1,
+                label="Temperature",
+                help="Controls randomness in generation"
+            )
+
+            return (model_select, temp_slider)
+
+        # ❌ Common Errors
+        @app.cell
+        def __(slider):
+            slider.value = 0.5  # Direct mutation - avoid this
+            return ()
+        ]]>
+      </example>
+    </ui_components>
+
+    <error_handling>
+      <standard>Use proper error boundaries and guards in each cell.</standard>
+      <standard>Provide descriptive error messages with context.</standard>
+      <standard>Use mo.stop() for validation guards.</standard>
+      <example>
+        <![CDATA[
+        # ✅ Correct Pattern
+        @app.cell
+        def __(form: mo.ui.Form, mo: Any) -> tuple[str]:
+            """Process form data with proper error handling.
+
+            Args:
+                form: The form UI component
+                mo: The marimo module
+
+            Returns:
+                tuple[str]: Processing result or error message
+            """
+            # Guard clause
+            mo.stop(not form.value, "Please fill out the form")
+
+            try:
+                result = process_form_data(form.value)
+                return (result,)
+            except ValidationError as e:
+                mo.md(f"""
+                ❌ **Validation Error**:
+                ```
+                {str(e)}
+                ```
+                Please check your input and try again.
+                """).style({
+                    "color": "red",
+                    "padding": "10px",
+                    "border-radius": "5px",
+                    "background": "#ffebee"
+                })
+                return ("",)
+            except Exception as e:
+                mo.md(f"""
+                ❌ **Unexpected Error**:
+                ```
+                {str(e)}
+                ```
+                Please contact support if this persists.
+                """).style({
+                    "color": "red",
+                    "padding": "10px",
+                    "border-radius": "5px",
+                    "background": "#ffebee"
+                })
+                return ("",)
+
+        # ❌ Common Errors
+        @app.cell
+        def __():
+            result = process_data()  # Missing try/except
+            return (result,)
+        ]]>
+      </example>
+    </error_handling>
+
+    <cell_dependencies>
+      <standard>All cell dependencies must be explicitly declared.</standard>
+      <standard>Avoid circular dependencies between cells.</standard>
+      <standard>Use proper ordering of cells based on dependencies.</standard>
+      <example>
+        <![CDATA[
+        # ✅ Correct Pattern
+        @app.cell
+        def __(data: pd.DataFrame) -> tuple[dict[str, Any]]:
+            """Process input data and return statistics.
+
+            Args:
+                data: Input DataFrame to analyze
+
+            Returns:
+                tuple[dict[str, Any]]: Dictionary of statistics
+            """
+            stats = calculate_statistics(data)
+            return (stats,)
+
+        @app.cell
+        def __(stats: dict[str, Any]) -> tuple[mo.md]:
+            """Create markdown display of statistics.
+
+            Args:
+                stats: Dictionary of statistics to display
+
+            Returns:
+                tuple[mo.md]: Formatted markdown output
+            """
+            return (mo.md(f"Statistics:\n{stats}"),)
+
+        # ❌ Common Errors
+        # Circular dependency
+        @app.cell
+        def __(cell2_output):
+            return (cell2_output * 2,)
+
+        @app.cell
+        def __(cell1_output):
+            return (cell1_output + 1,)
+        ]]>
+      </example>
+    </cell_dependencies>
+
+    <ui_styling>
+      <standard>Use consistent styling objects for UI components.</standard>
+      <standard>Follow Material Design principles for component styling.</standard>
+      <standard>Maintain responsive design patterns.</standard>
+      <example>
+        <![CDATA[
+        @app.cell
+        def __() -> tuple[dict[str, Any]]:
+            """Define reusable UI styles.
+
+            Returns:
+                tuple[dict[str, Any]]: Dictionary of style configurations
+            """
+            styles = {
+                "container": {
+                    "max-width": "800px",
+                    "margin": "0 auto",
+                    "padding": "20px",
+                },
+                "card": {
+                    "background": "#ffffff",
+                    "border-radius": "8px",
+                    "box-shadow": "0 2px 4px rgba(0,0,0,0.1)",
+                    "padding": "16px",
+                    "margin-bottom": "16px",
+                },
+                "error": {
+                    "color": "red",
+                    "padding": "10px",
+                    "border-radius": "5px",
+                    "background": "#ffebee",
+                },
+                "success": {
+                    "color": "green",
+                    "padding": "10px",
+                    "border-radius": "5px",
+                    "background": "#e8f5e9",
+                }
+            }
+            return (styles,)
+
+        @app.cell
+        def __(styles: dict[str, Any]) -> tuple[mo.md]:
+            """Create styled UI components.
+
+            Args:
+                styles: Dictionary of style configurations
+
+            Returns:
+                tuple[mo.md]: Styled markdown component
+            """
+            return (
+                mo.md("# Dashboard").style(styles["container"]),
+            )
+        ]]>
+      </example>
+    </ui_styling>
+
+    <python_differences>
+      <standard>Understand key differences from regular Python code.</standard>
+      <standard>Follow Marimo-specific patterns for state and reactivity.</standard>
+      <example>
+        <![CDATA[
+        # Regular Python vs Marimo Patterns
+
+        # ❌ Regular Python - Global State
+        global_counter = 0
+        def increment():
+            global global_counter
+            global_counter += 1
+
+        # ✅ Marimo - Reactive State
+        @app.cell
+        def __() -> tuple[int]:
+            """Initialize counter state.
+
+            Returns:
+                tuple[int]: Initial counter value
+            """
+            return (0,)
+
+        @app.cell
+        def __(counter: int) -> tuple[int]:
+            """Increment counter reactively.
+
+            Args:
+                counter: Current counter value
+
+            Returns:
+                tuple[int]: Incremented counter value
+            """
+            return (counter + 1,)
+
+        # ❌ Regular Python - Direct DOM Updates
+        def update_ui():
+            document.getElementById("result").innerHTML = "Updated"
+
+        # ✅ Marimo - Reactive UI Updates
+        @app.cell
+        def __(data: Any) -> tuple[mo.md]:
+            """Update UI reactively based on data changes.
+
+            Args:
+                data: Data to display
+
+            Returns:
+                tuple[mo.md]: Updated UI component
+            """
+            return (mo.md(f"Result: {data}"),)
+        ]]>
+      </example>
+    </python_differences>
+
+    <reactive_patterns>
+      <standard>Use reactive programming patterns for UI and state updates.</standard>
+      <standard>Maintain unidirectional data flow.</standard>
+      <standard>Handle side effects properly in reactive contexts.</standard>
+      <example>
+        <![CDATA[
+        # ✅ Correct Reactive Pattern
+        @app.cell
+        def __() -> tuple[mo.ui.Text, mo.ui.Button]:
+            """Create input and action components.
+
+            Returns:
+                tuple[mo.ui.Text, mo.ui.Button]: Text input and submit button
+            """
+            text_input = mo.ui.text(placeholder="Enter text")
+            submit_btn = mo.ui.button("Submit")
+            return (text_input, submit_btn)
+
+        @app.cell
+        def __(
+            text_input: mo.ui.Text,
+            submit_btn: mo.ui.Button
+        ) -> tuple[mo.md]:
+            """Handle reactive updates based on input changes.
+
+            Args:
+                text_input: Text input component
+                submit_btn: Submit button component
+
+            Returns:
+                tuple[mo.md]: Updated display component
+            """
+            if not submit_btn.clicked:
+                return (mo.md("Waiting for submission..."),)
+
+            if not text_input.value:
+                return (mo.md("Please enter some text."),)
+
+            return (mo.md(f"Submitted: {text_input.value}"),)
+
+        # ❌ Common Anti-patterns
+        @app.cell
+        def __(text_input: mo.ui.Text):
+            # Direct mutation of state
+            global_state["text"] = text_input.value
+            # Missing tuple return
+            return text_input.value
+        ]]>
+      </example>
+    </reactive_patterns>
+  </marimo_standards>
 </cursorrules>

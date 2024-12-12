@@ -41,6 +41,8 @@ from vcr import filters
 
 import pytest
 
+from pylint.config import find_default_config_files
+
 
 if TYPE_CHECKING:
     from _pytest.config import Config as PytestConfig
@@ -63,6 +65,21 @@ IS_RUNNING_ON_GITHUB_ACTIONS = bool(os.environ.get("GITHUB_ACTOR"))
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 FAKE_TIME = datetime.datetime(2020, 12, 25, 17, 5, 55)
+
+
+def pytest_configure(config: PytestConfig) -> None:
+    """Configure pytest by adding the pylint plugins directory to sys.path.
+
+    This function is called by pytest during initialization. It adds the pylint plugins
+    directory to the Python path to ensure pylint plugins are discoverable.
+
+    Args:
+        config (PytestConfig): The pytest configuration object.
+
+    Returns:
+        None
+    """
+    sys.path.append(str(Path(next(find_default_config_files())).parent.joinpath("pylint/plugins")))
 
 
 class IgnoreOrder:

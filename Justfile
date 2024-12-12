@@ -399,7 +399,7 @@ uv_pylint:
 
 # Run pylint with error-only configuration
 uv_pylint_error_only:
-	{{UV_RUN}} pylint --output-format=colorized --disable=all --max-line-length=120 --enable=F,E --rcfile pyproject.toml prompt_library tests
+	{{UV_RUN}} pylint --output-format=colorized --disable=all --max-line-length=120 --enable=F,E --rcfile pyproject.toml src/prompt_library tests
 
 # Run pylint on all files
 uv_lint_all:
@@ -673,31 +673,31 @@ uv_deploy_docs:
 
 # Add bespoke adobe concepts to cursor context
 add-cursor-context:
-	mkdir -p prompt_library/vendored || true
-	gh repo clone universityofprofessorex/cerebro-bot prompt_library/vendored/cerebro-bot || true && cd prompt_library/vendored/cerebro-bot && git checkout feature-discord-utils && cd ../../..
-	gh repo clone bossjones/prompt_library prompt_library/vendored/prompt_library || true
-	gh repo clone langchain-ai/retrieval-agent-template prompt_library/vendored/retrieval-agent-template || true
-	gh repo clone langchain-ai/rag-research-agent-template prompt_library/vendored/rag-research-agent-template || true
-	gh repo clone langchain-ai/memory-template prompt_library/vendored/memory-template || true
-	gh repo clone langchain-ai/react-agent prompt_library/vendored/react-agent || true
-	gh repo clone langchain-ai/chat-langchain prompt_library/vendored/chat-langchain || true
-	gh repo clone bossjones/goob_ai prompt_library/vendored/goob_ai || true
-	gh repo clone langchain-ai/langchain prompt_library/vendored/langchain || true
-	gh repo clone langchain-ai/langgraph prompt_library/vendored/langgraph || true
-	gh repo clone CraftSpider/dpytest prompt_library/vendored/dpytest || true
+	mkdir -p vendored || true
+	gh repo clone universityofprofessorex/cerebro-bot vendored/cerebro-bot || true && cd vendored/cerebro-bot && git checkout feature-discord-utils && cd ../../..
+	gh repo clone langchain-ai/retrieval-agent-template vendored/retrieval-agent-template || true
+	gh repo clone langchain-ai/rag-research-agent-template vendored/rag-research-agent-template || true
+	gh repo clone langchain-ai/memory-template vendored/memory-template || true
+	gh repo clone langchain-ai/react-agent vendored/react-agent || true
+	gh repo clone langchain-ai/chat-langchain vendored/chat-langchain || true
+	gh repo clone bossjones/goob_ai vendored/goob_ai || true
+	gh repo clone langchain-ai/langchain vendored/langchain || true
+	gh repo clone langchain-ai/langgraph vendored/langgraph || true
+	gh repo clone CraftSpider/dpytest vendored/dpytest || true
+	gh repo clone marimo-team/marimo vendored/marimo || true
 
-	rm -rf prompt_library/vendored/cerebro-bot/.git
-	rm -rf prompt_library/vendored/prompt_library/.git
-	rm -rf prompt_library/vendored/retrieval-agent-template/.git
-	rm -rf prompt_library/vendored/rag-research-agent-template/.git
-	rm -rf prompt_library/vendored/memory-template/.git
-	rm -rf prompt_library/vendored/react-agent/.git
-	rm -rf prompt_library/vendored/chat-langchain/.git
-	rm -rf prompt_library/vendored/goob_ai/.git
-	rm -rf prompt_library/vendored/langchain/.git
-	rm -rf prompt_library/vendored/langgraph/.git
-	rm -rf prompt_library/vendored/langchain-academy/.git
-	rm -rf prompt_library/vendored/dpytest/.git
+	rm -rf vendored/cerebro-bot/.git
+	rm -rf vendored/retrieval-agent-template/.git
+	rm -rf vendored/rag-research-agent-template/.git
+	rm -rf vendored/memory-template/.git
+	rm -rf vendored/react-agent/.git
+	rm -rf vendored/chat-langchain/.git
+	rm -rf vendored/goob_ai/.git
+	rm -rf vendored/langchain/.git
+	rm -rf vendored/langgraph/.git
+	rm -rf vendored/langchain-academy/.git
+	rm -rf vendored/dpytest/.git
+	rm -rf vendored/marimo/.git
 
 # List outdated packages
 outdated:
@@ -778,47 +778,55 @@ download-read-the-docs:
 
 # Edit the marimo demo notebook
 marimo-demo-edit:
-	{{UV_RUN}} marimo edit mariomo_is_awesome_demo.py
+	{{UV_RUN}} marimo edit marimo_is_awesome_demo.py
 
 # Run the marimo demo notebook
 marimo-demo-run:
-	{{UV_RUN}} marimo run mariomo_is_awesome_demo.py
+	{{UV_RUN}} marimo run marimo_is_awesome_demo.py
 
 # Edit the ad-hoc prompting notebook
 marimo-adhoc-edit:
-	{{UV_RUN}} marimo edit mariomo_adhoc_prompting.py
+	{{UV_RUN}} marimo edit marimo_adhoc_prompting.py
 
 # Run the ad-hoc prompting notebook
 marimo-adhoc-run:
-	{{UV_RUN}} marimo run mariomo_adhoc_prompting.py
+	{{UV_RUN}} marimo run marimo_adhoc_prompting.py
 
 # Edit the prompt library notebook
 marimo-library-edit:
-	{{UV_RUN}} marimo edit mariomo_prompt_library.py
+	{{UV_RUN}} marimo edit marimo_prompt_library.py
 
 # Run the prompt library notebook
 marimo-library-run:
-	{{UV_RUN}} marimo run mariomo_prompt_library.py
+	{{UV_RUN}} marimo run marimo_prompt_library.py
 
 # Edit the multi-LLM prompting notebook
 marimo-multi-llm-edit:
-	{{UV_RUN}} marimo edit mariomo_multi_llm_prompting.py
+	{{UV_RUN}} marimo edit marimo_multi_llm_prompting.py
 
 # Run the multi-LLM prompting notebook
 marimo-multi-llm-run:
-	{{UV_RUN}} marimo run mariomo_multi_llm_prompting.py
+	{{UV_RUN}} marimo run marimo_multi_llm_prompting.py
 
 # Edit the multi language model ranker notebook
 marimo-ranker-edit:
-	{{UV_RUN}} marimo edit mariomo_multi_language_model_ranker.py
+	{{UV_RUN}} marimo edit marimo_multi_language_model_ranker.py
 
 # Run the multi language model ranker notebook
 marimo-ranker-run:
-	{{UV_RUN}} marimo run mariomo_multi_language_model_ranker.py
+	{{UV_RUN}} marimo run marimo_multi_language_model_ranker.py
+
+# Edit the prompt analysis notebook
+marimo-analysis-edit:
+	{{UV_RUN}} marimo edit marimo_prompt_analysis.py
+
+# Run the prompt analysis notebook
+marimo-analysis-run:
+	{{UV_RUN}} marimo run marimo_prompt_analysis.py
 
 # Run all marimo notebooks
 marimo-run-all:
-	{{UV_RUN}} marimo run mariomo_is_awesome_demo.py mariomo_adhoc_prompting.py mariomo_prompt_library.py mariomo_multi_llm_prompting.py mariomo_multi_language_model_ranker.py
+	{{UV_RUN}} marimo run marimo_is_awesome_demo.py marimo_adhoc_prompting.py marimo_prompt_library.py marimo_multi_llm_prompting.py marimo_multi_language_model_ranker.py marimo_prompt_analysis.py
 
 
 
@@ -868,3 +876,19 @@ pyright-createstubs-missing:
 		echo "Creating stub for package: $package"
 		uv run pyright --createstub "$package"
 	done
+
+copy-rules:
+	@echo "🚀 Starting the copy process..."
+	cp -av cursorrules.xml .cursorrules
+	cp -av cursorrules.xml aider_configs/aider_rules
+	@echo "✅ Copy completed successfully!"
+
+# PYTHONPATH=. uv run pylint --load-plugins=marimo_cell_params_validator --disable=all --enable=marimo_cell_params_validator ../../mariomo_prompt_library.py
+
+# run pylint with the marimo cell params validator plugin
+pylint-plugin-debug-bad:
+	PYTHONPATH=. {{UV_RUN}} pylint --load-plugins=marimo_cell_params_validator --disable=all --enable=marimo_cell_params_validator marimo_prompt_analysis.py
+
+# run pylint with the marimo cell params validator plugin
+pylint-plugin-debug-good:
+	PYTHONPATH=. {{UV_RUN}} pylint --load-plugins=marimo_cell_params_validator --disable=all --enable=marimo_cell_params_validator marimo_prompt_library.py
