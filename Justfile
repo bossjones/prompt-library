@@ -38,6 +38,10 @@ test:
 	@echo "🚀 Testing code: Running pytest"
 	{{UV_RUN}} pytest --diff-width=60 --diff-symbols --cov-append --cov-report=term-missing --junitxml=junit/test-results.xml --cov-report=xml:cov.xml --cov-report=html:htmlcov --cov-report=annotate:cov_annotate --cov=.
 
+test-marimo:
+	@echo "🚀 Testing code: Running pytest"
+	{{UV_RUN}} pytest --diff-width=60 --diff-symbols --cov-append --cov-report=term-missing --junitxml=junit/test-results.xml --cov-report=xml:cov.xml --cov-report=html:htmlcov --cov-report=annotate:cov_annotate --cov=. tests/pylint/test_marimo_cell_params_validator.py
+
 
 # Build wheel file
 build: clean-build

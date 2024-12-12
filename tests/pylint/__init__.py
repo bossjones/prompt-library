@@ -11,7 +11,7 @@ from loguru import logger
 from pylint.testutils.unittest_linter import UnittestLinter
 
 
-@pysnooper.snoop(thread_info=True, max_variable_length=None, depth=10)
+# @pysnooper.snoop(thread_info=True, max_variable_length=None, depth=10)
 @contextlib.contextmanager
 def assert_no_messages(linter: UnittestLinter):
     """Assert that no messages are added by the given method."""
@@ -28,9 +28,9 @@ def assert_adds_messages(linter: UnittestLinter, *messages):
     actually be substituted into the message string.
     """
     yield
-    import bpdb
+    # import bpdb
 
-    bpdb.set_trace()
+    # bpdb.set_trace()
     got = linter.release_messages()
     no_msg = "No message."
     expected = "\n".join(repr(m) for m in messages) or no_msg
