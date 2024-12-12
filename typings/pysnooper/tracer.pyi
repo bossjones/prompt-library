@@ -19,7 +19,7 @@ def get_local_reprs(frame, watch=..., custom_repr=..., max_length=..., normalize
 class UnavailableSource:
     def __getitem__(self, i):
         ...
-
+    
 
 
 source_and_path_cache = ...
@@ -32,10 +32,10 @@ def get_write_function(output, overwrite):
 class FileWriter:
     def __init__(self, path, overwrite) -> None:
         ...
-
+    
     def write(self, s):
         ...
-
+    
 
 
 thread_global = ...
@@ -102,21 +102,24 @@ class Tracer:
     '''
     def __init__(self, output=..., watch=..., watch_explode=..., depth=..., prefix=..., overwrite=..., thread_info=..., custom_repr=..., max_variable_length=..., normalize=..., relative_time=..., color=...) -> None:
         ...
-
+    
     def __call__(self, function_or_class):
         ...
-
+    
     def write(self, s):
         ...
-
+    
     def __enter__(self):
         ...
-
+    
     def __exit__(self, exc_type, exc_value, exc_traceback):
         ...
-
+    
     def set_thread_info_padding(self, thread_info):
         ...
-
+    
     def trace(self, frame, event, arg):
         ...
+    
+
+

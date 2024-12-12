@@ -17,13 +17,16 @@ AstCallback = Callable[[nodes.NodeNG], None]
 class ASTWalker:
     def __init__(self, linter: PyLinter) -> None:
         ...
-
+    
     def add_checker(self, checker: BaseChecker) -> None:
         """Walk to the checker's dir and collect visit and leave methods."""
         ...
-
+    
     def walk(self, astroid: nodes.NodeNG) -> None:
         """Call visit events of astroid checkers for the given node, recurse on
         its children, then leave events.
         """
         ...
+    
+
+

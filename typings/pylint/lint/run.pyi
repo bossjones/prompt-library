@@ -17,9 +17,11 @@ class Run:
     _is_pylint_config: ClassVar[bool] = ...
     def __init__(self, args: Sequence[str], reporter: BaseReporter | None = ..., exit: bool = ...) -> None:
         ...
-
+    
 
 
 class _PylintConfigRun(Run):
     """A private wrapper for the 'pylint-config' command."""
     _is_pylint_config: ClassVar[bool] = ...
+
+

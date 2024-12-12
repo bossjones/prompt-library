@@ -21,19 +21,19 @@ class BaseReporter:
     name = ...
     def __init__(self, output: TextIO | None = ...) -> None:
         ...
-
+    
     def handle_message(self, msg: Message) -> None:
         """Handle a new message triggered on the current file."""
         ...
-
+    
     def writeln(self, string: str = ...) -> None:
         """Write a line in the output buffer."""
         ...
-
+    
     def display_reports(self, layout: Section) -> None:
         """Display results encapsulated in the layout tree."""
         ...
-
+    
     def display_messages(self, layout: Section | None) -> None:
         """Hook for displaying the messages of the reporter.
 
@@ -45,11 +45,14 @@ class BaseReporter:
         been aggregated.
         """
         ...
-
+    
     def on_set_current_module(self, module: str, filepath: str | None) -> None:
         """Hook called when a module starts to be analysed."""
         ...
-
+    
     def on_close(self, stats: LinterStats, previous_stats: LinterStats | None) -> None:
         """Hook called when a module finished analyzing."""
         ...
+    
+
+

@@ -142,7 +142,7 @@ class UnsupportedFormatCharacter(Exception):
     """
     def __init__(self, index: int) -> None:
         ...
-
+    
 
 
 def parse_format_string(format_string: str) -> tuple[set[str], int, dict[str, str], list[str]]:
@@ -673,3 +673,4 @@ def is_enum_member(node: nodes.AssignName) -> bool:
     `__members__` container).
     """
     ...
+

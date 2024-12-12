@@ -19,3 +19,4 @@ def report_messages_stats(sect: Section, stats: LinterStats, _: LinterStats | No
 def report_messages_by_module_stats(sect: Section, stats: LinterStats, _: LinterStats | None) -> None:
     """Make errors / warnings by modules report."""
     ...
+

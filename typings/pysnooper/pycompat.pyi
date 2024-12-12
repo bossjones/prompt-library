@@ -20,8 +20,8 @@ else:
         """
         __metaclass__ = abc.ABCMeta
         __slots__ = ...
-
-
+    
+    
 if hasattr(os, 'PathLike'):
     PathLike = ...
 else:
@@ -31,13 +31,13 @@ else:
         def __fspath__(self):
             """Return the file system path representation of the object."""
             ...
-
+        
         @classmethod
         def __subclasshook__(cls, subclass):
             ...
-
-
-
+        
+    
+    
 iscoroutinefunction = ...
 isasyncgenfunction = ...
 if PY3:
@@ -53,9 +53,10 @@ if sys.version_info[: 2] >= (3, 6):
 else:
     def time_isoformat(time, timespec=...):
         ...
-
+    
 def timedelta_format(timedelta):
     ...
 
 def timedelta_parse(s):
     ...
+

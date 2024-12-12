@@ -15,28 +15,31 @@ if TYPE_CHECKING:
 class MessageDefinition:
     def __init__(self, checker: BaseChecker, msgid: str, msg: str, description: str, symbol: str, scope: str, minversion: tuple[int, int] | None = ..., maxversion: tuple[int, int] | None = ..., old_names: list[tuple[str, str]] | None = ..., shared: bool = ..., default_enabled: bool = ...) -> None:
         ...
-
+    
     @staticmethod
     def check_msgid(msgid: str) -> None:
         ...
-
+    
     def __eq__(self, other: object) -> bool:
         ...
-
+    
     def __repr__(self) -> str:
         ...
-
+    
     def __str__(self) -> str:
         ...
-
+    
     def may_be_emitted(self, py_version: tuple[int, ...] | sys._version_info) -> bool:
         """May the message be emitted using the configured py_version?"""
         ...
-
+    
     def format_help(self, checkerref: bool = ...) -> str:
         """Return the help string for the given message id."""
         ...
-
+    
     def check_message_definition(self, line: int | None, node: nodes.NodeNG | None) -> None:
         """Check MessageDefinition for possible errors."""
         ...
+    
+
+

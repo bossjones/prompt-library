@@ -77,81 +77,81 @@ class LinterStats:
     """Class used to linter stats."""
     def __init__(self, bad_names: BadNames | None = ..., by_module: dict[str, ModuleStats] | None = ..., by_msg: dict[str, int] | None = ..., code_type_count: CodeTypeCount | None = ..., dependencies: dict[str, set[str]] | None = ..., duplicated_lines: DuplicatedLines | None = ..., node_count: NodeCount | None = ..., undocumented: UndocumentedNodes | None = ...) -> None:
         ...
-
+    
     def __repr__(self) -> str:
         ...
-
+    
     def __str__(self) -> str:
         ...
-
+    
     def init_single_module(self, module_name: str) -> None:
         """Use through PyLinter.set_current_module so PyLinter.current_name is
         consistent.
         """
         ...
-
+    
     def get_bad_names(self, node_name: Literal["argument", "attr", "class", "class_attribute", "class_const", "const", "inlinevar", "function", "method", "module", "variable", "typevar", "typealias",]) -> int:
         """Get a bad names node count."""
         ...
-
+    
     def increase_bad_name(self, node_name: str, increase: int) -> None:
         """Increase a bad names node count."""
         ...
-
+    
     def reset_bad_names(self) -> None:
         """Resets the bad_names attribute."""
         ...
-
+    
     def get_code_count(self, type_name: Literal["code", "comment", "docstring", "empty", "total"]) -> int:
         """Get a code type count."""
         ...
-
+    
     def reset_code_count(self) -> None:
         """Resets the code_type_count attribute."""
         ...
-
+    
     def reset_duplicated_lines(self) -> None:
         """Resets the duplicated_lines attribute."""
         ...
-
+    
     def get_node_count(self, node_name: Literal["function", "class", "method", "module"]) -> int:
         """Get a node count while handling some extra conditions."""
         ...
-
+    
     def reset_node_count(self) -> None:
         """Resets the node count attribute."""
         ...
-
+    
     def get_undocumented(self, node_name: Literal["function", "class", "method", "module"]) -> float:
         """Get a undocumented node count."""
         ...
-
+    
     def reset_undocumented(self) -> None:
         """Resets the undocumented attribute."""
         ...
-
+    
     def get_global_message_count(self, type_name: str) -> int:
         """Get a global message count."""
         ...
-
+    
     def get_module_message_count(self, modname: str, type_name: MessageTypesFullName) -> int:
         """Get a module message count."""
         ...
-
+    
     def increase_single_message_count(self, type_name: str, increase: int) -> None:
         """Increase the message type count of an individual message type."""
         ...
-
+    
     def increase_single_module_message_count(self, modname: str, type_name: MessageTypesFullName, increase: int) -> None:
         """Increase the message type count of an individual message type of a
         module.
         """
         ...
-
+    
     def reset_message_count(self) -> None:
         """Resets the message type count of the stats object."""
         ...
-
+    
 
 
 def merge_stats(stats: list[LinterStats]) -> LinterStats:
@@ -159,3 +159,4 @@ def merge_stats(stats: list[LinterStats]) -> LinterStats:
     parallel mode.
     """
     ...
+

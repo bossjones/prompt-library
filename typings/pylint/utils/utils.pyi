@@ -73,6 +73,9 @@ class IsortDriver:
     """A wrapper around isort API that changed between versions 4 and 5."""
     def __init__(self, config: argparse.Namespace) -> None:
         ...
-
+    
     def place_module(self, package: str) -> str:
         ...
+    
+
+

@@ -21,36 +21,36 @@ class BaseWriter:
         the given encoding if it fails
         """
         ...
-
+    
     def format_children(self, layout: EvaluationSection | Paragraph | Section) -> None:
         """Recurse on the layout children and call their accept method
         (see the Visitor pattern).
         """
         ...
-
+    
     def writeln(self, string: str = ...) -> None:
         """Write a line in the output buffer."""
         ...
-
+    
     def write(self, string: str) -> None:
         """Write a string in the output buffer."""
         ...
-
+    
     def begin_format(self) -> None:
         """Begin to format a layout."""
         ...
-
+    
     def end_format(self) -> None:
         """Finished formatting a layout."""
         ...
-
+    
     def get_table_content(self, table: Table) -> list[list[str]]:
         """Trick to get table content without actually writing it.
 
         return an aligned list of lists containing table cells values as string
         """
         ...
-
+    
     def compute_content(self, layout: BaseLayout) -> Iterator[str]:
         """Trick to compute the formatting of children layout before actually
         writing it.
@@ -58,3 +58,6 @@ class BaseWriter:
         return an iterator on strings (one for each child element)
         """
         ...
+    
+
+

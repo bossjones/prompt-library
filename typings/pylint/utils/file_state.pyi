@@ -17,11 +17,11 @@ class FileState:
     """Hold internal state specific to the currently analyzed file."""
     def __init__(self, modname: str, msg_store: MessageDefinitionStore, node: nodes.Module | None = ..., *, is_base_filestate: bool = ...) -> None:
         ...
-
+    
     def set_msg_status(self, msg: MessageDefinition, line: int, status: bool, scope: str = ...) -> None:
         """Set status (enabled/disable) for a given message at a given line."""
         ...
-
+    
     def handle_ignored_message(self, state_scope: Literal[0, 1, 2] | None, msgid: str, line: int | None) -> None:
         """Report an ignored message.
 
@@ -30,9 +30,12 @@ class FileState:
         or globally.
         """
         ...
-
+    
     def iter_spurious_suppression_messages(self, msgs_store: MessageDefinitionStore) -> Iterator[tuple[Literal["useless-suppression", "suppressed-message"], int, tuple[str] | tuple[str, int],]]:
         ...
-
+    
     def get_effective_max_line_number(self) -> int | None:
         ...
+    
+
+

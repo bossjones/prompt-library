@@ -13,3 +13,4 @@ if TYPE_CHECKING:
 def print_full_documentation(linter: PyLinter, stream: TextIO = ..., show_options: bool = ...) -> None:
     """Output a full documentation in ReST format."""
     ...
+

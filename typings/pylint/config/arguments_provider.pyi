@@ -15,3 +15,6 @@ class _ArgumentsProvider:
     option_groups_descs: dict[str, str] = ...
     def __init__(self, arguments_manager: _ArgumentsManager) -> None:
         ...
+    
+
+

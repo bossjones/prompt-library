@@ -19,7 +19,7 @@ class _CallbackAction(argparse.Action):
     @abc.abstractmethod
     def __call__(self, parser: argparse.ArgumentParser, namespace: argparse.Namespace, values: str | Sequence[Any] | None, option_string: str | None = ...) -> None:
         ...
-
+    
 
 
 class _DoNothingAction(_CallbackAction):
@@ -30,84 +30,84 @@ class _DoNothingAction(_CallbackAction):
     """
     def __call__(self, parser: argparse.ArgumentParser, namespace: argparse.Namespace, values: str | Sequence[Any] | None, option_string: str | None = ...) -> None:
         ...
-
+    
 
 
 class _AccessRunObjectAction(_CallbackAction):
     """Action that has access to the Run object."""
     def __init__(self, option_strings: Sequence[str], dest: str, nargs: None = ..., const: None = ..., default: None = ..., type: None = ..., choices: None = ..., required: bool = ..., help: str = ..., metavar: str = ..., **kwargs: Run) -> None:
         ...
-
+    
     @abc.abstractmethod
     def __call__(self, parser: argparse.ArgumentParser, namespace: argparse.Namespace, values: str | Sequence[Any] | None, option_string: str | None = ...) -> None:
         ...
-
+    
 
 
 class _MessageHelpAction(_CallbackAction):
     """Display the help message of a message."""
     def __init__(self, option_strings: Sequence[str], dest: str, nargs: None = ..., const: None = ..., default: None = ..., type: None = ..., choices: None = ..., required: bool = ..., help: str = ..., metavar: str = ..., **kwargs: Run) -> None:
         ...
-
+    
     def __call__(self, parser: argparse.ArgumentParser, namespace: argparse.Namespace, values: str | Sequence[str] | None, option_string: str | None = ...) -> None:
         ...
-
+    
 
 
 class _ListMessagesAction(_AccessRunObjectAction):
     """Display all available messages."""
     def __call__(self, parser: argparse.ArgumentParser, namespace: argparse.Namespace, values: str | Sequence[Any] | None, option_string: str | None = ...) -> None:
         ...
-
+    
 
 
 class _ListMessagesEnabledAction(_AccessRunObjectAction):
     """Display all enabled messages."""
     def __call__(self, parser: argparse.ArgumentParser, namespace: argparse.Namespace, values: str | Sequence[Any] | None, option_string: str | None = ...) -> None:
         ...
-
+    
 
 
 class _ListCheckGroupsAction(_AccessRunObjectAction):
     """Display all the check groups that pylint knows about."""
     def __call__(self, parser: argparse.ArgumentParser, namespace: argparse.Namespace, values: str | Sequence[Any] | None, option_string: str | None = ...) -> None:
         ...
-
+    
 
 
 class _ListConfidenceLevelsAction(_AccessRunObjectAction):
     """Display all the confidence levels that pylint knows about."""
     def __call__(self, parser: argparse.ArgumentParser, namespace: argparse.Namespace, values: str | Sequence[Any] | None, option_string: str | None = ...) -> None:
         ...
-
+    
 
 
 class _ListExtensionsAction(_AccessRunObjectAction):
     """Display all extensions under pylint.extensions."""
     def __call__(self, parser: argparse.ArgumentParser, namespace: argparse.Namespace, values: str | Sequence[Any] | None, option_string: str | None = ...) -> None:
         ...
-
+    
 
 
 class _FullDocumentationAction(_AccessRunObjectAction):
     """Display the full documentation."""
     def __call__(self, parser: argparse.ArgumentParser, namespace: argparse.Namespace, values: str | Sequence[Any] | None, option_string: str | None = ...) -> None:
         ...
-
+    
 
 
 class _GenerateRCFileAction(_AccessRunObjectAction):
     """Generate a pylintrc file."""
     def __call__(self, parser: argparse.ArgumentParser, namespace: argparse.Namespace, values: str | Sequence[Any] | None, option_string: str | None = ...) -> None:
         ...
-
+    
 
 
 class _GenerateConfigFileAction(_AccessRunObjectAction):
     """Generate a .toml format configuration file."""
     def __call__(self, parser: argparse.ArgumentParser, namespace: argparse.Namespace, values: str | Sequence[Any] | None, option_string: str | None = ...) -> None:
         ...
-
+    
 
 
 class _ErrorsOnlyModeAction(_AccessRunObjectAction):
@@ -122,25 +122,25 @@ class _ErrorsOnlyModeAction(_AccessRunObjectAction):
     """
     def __call__(self, parser: argparse.ArgumentParser, namespace: argparse.Namespace, values: str | Sequence[Any] | None, option_string: str | None = ...) -> None:
         ...
-
+    
 
 
 class _LongHelpAction(_AccessRunObjectAction):
     """Display the long help message."""
     def __call__(self, parser: argparse.ArgumentParser, namespace: argparse.Namespace, values: str | Sequence[Any] | None, option_string: str | None = ...) -> None:
         ...
-
+    
 
 
 class _AccessLinterObjectAction(_CallbackAction):
     """Action that has access to the Linter object."""
     def __init__(self, option_strings: Sequence[str], dest: str, nargs: None = ..., const: None = ..., default: None = ..., type: None = ..., choices: None = ..., required: bool = ..., help: str = ..., metavar: str = ..., **kwargs: PyLinter) -> None:
         ...
-
+    
     @abc.abstractmethod
     def __call__(self, parser: argparse.ArgumentParser, namespace: argparse.Namespace, values: str | Sequence[Any] | None, option_string: str | None = ...) -> None:
         ...
-
+    
 
 
 class _XableAction(_AccessLinterObjectAction):
@@ -148,35 +148,38 @@ class _XableAction(_AccessLinterObjectAction):
     @abc.abstractmethod
     def __call__(self, parser: argparse.ArgumentParser, namespace: argparse.Namespace, values: str | Sequence[Any] | None, option_string: str | None = ...) -> None:
         ...
-
+    
 
 
 class _DisableAction(_XableAction):
     """Callback action for disabling a message."""
     def __call__(self, parser: argparse.ArgumentParser, namespace: argparse.Namespace, values: str | Sequence[Any] | None, option_string: str | None = ...) -> None:
         ...
-
+    
 
 
 class _EnableAction(_XableAction):
     """Callback action for enabling a message."""
     def __call__(self, parser: argparse.ArgumentParser, namespace: argparse.Namespace, values: str | Sequence[Any] | None, option_string: str | None = ...) -> None:
         ...
-
+    
 
 
 class _OutputFormatAction(_AccessLinterObjectAction):
     """Callback action for setting the output format."""
     def __call__(self, parser: argparse.ArgumentParser, namespace: argparse.Namespace, values: str | Sequence[Any] | None, option_string: str | None = ...) -> None:
         ...
-
+    
 
 
 class _AccessParserAction(_CallbackAction):
     """Action that has access to the ArgumentParser object."""
     def __init__(self, option_strings: Sequence[str], dest: str, nargs: None = ..., const: None = ..., default: None = ..., type: None = ..., choices: None = ..., required: bool = ..., help: str = ..., metavar: str = ..., **kwargs: argparse.ArgumentParser) -> None:
         ...
-
+    
     @abc.abstractmethod
     def __call__(self, parser: argparse.ArgumentParser, namespace: argparse.Namespace, values: str | Sequence[Any] | None, option_string: str | None = ...) -> None:
         ...
+    
+
+

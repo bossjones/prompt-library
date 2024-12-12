@@ -23,11 +23,11 @@ class ReportsHandlerMixIn:
     """
     def __init__(self) -> None:
         ...
-
+    
     def report_order(self) -> MutableSequence[BaseChecker]:
         """Return a list of reporters."""
         ...
-
+    
     def register_report(self, reportid: str, r_title: str, r_cb: ReportsCallable, checker: BaseChecker) -> None:
         """Register a report.
 
@@ -37,19 +37,22 @@ class ReportsHandlerMixIn:
         :param checker: The checker defining the report
         """
         ...
-
+    
     def enable_report(self, reportid: str) -> None:
         """Enable the report of the given id."""
         ...
-
+    
     def disable_report(self, reportid: str) -> None:
         """Disable the report of the given id."""
         ...
-
+    
     def report_is_enabled(self, reportid: str) -> bool:
         """Is the report associated to the given identifier enabled ?"""
         ...
-
+    
     def make_reports(self: PyLinter, stats: LinterStats, old_stats: LinterStats | None) -> Section:
         """Render registered reports."""
         ...
+    
+
+

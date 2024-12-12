@@ -20,7 +20,7 @@ MANAGER = ...
 class GetAstProtocol(Protocol):
     def __call__(self, filepath: str, modname: str, data: str | None = ...) -> nodes.Module:
         ...
-
+    
 
 
 MSGS: dict[str, MessageDefinitionTuple] = ...
@@ -46,10 +46,10 @@ class PyLinter(_ArgumentsManager, _MessageStateHandler, reporters.ReportsHandler
     option_groups_descs = ...
     def __init__(self, options: Options = ..., reporter: reporters.BaseReporter | reporters.MultiReporter | None = ..., option_groups: tuple[tuple[str, str], ...] = ..., pylintrc: str | None = ...) -> None:
         ...
-
+    
     def load_default_plugins(self) -> None:
         ...
-
+    
     def load_plugin_modules(self, modnames: Iterable[str], force: bool = ...) -> None:
         """Check a list of pylint plugins modules, load and register them.
 
@@ -61,7 +61,7 @@ class PyLinter(_ArgumentsManager, _MessageStateHandler, reporters.ReportsHandler
         reloaded regardless if an entry exists in self._dynamic_plugins.
         """
         ...
-
+    
     def load_plugin_configuration(self) -> None:
         """Call the configuration hook for plugins.
 
@@ -79,22 +79,22 @@ class PyLinter(_ArgumentsManager, _MessageStateHandler, reporters.ReportsHandler
             means that we avoid the ``init-hook`` problems from before.
         """
         ...
-
+    
     def set_reporter(self, reporter: reporters.BaseReporter | reporters.MultiReporter) -> None:
         """Set the reporter used to display messages and reports."""
         ...
-
+    
     def register_reporter(self, reporter_class: type[reporters.BaseReporter]) -> None:
         """Registers a reporter class on the _reporters attribute."""
         ...
-
+    
     def report_order(self) -> list[BaseChecker]:
         ...
-
+    
     def register_checker(self, checker: checkers.BaseChecker) -> None:
         """This method auto registers the checker."""
         ...
-
+    
     def enable_fail_on_messages(self) -> None:
         """Enable 'fail on' msgs.
 
@@ -102,26 +102,26 @@ class PyLinter(_ArgumentsManager, _MessageStateHandler, reporters.ReportsHandler
         or symbol) to specific msgs, then enable and flag them for later.
         """
         ...
-
+    
     def any_fail_on_issues(self) -> bool:
         ...
-
+    
     def disable_reporters(self) -> None:
         """Disable all reporters."""
         ...
-
+    
     def get_checkers(self) -> list[BaseChecker]:
         """Return all available checkers as an ordered list."""
         ...
-
+    
     def get_checker_names(self) -> list[str]:
         """Get all the checker names that this linter knows about."""
         ...
-
+    
     def prepare_checkers(self) -> list[BaseChecker]:
         """Return checkers needed for activated messages and reports."""
         ...
-
+    
     @staticmethod
     def should_analyze_file(modname: str, path: str, is_argument: bool = ...) -> bool:
         """Returns whether a module should be checked.
@@ -140,21 +140,21 @@ class PyLinter(_ArgumentsManager, _MessageStateHandler, reporters.ReportsHandler
         :returns: True if the module should be checked.
         """
         ...
-
+    
     def initialize(self) -> None:
         """Initialize linter for linting.
 
         This method is called before any linting is done.
         """
         ...
-
+    
     def check(self, files_or_modules: Sequence[str]) -> None:
         """Main checking entry: check a list of files or modules from their name.
 
         files_or_modules is either a string or list of strings presenting modules to check.
         """
         ...
-
+    
     def check_single_file_item(self, file: FileItem) -> None:
         """Check single file item.
 
@@ -163,13 +163,13 @@ class PyLinter(_ArgumentsManager, _MessageStateHandler, reporters.ReportsHandler
         initialize() should be called before calling this method
         """
         ...
-
+    
     def set_current_module(self, modname: str, filepath: str | None = ...) -> None:
         """Set the name of the currently analyzed module and
         init statistics for it.
         """
         ...
-
+    
     def get_ast(self, filepath: str, modname: str, data: str | None = ...) -> nodes.Module | None:
         """Return an ast(roid) representation of a module or a string.
 
@@ -181,25 +181,25 @@ class PyLinter(_ArgumentsManager, _MessageStateHandler, reporters.ReportsHandler
         :raises AstroidBuildingError: Whenever we encounter an unexpected exception
         """
         ...
-
+    
     def check_astroid_module(self, ast_node: nodes.Module, walker: ASTWalker, rawcheckers: list[checkers.BaseRawFileChecker], tokencheckers: list[checkers.BaseTokenChecker]) -> bool | None:
         """Check a module from its astroid representation.
 
         For return value see _check_astroid_module
         """
         ...
-
+    
     def open(self) -> None:
         """Initialize counters."""
         ...
-
+    
     def generate_reports(self, verbose: bool = ...) -> int | None:
         """Close the whole package /module, it's time to make reports !
 
         if persistent run, pickle results for later comparison
         """
         ...
-
+    
     def add_message(self, msgid: str, line: int | None = ..., node: nodes.NodeNG | None = ..., args: Any | None = ..., confidence: interfaces.Confidence | None = ..., col_offset: int | None = ..., end_lineno: int | None = ..., end_col_offset: int | None = ...) -> None:
         """Adds a message given by ID or name.
 
@@ -210,7 +210,7 @@ class PyLinter(_ArgumentsManager, _MessageStateHandler, reporters.ReportsHandler
         must provide the line argument.
         """
         ...
-
+    
     def add_ignored_message(self, msgid: str, line: int, node: nodes.NodeNG | None = ..., confidence: interfaces.Confidence | None = ...) -> None:
         """Prepares a message to be added to the ignored message storage.
 
@@ -220,3 +220,6 @@ class PyLinter(_ArgumentsManager, _MessageStateHandler, reporters.ReportsHandler
         This function avoids this by adding those message to the ignored msgs attribute
         """
         ...
+    
+
+

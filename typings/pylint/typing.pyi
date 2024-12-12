@@ -91,3 +91,6 @@ DirectoryNamespaceDict = dict[Path, tuple[argparse.Namespace, "DirectoryNamespac
 class GetProjectCallable(Protocol):
     def __call__(self, module: str, name: str | None = ...) -> Project:
         ...
+    
+
+

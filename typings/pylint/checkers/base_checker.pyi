@@ -29,7 +29,7 @@ class BaseChecker(_ArgumentsProvider):
     def __init__(self, linter: PyLinter) -> None:
         """Checker instances should have the linter as argument."""
         ...
-
+    
     def __gt__(self, other: Any) -> bool:
         """Permits sorting checkers for stable doc and tests.
 
@@ -37,18 +37,18 @@ class BaseChecker(_ArgumentsProvider):
         order, then extension checkers in alphabetical order.
         """
         ...
-
+    
     def __eq__(self, other: object) -> bool:
         """Permit to assert Checkers are equal."""
         ...
-
+    
     def __hash__(self) -> int:
         """Make Checker hashable."""
         ...
-
+    
     def __repr__(self) -> str:
         ...
-
+    
     def __str__(self) -> str:
         """This might be incomplete because multiple classes inheriting BaseChecker
         can have the same name.
@@ -56,13 +56,13 @@ class BaseChecker(_ArgumentsProvider):
         See: MessageHandlerMixIn.get_full_documentation()
         """
         ...
-
+    
     def get_full_documentation(self, msgs: dict[str, MessageDefinitionTuple], options: Iterable[tuple[str, OptionDict, Any]], reports: Sequence[tuple[str, str, ReportsCallable]], doc: str | None = ..., module: str | None = ..., show_options: bool = ...) -> str:
         ...
-
+    
     def add_message(self, msgid: str, line: int | None = ..., node: nodes.NodeNG | None = ..., args: Any = ..., confidence: Confidence | None = ..., col_offset: int | None = ..., end_lineno: int | None = ..., end_col_offset: int | None = ...) -> None:
         ...
-
+    
     def check_consistency(self) -> None:
         """Check the consistency of msgid.
 
@@ -74,28 +74,28 @@ class BaseChecker(_ArgumentsProvider):
         always the same.
         """
         ...
-
+    
     def create_message_definition_from_tuple(self, msgid: str, msg_tuple: MessageDefinitionTuple) -> MessageDefinition:
         ...
-
+    
     @property
     def messages(self) -> list[MessageDefinition]:
         ...
-
+    
     def open(self) -> None:
         """Called before visiting project (i.e. set of modules)."""
         ...
-
+    
     def close(self) -> None:
         """Called after visiting project (i.e set of modules)."""
         ...
-
+    
     def get_map_data(self) -> Any:
         ...
-
+    
     def reduce_map_data(self, linter: PyLinter, data: list[Any]) -> None:
         ...
-
+    
 
 
 class BaseTokenChecker(BaseChecker):
@@ -104,7 +104,7 @@ class BaseTokenChecker(BaseChecker):
     def process_tokens(self, tokens: list[TokenInfo]) -> None:
         """Should be overridden by subclasses."""
         ...
-
+    
 
 
 class BaseRawFileChecker(BaseChecker):
@@ -116,3 +116,6 @@ class BaseRawFileChecker(BaseChecker):
         The module's content is accessible via ``astroid.stream``
         """
         ...
+    
+
+

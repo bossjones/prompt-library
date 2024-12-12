@@ -19,20 +19,23 @@ class _ArgumentsManager:
     """Arguments manager class used to handle command-line arguments and options."""
     def __init__(self, prog: str, usage: str | None = ..., description: str | None = ...) -> None:
         ...
-
+    
     @property
     def config(self) -> argparse.Namespace:
         """Namespace for all options."""
         ...
-
+    
     @config.setter
     def config(self, value: argparse.Namespace) -> None:
         ...
-
+    
     def help(self) -> str:
         """Return the usage string based on the available options."""
         ...
-
+    
     def set_option(self, optname: str, value: Any) -> None:
         """Set an option on the namespace object."""
         ...
+    
+
+

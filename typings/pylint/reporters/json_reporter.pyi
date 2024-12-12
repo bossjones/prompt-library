@@ -25,19 +25,19 @@ class JSONReporter(BaseReporter):
     def display_messages(self, layout: Section | None) -> None:
         """Launch layouts display."""
         ...
-
+    
     def display_reports(self, layout: Section) -> None:
         """Don't do anything in this reporter."""
         ...
-
+    
     @staticmethod
     def serialize(message: Message) -> OldJsonExport:
         ...
-
+    
     @staticmethod
     def deserialize(message_as_json: OldJsonExport) -> Message:
         ...
-
+    
 
 
 class JSONMessage(TypedDict):
@@ -63,24 +63,25 @@ class JSON2Reporter(BaseReporter):
     def display_reports(self, layout: Section) -> None:
         """Don't do anything in this reporter."""
         ...
-
+    
     def display_messages(self, layout: Section | None) -> None:
         """Launch layouts display."""
         ...
-
+    
     @staticmethod
     def serialize(message: Message) -> JSONMessage:
         ...
-
+    
     @staticmethod
     def deserialize(message_as_json: JSONMessage) -> Message:
         ...
-
+    
     def serialize_stats(self) -> dict[str, str | int | dict[str, int]]:
         """Serialize the linter stats into something JSON dumpable."""
         ...
-
+    
 
 
 def register(linter: PyLinter) -> None:
     ...
+

@@ -28,7 +28,7 @@ class Message:
     end_column: int | None
     def __init__(self, msg_id: str, symbol: str, location: MessageLocationTuple, msg: str, confidence: Confidence | None) -> None:
         ...
-
+    
     def format(self, template: str) -> str:
         """Format the message according to the given template.
 
@@ -36,7 +36,10 @@ class Message:
         cf. https://docs.python.org/2/library/string.html#formatstrings
         """
         ...
-
+    
     @property
     def location(self) -> MessageLocationTuple:
         ...
+    
+
+

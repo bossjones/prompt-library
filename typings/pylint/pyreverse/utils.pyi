@@ -43,11 +43,11 @@ class FilterMixIn:
     def __init__(self, mode: str) -> None:
         """Init filter modes."""
         ...
-
+    
     def show_attr(self, node: nodes.NodeNG | str) -> bool:
         """Return true if the node should be treated."""
         ...
-
+    
 
 
 class LocalsVisitor:
@@ -61,15 +61,15 @@ class LocalsVisitor:
     """
     def __init__(self) -> None:
         ...
-
+    
     def get_callbacks(self, node: nodes.NodeNG) -> _CallbackTupleT:
         """Get callbacks from handler for the visited node."""
         ...
-
+    
     def visit(self, node: nodes.NodeNG) -> Any:
         """Launch the visit starting from the given node."""
         ...
-
+    
 
 
 def get_annotation_label(ann: nodes.Name | nodes.NodeNG) -> str:
@@ -100,3 +100,4 @@ def check_if_graphviz_supports_format(output_format: str) -> None:
     from *.gv into the final output format.
     """
     ...
+

@@ -15,16 +15,16 @@ VisitLeaveFunction = Callable[[_T, Any, Any], None]
 class VNode:
     def __init__(self) -> None:
         ...
-
+    
     def __iter__(self) -> Iterator[VNode]:
         ...
-
+    
     def accept(self: _VNodeT, visitor: BaseWriter, *args: Any, **kwargs: Any) -> None:
         ...
-
+    
     def leave(self: _VNodeT, visitor: BaseWriter, *args: Any, **kwargs: Any) -> None:
         ...
-
+    
 
 
 class BaseLayout(VNode):
@@ -35,23 +35,23 @@ class BaseLayout(VNode):
     """
     def __init__(self, children: Iterable[Text | str] = ...) -> None:
         ...
-
+    
     def append(self, child: VNode) -> None:
         """Add a node to children."""
         ...
-
+    
     def insert(self, index: int, child: VNode) -> None:
         """Insert a child node."""
         ...
-
+    
     def parents(self) -> list[BaseLayout]:
         """Return the ancestor nodes."""
         ...
-
+    
     def add_text(self, text: str) -> None:
         """Shortcut to add text data."""
         ...
-
+    
 
 
 class Text(VNode):
@@ -62,7 +62,7 @@ class Text(VNode):
     """
     def __init__(self, data: str, escaped: bool = ...) -> None:
         ...
-
+    
 
 
 class VerbatimText(Text):
@@ -87,13 +87,13 @@ class Section(BaseLayout):
     """
     def __init__(self, title: str | None = ..., description: str | None = ..., children: Iterable[Text | str] = ...) -> None:
         ...
-
+    
 
 
 class EvaluationSection(Section):
     def __init__(self, message: str, children: Iterable[Text | str] = ...) -> None:
         ...
-
+    
 
 
 class Title(BaseLayout):
@@ -130,3 +130,6 @@ class Table(BaseLayout):
     """
     def __init__(self, cols: int, title: str | None = ..., rheaders: int = ..., cheaders: int = ..., children: Iterable[Text | str] = ...) -> None:
         ...
+    
+
+

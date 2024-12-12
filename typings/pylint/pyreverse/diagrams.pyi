@@ -14,14 +14,14 @@ class Figure:
     """Base class for counter handling."""
     def __init__(self) -> None:
         ...
-
+    
 
 
 class Relationship(Figure):
     """A relationship from an object in the diagram to another."""
     def __init__(self, from_object: DiagramEntity, to_object: DiagramEntity, relation_type: str, name: str | None = ...) -> None:
         ...
-
+    
 
 
 class DiagramEntity(Figure):
@@ -29,7 +29,7 @@ class DiagramEntity(Figure):
     default_shape = ...
     def __init__(self, title: str = ..., node: nodes.NodeNG | None = ...) -> None:
         ...
-
+    
 
 
 class PackageEntity(DiagramEntity):
@@ -42,7 +42,7 @@ class ClassEntity(DiagramEntity):
     default_shape = ...
     def __init__(self, title: str, node: nodes.ClassDef) -> None:
         ...
-
+    
 
 
 class ClassDiagram(Figure, FilterMixIn):
@@ -50,57 +50,57 @@ class ClassDiagram(Figure, FilterMixIn):
     TYPE = ...
     def __init__(self, title: str, mode: str) -> None:
         ...
-
+    
     def get_relationships(self, role: str) -> Iterable[Relationship]:
         ...
-
+    
     def add_relationship(self, from_object: DiagramEntity, to_object: DiagramEntity, relation_type: str, name: str | None = ...) -> None:
         """Create a relationship."""
         ...
-
+    
     def get_relationship(self, from_object: DiagramEntity, relation_type: str) -> Relationship:
         """Return a relationship or None."""
         ...
-
+    
     def get_attrs(self, node: nodes.ClassDef) -> list[str]:
         """Return visible attributes, possibly with class name."""
         ...
-
+    
     def get_methods(self, node: nodes.ClassDef) -> list[nodes.FunctionDef]:
         """Return visible methods."""
         ...
-
+    
     def add_object(self, title: str, node: nodes.ClassDef) -> None:
         """Create a diagram object."""
         ...
-
+    
     def class_names(self, nodes_lst: Iterable[nodes.NodeNG]) -> list[str]:
         """Return class names if needed in diagram."""
         ...
-
+    
     def has_node(self, node: nodes.NodeNG) -> bool:
         """Return true if the given node is included in the diagram."""
         ...
-
+    
     def object_from_node(self, node: nodes.NodeNG) -> DiagramEntity:
         """Return the diagram object mapped to node."""
         ...
-
+    
     def classes(self) -> list[ClassEntity]:
         """Return all class nodes in the diagram."""
         ...
-
+    
     def classe(self, name: str) -> ClassEntity:
         """Return a class by its name, raise KeyError if not found."""
         ...
-
+    
     def extract_relationships(self) -> None:
         """Extract relationships between nodes in the diagram."""
         ...
-
+    
     def assign_association_relationship(self, value: astroid.NodeNG, obj: ClassEntity, name: str, type_relationship: str) -> None:
         ...
-
+    
 
 
 class PackageDiagram(ClassDiagram):
@@ -109,25 +109,28 @@ class PackageDiagram(ClassDiagram):
     def modules(self) -> list[PackageEntity]:
         """Return all module nodes in the diagram."""
         ...
-
+    
     def module(self, name: str) -> PackageEntity:
         """Return a module by its name, raise KeyError if not found."""
         ...
-
+    
     def add_object(self, title: str, node: nodes.Module) -> None:
         """Create a diagram object."""
         ...
-
+    
     def get_module(self, name: str, node: nodes.Module) -> PackageEntity:
         """Return a module by its name, looking also for relative imports;
         raise KeyError if not found.
         """
         ...
-
+    
     def add_from_depend(self, node: nodes.ImportFrom, from_module: str) -> None:
         """Add dependencies created by from-imports."""
         ...
-
+    
     def extract_relationships(self) -> None:
         """Extract relationships between nodes in the diagram."""
         ...
+    
+
+

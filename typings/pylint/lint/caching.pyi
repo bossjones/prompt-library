@@ -14,3 +14,4 @@ def load_results(base: str | Path, pylint_home: str | Path = ...) -> LinterStats
 
 def save_results(results: LinterStats, base: str | Path, pylint_home: str | Path = ...) -> None:
     ...
+

@@ -20,3 +20,4 @@ def check_parallel(linter: PyLinter, jobs: int, files: Iterable[FileItem], extra
     multiple files, as in the similarity-checker, then implement the map/reduce functionality.
     """
     ...
+

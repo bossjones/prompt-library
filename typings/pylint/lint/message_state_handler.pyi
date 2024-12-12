@@ -18,26 +18,26 @@ class _MessageStateHandler:
     """
     def __init__(self, linter: PyLinter) -> None:
         ...
-
+    
     def disable(self, msgid: str, scope: str = ..., line: int | None = ..., ignore_unknown: bool = ...) -> None:
         """Disable a message for a scope."""
         ...
-
+    
     def disable_next(self, msgid: str, _: str = ..., line: int | None = ..., ignore_unknown: bool = ...) -> None:
         """Disable a message for the next line."""
         ...
-
+    
     def enable(self, msgid: str, scope: str = ..., line: int | None = ..., ignore_unknown: bool = ...) -> None:
         """Enable a message for a scope."""
         ...
-
+    
     def disable_noerror_messages(self) -> None:
         """Disable message categories other than `error` and `fatal`."""
         ...
-
+    
     def list_messages_enabled(self) -> None:
         ...
-
+    
     def is_message_enabled(self, msg_descr: str, line: int | None = ..., confidence: interfaces.Confidence | None = ...) -> bool:
         """Is this message enabled for the current file ?
 
@@ -53,7 +53,7 @@ class _MessageStateHandler:
         :param confidence: The confidence of the message
         """
         ...
-
+    
     def process_tokens(self, tokens: list[tokenize.TokenInfo]) -> None:
         """Process tokens from the current module to search for module/block level
         options.
@@ -61,3 +61,6 @@ class _MessageStateHandler:
         See func_block_disable_msg.py test case for expected behaviour.
         """
         ...
+    
+
+

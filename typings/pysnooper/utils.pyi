@@ -12,11 +12,11 @@ class WritableStream(ABC):
     @abc.abstractmethod
     def write(self, s):
         ...
-
+    
     @classmethod
     def __subclasshook__(cls, C):
         ...
-
+    
 
 
 file_reading_errors = ...
@@ -39,3 +39,4 @@ def truncate(string, max_length):
 
 def ensure_tuple(x):
     ...
+

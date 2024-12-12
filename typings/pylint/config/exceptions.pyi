@@ -18,9 +18,11 @@ class _UnrecognizedOptionError(Exception):
     """
     def __init__(self, options: list[str], *args: object) -> None:
         ...
-
+    
 
 
 class ArgumentPreprocessingError(Exception):
     """Raised if an error occurs during argument pre-processing."""
     ...
+
+

@@ -49,7 +49,7 @@ repos:
         # SOURCE: https://github.com/girder/large_image/blob/2e6fd90cfb9179f2c0bd59031f45805018f3f04a/.pre-commit-config.yaml
         types_or:
           - python
-          - pyi
+          # - pyi
           # - jupyter
         exclude: ^(scripts|typings)/.*
 
@@ -58,12 +58,13 @@ repos:
         # entry: ruff format --force-exclude
         types_or:
           - python
-          - pyi
+          # - pyi
           # - jupyter
         args:
           - --config=pyproject.toml
         files: ^((src|tests|notebooks)/.+)?[^/]+\.(py|pyi|ipynb)$
-        exclude: (.tasks|hack)
+        exclude: (.tasks|hack|scripts)
+
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
     hooks:
@@ -71,8 +72,11 @@ repos:
       - id: check-merge-conflict
       - id: check-symlinks
       - id: end-of-file-fixer
+        exclude: (.*\.pyi$)
       - id: mixed-line-ending
+        exclude: (.*\.pyi$)
       - id: trailing-whitespace
+        exclude: (.*\.pyi$)
 
   # SOURCE:https://github.com/humblFINANCE/humblAPI/blob/master/.pre-commit-config.yaml
   # SOURCE: https://github.com/pypa/pip/blob/main/.pre-commit-config.yaml

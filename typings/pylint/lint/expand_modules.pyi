@@ -18,3 +18,4 @@ def expand_modules(files_or_modules: Sequence[str], source_roots: Sequence[str],
     (file, module name) which have to be actually checked.
     """
     ...
+

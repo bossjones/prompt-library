@@ -16,34 +16,34 @@ class IdGeneratorMixIn:
     """Mixin adding the ability to generate integer uid."""
     def __init__(self, start_value: int = ...) -> None:
         ...
-
+    
     def init_counter(self, start_value: int = ...) -> None:
         """Init the id counter."""
         ...
-
+    
     def generate_id(self) -> int:
         """Generate a new identifier."""
         ...
-
+    
 
 
 class Project:
     """A project handle a set of modules / packages."""
     def __init__(self, name: str = ...) -> None:
         ...
-
+    
     def add_module(self, node: nodes.Module) -> None:
         ...
-
+    
     def get_module(self, name: str) -> nodes.Module:
         ...
-
+    
     def get_children(self) -> list[nodes.Module]:
         ...
-
+    
     def __repr__(self) -> str:
         ...
-
+    
 
 
 class Linker(IdGeneratorMixIn, utils.LocalsVisitor):
@@ -73,14 +73,14 @@ class Linker(IdGeneratorMixIn, utils.LocalsVisitor):
     """
     def __init__(self, project: Project, tag: bool = ...) -> None:
         ...
-
+    
     def visit_project(self, node: Project) -> None:
         """Visit a pyreverse.utils.Project node.
 
         * optionally tag the node with a unique id
         """
         ...
-
+    
     def visit_module(self, node: nodes.Module) -> None:
         """Visit an astroid.Module node.
 
@@ -89,7 +89,7 @@ class Linker(IdGeneratorMixIn, utils.LocalsVisitor):
         * optionally tag the node with a unique id
         """
         ...
-
+    
     def visit_classdef(self, node: nodes.ClassDef) -> None:
         """Visit an astroid.Class node.
 
@@ -97,7 +97,7 @@ class Linker(IdGeneratorMixIn, utils.LocalsVisitor):
         * optionally tag the node with a unique id
         """
         ...
-
+    
     def visit_functiondef(self, node: nodes.FunctionDef) -> None:
         """Visit an astroid.Function node.
 
@@ -105,14 +105,14 @@ class Linker(IdGeneratorMixIn, utils.LocalsVisitor):
         * optionally tag the node with a unique id
         """
         ...
-
+    
     def visit_assignname(self, node: nodes.AssignName) -> None:
         """Visit an astroid.AssignName node.
 
         handle locals_type
         """
         ...
-
+    
     @staticmethod
     def handle_assignattr_type(node: nodes.AssignAttr, parent: nodes.ClassDef) -> None:
         """Handle an astroid.assignattr node.
@@ -120,36 +120,36 @@ class Linker(IdGeneratorMixIn, utils.LocalsVisitor):
         handle instance_attrs_type
         """
         ...
-
+    
     def visit_import(self, node: nodes.Import) -> None:
         """Visit an astroid.Import node.
 
         resolve module dependencies
         """
         ...
-
+    
     def visit_importfrom(self, node: nodes.ImportFrom) -> None:
         """Visit an astroid.ImportFrom node.
 
         resolve module dependencies
         """
         ...
-
+    
     def compute_module(self, context_name: str, mod_path: str) -> bool:
         """Should the module be added to dependencies ?"""
         ...
-
+    
 
 
 class AssociationHandlerInterface(ABC):
     @abstractmethod
     def set_next(self, handler: AssociationHandlerInterface) -> AssociationHandlerInterface:
         ...
-
+    
     @abstractmethod
     def handle(self, node: nodes.AssignAttr, parent: nodes.ClassDef) -> None:
         ...
-
+    
 
 
 class AbstractAssociationHandler(AssociationHandlerInterface):
@@ -166,25 +166,26 @@ class AbstractAssociationHandler(AssociationHandlerInterface):
     _next_handler: AssociationHandlerInterface
     def set_next(self, handler: AssociationHandlerInterface) -> AssociationHandlerInterface:
         ...
-
+    
     @abstractmethod
     def handle(self, node: nodes.AssignAttr, parent: nodes.ClassDef) -> None:
         ...
-
+    
 
 
 class AggregationsHandler(AbstractAssociationHandler):
     def handle(self, node: nodes.AssignAttr, parent: nodes.ClassDef) -> None:
         ...
-
+    
 
 
 class OtherAssociationsHandler(AbstractAssociationHandler):
     def handle(self, node: nodes.AssignAttr, parent: nodes.ClassDef) -> None:
         ...
-
+    
 
 
 def project_from_files(files: list[str], func_wrapper: _WrapperFuncT = ..., project_name: str = ..., black_list: tuple[str, ...] = ..., verbose: bool = ...) -> Project:
     """Return a Project from a list of files or modules."""
     ...
+

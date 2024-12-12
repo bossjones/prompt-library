@@ -20,20 +20,20 @@ class MessageDefinitionStore:
     """
     def __init__(self, py_version: tuple[int, ...] | sys._version_info = ...) -> None:
         ...
-
+    
     @property
     def messages(self) -> ValuesView[MessageDefinition]:
         """The list of all active messages."""
         ...
-
+    
     def register_messages_from_checker(self, checker: BaseChecker) -> None:
         """Register all messages definitions from a checker."""
         ...
-
+    
     def register_message(self, message: MessageDefinition) -> None:
         """Register a MessageDefinition with consistency in mind."""
         ...
-
+    
     @cache
     def get_message_definitions(self, msgid_or_symbol: str) -> list[MessageDefinition]:
         """Returns the Message definition for either a numeric or symbolic id.
@@ -43,19 +43,22 @@ class MessageDefinitionStore:
         take up ~= 1 Mb.
         """
         ...
-
+    
     def get_msg_display_string(self, msgid_or_symbol: str) -> str:
         """Generates a user-consumable representation of a message."""
         ...
-
+    
     def help_message(self, msgids_or_symbols: Sequence[str]) -> None:
         """Display help messages for the given message identifiers."""
         ...
-
+    
     def list_messages(self) -> None:
         """Output full messages list documentation in ReST format."""
         ...
-
+    
     def find_emittable_messages(self) -> tuple[list[MessageDefinition], list[MessageDefinition]]:
         """Finds all emittable and non-emittable messages."""
         ...
+    
+
+
