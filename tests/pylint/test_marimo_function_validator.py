@@ -7,6 +7,8 @@ from typing import TYPE_CHECKING
 
 import astroid
 
+from astroid.builder import parse as astroid_parse
+
 import pytest
 
 from pylint.checkers import BaseChecker
@@ -48,7 +50,7 @@ class TestMarimoFunctionChecker(CheckerTestCase):
             result = helper_function()
             return (result,)
         """
-        module = astroid.parse(code)
+        module: astroid.Module = astroid_parse(code)
         mocker.patch.object(marimo_function_checker, "_is_marimo_notebook", return_value=True)
         marimo_function_checker.visit(module)
 
@@ -70,7 +72,7 @@ class TestMarimoFunctionChecker(CheckerTestCase):
             square = lambda x: x * x
             return (square(5),)
         """
-        module = astroid.parse(code)
+        module: astroid.Module = astroid_parse(code)
         mocker.patch.object(marimo_function_checker, "_is_marimo_notebook", return_value=True)
         marimo_function_checker.visit(module)
 
@@ -99,7 +101,7 @@ class TestMarimoFunctionChecker(CheckerTestCase):
             result = await fetch_data()
             return (result,)
         """
-        module = astroid.parse(code)
+        module: astroid.Module = astroid_parse(code)
         mocker.patch.object(marimo_function_checker, "_is_marimo_notebook", return_value=True)
         marimo_function_checker.visit(module)
 
@@ -127,7 +129,7 @@ class TestMarimoFunctionChecker(CheckerTestCase):
             result = helper_function()
             return (result,)
         """
-        module = astroid.parse(code)
+        module: astroid.Module = astroid_parse(code)
         mocker.patch.object(marimo_function_checker, "_is_marimo_notebook", return_value=True)
         marimo_function_checker.visit(module)
 
@@ -151,7 +153,7 @@ class TestMarimoFunctionChecker(CheckerTestCase):
 
         square = lambda x: x * x
         """
-        module = astroid.parse(code)
+        module: astroid.Module = astroid_parse(code)
         mocker.patch.object(marimo_function_checker, "_is_marimo_notebook", return_value=False)
         marimo_function_checker.visit(module)
 

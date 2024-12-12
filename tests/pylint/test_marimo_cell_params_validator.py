@@ -1,11 +1,10 @@
 """Tests for the Marimo cell parameters validator."""
 
-# pyright: reportAttributeAccessIssue=false
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
-
 import astroid
+
+from astroid.builder import parse as astroid_parse
 
 import pytest
 
@@ -18,17 +17,13 @@ from pylint.utils.ast_walker import ASTWalker
 from . import assert_adds_messages, assert_no_messages
 
 
-if TYPE_CHECKING:
-    from _pytest.capture import CaptureFixture
-    from _pytest.fixtures import FixtureRequest
-    from _pytest.logging import LogCaptureFixture
-    from _pytest.monkeypatch import MonkeyPatch
-
-    from pytest_mock.plugin import MockerFixture
-
-
 def test_good_cell_params(linter: UnittestLinter, marimo_cell_params_checker: BaseChecker) -> None:
-    """Test that properly used cell parameters are not flagged."""
+    """Test that properly used cell parameters are not flagged.
+
+    Args:
+        linter: The pylint linter instance
+        marimo_cell_params_checker: The cell parameter checker
+    """
     code = """
     @app.cell
     def __():
@@ -40,7 +35,7 @@ def test_good_cell_params(linter: UnittestLinter, marimo_cell_params_checker: Ba
         result = os.path.join(sys.path[0])
         return (result,)
     """
-    root_node: astroid.Module = astroid.parse(code, "marimo_test.py")
+    root_node = astroid_parse(code, "marimo_test.py")
     walker = ASTWalker(linter)
     walker.add_checker(marimo_cell_params_checker)
 
@@ -49,7 +44,7 @@ def test_good_cell_params(linter: UnittestLinter, marimo_cell_params_checker: Ba
 
 
 @pytest.mark.parametrize(
-    ("code", "param_name", "line_num"),
+    ("code", "param_name", "line_num", "path"),
     [
         (
             """
@@ -65,6 +60,7 @@ def test_good_cell_params(linter: UnittestLinter, marimo_cell_params_checker: Ba
             """,
             "unused_param",
             8,
+            "marimo_test.py",
         ),
         (
             """
@@ -80,6 +76,7 @@ def test_good_cell_params(linter: UnittestLinter, marimo_cell_params_checker: Ba
             """,
             "unused1",
             8,
+            "marimo_test.py",
         ),
         (
             """
@@ -95,6 +92,23 @@ def test_good_cell_params(linter: UnittestLinter, marimo_cell_params_checker: Ba
             """,
             "extra",
             8,
+            "marimo_test.py",
+        ),
+        (
+            """
+            @app.cell
+            def __():
+                import numpy as np
+                return (np,)
+
+            @app.cell
+            def __(np, unused_config):
+                arr = np.array([1, 2, 3])
+                return (arr,)
+            """,
+            "unused_config",
+            8,
+            "marimo_notebook.py",
         ),
     ],
 )
@@ -104,6 +118,7 @@ def test_bad_cell_params(
     code: str,
     param_name: str,
     line_num: int,
+    path: str,
 ) -> None:
     """Test that unused cell parameters are properly detected and reported.
 
@@ -113,8 +128,9 @@ def test_bad_cell_params(
         code: The test code to analyze
         param_name: The name of the parameter expected to be flagged
         line_num: The line number where the error should be reported
+        path: The file path to use for the test
     """
-    root_node: astroid.Module = astroid.parse(code, "marimo_test.py")
+    root_node = astroid_parse(code, path)
     walker = ASTWalker(linter)
     walker.add_checker(marimo_cell_params_checker)
 
@@ -129,39 +145,62 @@ def test_bad_cell_params(
             col_offset=0,
             end_line=line_num,
             end_col_offset=13,
+            path=path,
         ),
     ):
         walker.walk(root_node)
 
 
 @pytest.mark.parametrize(
-    "code",
+    ("code", "path"),
     [
-        """
-        def regular_function(unused_param):
-            return 42
-        """,
-        """
-        class TestClass:
-            def method(self, unused_param):
+        (
+            """
+            def regular_function(unused_param):
+                return 42
+            """,
+            "marimo_test.py",
+        ),
+        (
+            """
+            class TestClass:
+                def method(self, unused_param):
+                    pass
+            """,
+            "marimo_test.py",
+        ),
+        (
+            """
+            @some_other_decorator
+            def decorated_func(unused_param):
+                return True
+            """,
+            "marimo_test.py",
+        ),
+        (
+            """
+            def __init__(self, unused_param):
                 pass
-        """,
-        """
-        @some_other_decorator
-        def decorated_func(unused_param):
-            return True
-        """,
+            """,
+            "marimo_test.py",
+        ),
     ],
 )
-def test_non_cell_functions(linter: UnittestLinter, marimo_cell_params_checker: BaseChecker, code: str) -> None:
+def test_non_cell_functions(
+    linter: UnittestLinter,
+    marimo_cell_params_checker: BaseChecker,
+    code: str,
+    path: str,
+) -> None:
     """Test that non-cell functions are properly ignored.
 
     Args:
         linter: The pylint linter instance
         marimo_cell_params_checker: The cell parameter checker
         code: The test code to analyze
+        path: The file path to use for the test
     """
-    root_node = astroid.parse(code, "marimo_test.py")
+    root_node = astroid_parse(code, path)
     walker = ASTWalker(linter)
     walker.add_checker(marimo_cell_params_checker)
 
@@ -170,41 +209,51 @@ def test_non_cell_functions(linter: UnittestLinter, marimo_cell_params_checker: 
 
 
 @pytest.mark.parametrize(
-    ("filename", "code"),
+    ("code", "path"),
     [
         (
-            "regular_file.py",
             """
             @app.cell
             def __(unused_param):
                 return (42,)
             """,
+            "regular_file.py",
         ),
         (
-            "not_marimo.py",
             """
             @app.cell
             def __(x, y, unused):
                 return (x + y,)
             """,
+            "not_marimo.py",
+        ),
+        (
+            """
+            @app.cell
+            def __(data, config):
+                # Config is used in a string context
+                print(f"Using config: {config}")
+                return (data,)
+            """,
+            "marimo_test.py",
         ),
     ],
 )
-def test_non_marimo_files(
+def test_non_marimo_files_and_special_cases(
     linter: UnittestLinter,
     marimo_cell_params_checker: BaseChecker,
-    filename: str,
     code: str,
+    path: str,
 ) -> None:
-    """Test that non-marimo files are properly ignored.
+    """Test that non-marimo files and special parameter cases are properly handled.
 
     Args:
         linter: The pylint linter instance
         marimo_cell_params_checker: The cell parameter checker
-        filename: The name of the file being tested
         code: The test code to analyze
+        path: The file path to use for the test
     """
-    root_node = astroid.parse(code, filename)
+    root_node = astroid_parse(code, path)
     walker = ASTWalker(linter)
     walker.add_checker(marimo_cell_params_checker)
 

@@ -7,6 +7,8 @@ from typing import TYPE_CHECKING, Any, cast
 
 import astroid
 
+from astroid.builder import parse as astroid_parse
+
 import pytest
 
 from pylint.checkers import BaseChecker
@@ -51,7 +53,7 @@ class TestMarimoImportsChecker(CheckerTestCase):
             import sys  # This should trigger a warning
             return (os, sys)
         """
-        module = astroid.parse(code)
+        module: astroid.Module = astroid_parse(code)
         mocker.patch.object(marimo_imports_checker, "_is_marimo_notebook", return_value=True)
         marimo_imports_checker.visit(module)
 
@@ -77,7 +79,7 @@ class TestMarimoImportsChecker(CheckerTestCase):
             counter += 1
             return (counter,)
         """
-        module = astroid.parse(code)
+        module: astroid.Module = astroid_parse(code)
         mocker.patch.object(marimo_imports_checker, "_is_marimo_notebook", return_value=True)
         marimo_imports_checker.visit(module)
 
@@ -98,7 +100,7 @@ class TestMarimoImportsChecker(CheckerTestCase):
             x = 42
             return x  # Should be (x,)
         """
-        module = astroid.parse(code)
+        module: astroid.Module = astroid_parse(code)
         mocker.patch.object(marimo_imports_checker, "_is_marimo_notebook", return_value=True)
         marimo_imports_checker.visit(module)
 
@@ -125,7 +127,7 @@ class TestMarimoImportsChecker(CheckerTestCase):
             result = os.path.join(sys.path[0])
             return (result,)
         """
-        module = astroid.parse(code)
+        module: astroid.Module = astroid_parse(code)
         mocker.patch.object(marimo_imports_checker, "_is_marimo_notebook", return_value=True)
         marimo_imports_checker.visit(module)
 
@@ -149,7 +151,7 @@ class TestMarimoImportsChecker(CheckerTestCase):
             some_var = 42
             return some_var
         """
-        module = astroid.parse(code)
+        module: astroid.Module = astroid_parse(code)
         mocker.patch.object(marimo_imports_checker, "_is_marimo_notebook", return_value=False)
         marimo_imports_checker.visit(module)
 

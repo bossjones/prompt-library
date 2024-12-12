@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import astroid
 
+from astroid.builder import parse as astroid_parse
 from astroid.nodes import Module
 
 import pytest
@@ -29,7 +30,7 @@ def test_valid_marimo_cell(linter: UnittestLinter, marimo_checker: BaseChecker) 
         return "Hello, World!"
     """
 
-    root_node: astroid.Module = astroid.parse(code, "marimo_test.py")
+    root_node: astroid.Module = astroid_parse(code, "marimo_test.py")
     walker = ASTWalker(linter)
     walker.add_checker(marimo_checker)
 
@@ -47,7 +48,7 @@ def test_missing_cell_decorator(linter: UnittestLinter, marimo_checker: BaseChec
         return "Hello, World!"
     """
 
-    root_node: astroid.Module = astroid.parse(code, "marimo_test.py")
+    root_node: astroid.Module = astroid_parse(code, "marimo_test.py")
     walker = ASTWalker(linter)
     walker.add_checker(marimo_checker)
 
@@ -81,7 +82,7 @@ def test_invalid_cell_name(linter: UnittestLinter, marimo_checker: BaseChecker) 
         return "Hello, World!"
     """
 
-    root_node: astroid.Module = astroid.parse(code, "marimo_test.py")
+    root_node: astroid.Module = astroid_parse(code, "marimo_test.py")
     walker = ASTWalker(linter)
     walker.add_checker(marimo_checker)
 
@@ -117,7 +118,7 @@ def test_nested_function_definition(linter: UnittestLinter, marimo_checker: Base
         return helper()
     """
 
-    root_node: astroid.Module = astroid.parse(code, "marimo_test.py")
+    root_node: astroid.Module = astroid_parse(code, "marimo_test.py")
     walker = ASTWalker(linter)
     walker.add_checker(marimo_checker)
 
@@ -161,7 +162,7 @@ def test_nested_function_definition(linter: UnittestLinter, marimo_checker: Base
 )
 def test_non_marimo_files(linter: UnittestLinter, marimo_checker: BaseChecker, code: str, filename: str) -> None:
     """Test that non-Marimo files are not affected by the validator."""
-    root_node: astroid.Module = astroid.parse(code, filename)
+    root_node: astroid.Module = astroid_parse(code, filename)
     walker = ASTWalker(linter)
     walker.add_checker(marimo_checker)
 
@@ -180,7 +181,7 @@ def test_async_cell_function(linter: UnittestLinter, marimo_checker: BaseChecker
         return "Async cell"
     """
 
-    root_node: astroid.Module = astroid.parse(code, "marimo_test.py")
+    root_node: astroid.Module = astroid_parse(code, "marimo_test.py")
     walker = ASTWalker(linter)
     walker.add_checker(marimo_checker)
 
@@ -203,7 +204,7 @@ def test_multiple_decorators(linter: UnittestLinter, marimo_checker: BaseChecker
         return "Multiple decorators"
     """
 
-    root_node: astroid.Module = astroid.parse(code, "marimo_test.py")
+    root_node: astroid.Module = astroid_parse(code, "marimo_test.py")
     walker = ASTWalker(linter)
     walker.add_checker(marimo_checker)
 
