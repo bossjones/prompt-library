@@ -33,7 +33,7 @@ class MarimoFunctionChecker(BaseChecker):
         linter (PyLinter): The pylint linter instance
     """
 
-    name = "marimo-functions"
+    name = "marimo_function_validator"
     priority = -1
     msgs = {
         "W9201": (

@@ -37,7 +37,7 @@ class MarimoImportsChecker(BaseChecker):
         _current_cell_name (Optional[str]): The name of the current cell being checked
     """
 
-    name = "marimo-imports"
+    name = "marimo_imports_checker"
     priority = -1
     msgs = {
         "W9101": (

@@ -31,7 +31,7 @@ class MarimoChecker(BaseChecker):
 
     # __implements__ = IAstroidChecker
 
-    name = "marimo"
+    name = "marimo_cell_validator"
     priority = -1
     msgs = {
         "W9001": (

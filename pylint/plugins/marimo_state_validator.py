@@ -31,7 +31,7 @@ class MarimoStateChecker(BaseChecker):
         msgs: Dictionary of warning messages and their descriptions
     """
 
-    name = "marimo-state"
+    name = "marimo_state_validator"
     priority = -1
     msgs = {
         "W9201": (

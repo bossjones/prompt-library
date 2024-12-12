@@ -30,7 +30,7 @@ class MarimoCellImportsChecker(BaseChecker):
         msgs: Dictionary of warning messages and their descriptions
     """
 
-    name = "marimo-imports"
+    name = "marimo_imports_checker"
     priority = -1
     msgs = {
         "W9101": (

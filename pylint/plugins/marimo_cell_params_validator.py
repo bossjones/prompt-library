@@ -33,7 +33,7 @@ class MarimoCellParamsChecker(BaseChecker):
         linter: The pylint linter instance
     """
 
-    name = "marimo-cell-params"
+    name = "marimo_cell_params_validator"
     priority = -1
     msgs = {
         "W9301": (
