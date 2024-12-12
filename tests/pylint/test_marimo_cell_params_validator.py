@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from types import ModuleType
+
 import astroid
 
 from astroid.builder import parse as astroid_parse
@@ -17,7 +19,7 @@ from pylint.utils.ast_walker import ASTWalker
 from . import assert_adds_messages, assert_no_messages
 
 
-def test_good_cell_params(linter: UnittestLinter, marimo_cell_params_checker: BaseChecker) -> None:
+def test_good_cell_params(linter: UnittestLinter, marimo_cell_params_checker: ModuleType) -> None:
     """Test that properly used cell parameters are not flagged.
 
     Args:
@@ -114,7 +116,7 @@ def test_good_cell_params(linter: UnittestLinter, marimo_cell_params_checker: Ba
 )
 def test_bad_cell_params(
     linter: UnittestLinter,
-    marimo_cell_params_checker: BaseChecker,
+    marimo_cell_params_checker: ModuleType,
     code: str,
     param_name: str,
     line_num: int,
@@ -139,13 +141,21 @@ def test_bad_cell_params(
         MessageTest(
             msg_id="unused-cell-parameter",
             line=line_num,
-            node=root_node.body[2],
+            node=next(
+                node
+                for node in root_node.body
+                if isinstance(node, astroid.nodes.FunctionDef)
+                and node.name == "__"
+                and any(
+                    isinstance(dec, (astroid.nodes.Name, astroid.nodes.Attribute)) and dec.as_string() == "app.cell"
+                    for dec in node.decorators.nodes
+                )
+            ),
             args=(param_name,),
             confidence=UNDEFINED,
             col_offset=0,
             end_line=line_num,
             end_col_offset=13,
-            path=path,
         ),
     ):
         walker.walk(root_node)
@@ -188,7 +198,7 @@ def test_bad_cell_params(
 )
 def test_non_cell_functions(
     linter: UnittestLinter,
-    marimo_cell_params_checker: BaseChecker,
+    marimo_cell_params_checker: ModuleType,
     code: str,
     path: str,
 ) -> None:
@@ -241,7 +251,7 @@ def test_non_cell_functions(
 )
 def test_non_marimo_files_and_special_cases(
     linter: UnittestLinter,
-    marimo_cell_params_checker: BaseChecker,
+    marimo_cell_params_checker: ModuleType,
     code: str,
     path: str,
 ) -> None:

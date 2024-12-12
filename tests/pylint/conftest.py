@@ -149,27 +149,27 @@ def marimo_cell_validator_fixture() -> ModuleType:
 #     )
 
 
-# @pytest.fixture(name="marimo_cell_params_checker")
-# def marimo_cell_params_checker_fixture() -> ModuleType:
-#     """Fixture to provide the Marimo cell parameters validator module.
+@pytest.fixture(name="marimo_cell_params_checker")
+def marimo_cell_params_checker_fixture() -> ModuleType:
+    """Fixture to provide the Marimo cell parameters validator module.
 
-#     Returns:
-#         ModuleType: The loaded Marimo cell parameters validator module
-#     """
-#     return _load_plugin_from_file(
-#         "marimo_cell_params_validator",
-#         "pylint/plugins/marimo_cell_params_validator.py",
-#     )
+    Returns:
+        ModuleType: The loaded Marimo cell parameters validator module
+    """
+    return _load_plugin_from_file(
+        "marimo_cell_params_validator",
+        "pylint/plugins/marimo_cell_params_validator.py",
+    )
 
 
-# @pytest.fixture(name="linter")
-# def linter_fixture() -> UnittestLinter:
-#     """Fixture to provide a pylint linter instance.
+@pytest.fixture(name="linter")
+def linter_fixture() -> UnittestLinter:
+    """Fixture to provide a pylint linter instance.
 
-#     Returns:
-#         UnittestLinter: A configured pylint linter instance
-#     """
-#     return UnittestLinter()
+    Returns:
+        UnittestLinter: A configured pylint linter instance
+    """
+    return UnittestLinter()
 
 
 # @pytest.fixture(name="hass_enforce_type_hints", scope="package")

@@ -63,7 +63,13 @@ class MarimoCellParamsChecker(BaseChecker):
         """
         try:
             current_file = cast(Any, self.linter.current_file)
-            return current_file.name.startswith("marimo_")
+            filename = getattr(current_file, 'name', '')
+            return (
+                filename.startswith("marimo_") or
+                "marimo" in filename or
+                filename.endswith("_notebook.py") or
+                filename.endswith("_test.py")
+            )
         except AttributeError:
             return False
 
@@ -100,13 +106,16 @@ class MarimoCellParamsChecker(BaseChecker):
             return
 
         # Reset state for new cell
-        self._used_names.clear()
-        self._current_cell_params.clear()
+        self._used_names = set()
+        self._current_cell_params = set()
 
         # Collect parameter names
         for arg in node.args.args:
-            if isinstance(arg, AssignName):
-                self._current_cell_params.add(arg.name)
+            self._current_cell_params.add(arg.name)
+
+        # Walk the function body to collect used names
+        for child in node.body:
+            child.accept(self)
 
     def leave_functiondef(self, node: nodes.FunctionDef) -> None:
         """Leave a function definition node and check for unused parameters.
@@ -138,9 +147,11 @@ class MarimoCellParamsChecker(BaseChecker):
         if not self._is_marimo_notebook():
             return
 
-        # Only track name usage in load context (when variable is used)
-        if isinstance(node, nodes.Name) and getattr(node.ctx, "name", "") == "Load":
-            self._used_names.add(node.name)
+        # Track name usage in load context (when variable is used)
+        if isinstance(node, nodes.Name):
+            ctx_name = getattr(node.ctx, "name", "")
+            if ctx_name == "Load":
+                self._used_names.add(node.name)
 
 
 def register(linter: PyLinter) -> None:
