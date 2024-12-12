@@ -105,16 +105,19 @@ class MarimoChecker(BaseChecker):
         if not self._is_marimo_notebook():
             return
 
-        if not self._has_app_cell_decorator(node):
-            self.add_message("missing-app-cell-decorator", node=node)
-
-        if not node.name.startswith("__"):
-            self.add_message("invalid-cell-name", node=node)
-
-        # Check for nested function definitions
+        # Always check for nested functions regardless of other conditions
         for child in node.get_children():
             if isinstance(child, (nodes.FunctionDef, nodes.AsyncFunctionDef)):
                 self.add_message("function-in-cell", node=child)
+
+        # Check for @app.cell decorator
+        if not self._has_app_cell_decorator(node):
+            self.add_message("missing-app-cell-decorator", node=node)
+            return
+
+        # Check cell naming convention
+        if not node.name.startswith("__"):
+            self.add_message("invalid-cell-name", node=node)
 
     def visit_functiondef(self, node: nodes.FunctionDef) -> None:
         """Visit and check a function definition node.

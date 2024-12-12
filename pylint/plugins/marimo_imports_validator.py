@@ -4,6 +4,8 @@ This module provides a custom pylint checker for enforcing Marimo import and dep
 It ensures proper import organization, cell dependencies, and state management.
 """
 
+# pyright: reportAttributeAccessIssue=false
+
 from __future__ import annotations
 
 from typing import Any, Optional, Sequence, cast
@@ -11,7 +13,6 @@ from typing import Any, Optional, Sequence, cast
 import astroid
 
 from astroid import nodes
-from astroid.context import Context, Load
 from astroid.nodes import AssignName, Attribute, Call, Decorators, Name, NodeNG, Return, Tuple
 
 from pylint.checkers import BaseChecker
@@ -65,13 +66,13 @@ class MarimoImportsChecker(BaseChecker):
         ),
     }
 
-    def __init__(self, linter: PyLinter) -> None:
+    def __init__(self, linter: PyLinter | None = None) -> None:
         """Initialize the checker.
 
         Args:
             linter: The pylint linter instance
         """
-        super().__init__(linter)
+        super().__init__(linter if linter is not None else PyLinter())
         self._first_cell_seen = False
         self._current_cell_name: Optional[str] = None
 

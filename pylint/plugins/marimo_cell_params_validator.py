@@ -11,7 +11,6 @@ from typing import Any, Set, cast
 import astroid
 
 from astroid import nodes
-from astroid.context import Context, Load
 from astroid.nodes import AssignName, Attribute, Name, NodeNG
 
 from pylint.checkers import BaseChecker
@@ -44,13 +43,13 @@ class MarimoCellParamsChecker(BaseChecker):
         ),
     }
 
-    def __init__(self, linter: PyLinter) -> None:
+    def __init__(self, linter: PyLinter | None = None) -> None:
         """Initialize the checker.
 
         Args:
             linter: The pylint linter instance
         """
-        super().__init__(linter)
+        super().__init__(linter if linter is not None else PyLinter())
         self._used_names: set[str] = set()
         self._current_cell_params: set[str] = set()
 
@@ -139,7 +138,7 @@ class MarimoCellParamsChecker(BaseChecker):
             return
 
         # Only track name usage in load context (when variable is used)
-        if isinstance(node.ctx, Context) and node.ctx == Load:
+        if isinstance(node, nodes.Name) and getattr(node.ctx, "name", "") == "Load":
             self._used_names.add(node.name)
 
 

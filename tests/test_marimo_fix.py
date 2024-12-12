@@ -36,7 +36,7 @@ def test_styles_cell(app):
     globals = {}
 
     # Run all cells in order
-    for cell in app._cell_manager._cells.values():
+    for cell in app._cell_manager.cells.values():
         result = cell._cell._cell()
         if result is not None:
             outputs.append(result)
@@ -64,7 +64,7 @@ def test_imports_cell(app):
     globals = {}
 
     # Run cells in order
-    for cell in app._cell_manager._cells.values():
+    for cell in app._cell_manager.cells.values():
         result = cell._cell._cell()
         if result is not None:
             outputs.append(result)
@@ -95,7 +95,7 @@ def test_directories_cell(app):
     globals = {}
 
     # Run cells in order
-    for cell in app._cell_manager._cells.values():
+    for cell in app._cell_manager.cells.values():
         result = cell._cell._cell()
         if result is not None:
             outputs.append(result)
@@ -120,7 +120,7 @@ def test_models_cell(app):
     globals = {}
 
     # Run cells in order
-    for cell in app._cell_manager._cells.values():
+    for cell in app._cell_manager.cells.values():
         result = cell._cell._cell()
         if result is not None:
             outputs.append(result)
