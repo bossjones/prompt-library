@@ -48,13 +48,13 @@ class MarimoCellParamsChecker(BaseChecker):
         ),
     }
 
-    def __init__(self, linter: PyLinter | None = None) -> None:
+    def __init__(self, linter: PyLinter) -> None:
         """Initialize the checker.
 
         Args:
             linter: The pylint linter instance
         """
-        super().__init__(linter if linter is not None else PyLinter())
+        super().__init__(linter)
         self._used_names: set[str] = set()
         self._current_cell_params: set[str] = set()
 
@@ -97,6 +97,7 @@ class MarimoCellParamsChecker(BaseChecker):
         except AttributeError:
             return False
 
+    @pysnooper.snoop(output='/Users/malcolm/dev/bossjones/prompt-library/pylint-debug.log', thread_info=True, max_variable_length=None, depth=10)
     def visit_functiondef(self, node: nodes.FunctionDef) -> None:
         """Visit and check a function definition node.
 

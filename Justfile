@@ -887,8 +887,12 @@ copy-rules:
 
 # run pylint with the marimo cell params validator plugin
 pylint-plugin-debug-bad:
+	#!/bin/bash
 	PYTHONPATH=. {{UV_RUN}} pylint --load-plugins=marimo_cell_params_validator --disable=all --enable=marimo_cell_params_validator marimo_prompt_analysis.py
 
 # run pylint with the marimo cell params validator plugin
 pylint-plugin-debug-good:
+	#!/bin/bash
 	PYTHONPATH=. {{UV_RUN}} pylint --load-plugins=marimo_cell_params_validator --disable=all --enable=marimo_cell_params_validator marimo_prompt_library.py
+
+test-pylint-plugin: test pylint-plugin-debug-bad
