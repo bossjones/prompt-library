@@ -4,9 +4,14 @@ from __future__ import annotations
 
 import contextlib
 
+import pysnooper
+
+from loguru import logger
+
 from pylint.testutils.unittest_linter import UnittestLinter
 
 
+@pysnooper.snoop(thread_info=True, max_variable_length=None, depth=10)
 @contextlib.contextmanager
 def assert_no_messages(linter: UnittestLinter):
     """Assert that no messages are added by the given method."""

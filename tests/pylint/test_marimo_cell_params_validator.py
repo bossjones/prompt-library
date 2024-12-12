@@ -5,8 +5,12 @@ from __future__ import annotations
 from types import ModuleType
 
 import astroid
+import pysnooper
 
+from _pytest.logging import LogCaptureFixture
 from astroid.builder import parse as astroid_parse
+from astroid.nodes import Module
+from loguru import logger
 
 import pytest
 
@@ -45,6 +49,7 @@ def test_good_cell_params(linter: UnittestLinter, marimo_cell_params_checker: Mo
         walker.walk(root_node)
 
 
+# @pysnooper.snoop(thread_info=True, max_variable_length=None, depth=10)
 @pytest.mark.parametrize(
     ("code", "param_name", "line_num", "path"),
     [
@@ -121,6 +126,7 @@ def test_bad_cell_params(
     param_name: str,
     line_num: int,
     path: str,
+    caplog: LogCaptureFixture,
 ) -> None:
     """Test that unused cell parameters are properly detected and reported.
 
@@ -132,7 +138,12 @@ def test_bad_cell_params(
         line_num: The line number where the error should be reported
         path: The file path to use for the test
     """
-    root_node = astroid_parse(code, path)
+    logger.info(f"Running test_bad_cell_params with code: {code}")
+    logger.info(f"Path: {path}")
+    logger.info(f"Line num: {line_num}")
+    logger.info(f"Param name: {param_name}")
+
+    root_node: Module = astroid_parse(code, path)
     walker = ASTWalker(linter)
     walker.add_checker(marimo_cell_params_checker)
 
