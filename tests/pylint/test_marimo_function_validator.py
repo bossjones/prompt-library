@@ -8,6 +8,7 @@ import astroid
 
 import pytest
 
+from prompt_library.pylint.plugins.marimo_function_validator import MarimoFunctionChecker
 from pylint.checkers import BaseChecker
 from pylint.testutils import CheckerTestCase, MessageTest
 
@@ -25,7 +26,7 @@ if TYPE_CHECKING:
 class TestMarimoFunctionChecker(CheckerTestCase):
     """Test class for the MarimoFunctionChecker."""
 
-    CHECKER_CLASS = None  # Set by fixture
+    CHECKER_CLASS = MarimoFunctionChecker
 
     @pytest.mark.usefixtures("marimo_function_checker")
     def test_regular_function_in_notebook(self, marimo_function_checker: BaseChecker, mocker: MockerFixture) -> None:

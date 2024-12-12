@@ -8,6 +8,7 @@ import astroid
 
 import pytest
 
+from prompt_library.pylint.plugins.marimo_imports_validator import MarimoImportsChecker
 from pylint.checkers import BaseChecker
 from pylint.testutils import CheckerTestCase, MessageTest
 
@@ -31,7 +32,7 @@ class TestMarimoImportsChecker(CheckerTestCase):
     3. All cells must return tuples
     """
 
-    CHECKER_CLASS = None  # Set by fixture
+    CHECKER_CLASS = MarimoImportsChecker
 
     @pytest.mark.usefixtures("marimo_imports_checker")
     def test_import_not_in_first_cell(self, marimo_imports_checker: BaseChecker, mocker: MockerFixture) -> None:

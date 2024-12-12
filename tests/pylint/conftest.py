@@ -23,7 +23,9 @@ if TYPE_CHECKING:
 
     from pytest_mock.plugin import MockerFixture
 
-BASE_PATH = Path(__file__).parents[2]
+BASE_PATH = Path(__file__).resolve().parents[2]
+if not (BASE_PATH / "pylint" / "plugins").is_dir():
+    raise RuntimeError(f"Could not find pylint plugins directory in {BASE_PATH}")
 
 
 def _load_plugin_from_file(module_name: str, file: str) -> ModuleType:
@@ -39,11 +41,16 @@ def _load_plugin_from_file(module_name: str, file: str) -> ModuleType:
     Raises:
         AssertionError: If the module spec or loader is not found
     """
+    full_path = BASE_PATH.joinpath(file)
+    if not full_path.exists():
+        raise FileNotFoundError(f"Plugin file not found: {full_path}")
+
     spec = spec_from_file_location(
         module_name,
-        str(BASE_PATH.joinpath(file)),
+        str(full_path),
     )
-    assert spec and spec.loader, f"Could not load module {module_name} from {file}"
+    if not spec or not spec.loader:
+        raise ImportError(f"Could not load module {module_name} from {file}")
 
     module = module_from_spec(spec)
     sys.modules[module_name] = module
