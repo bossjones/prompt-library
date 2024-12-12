@@ -1,169 +1,253 @@
-# Marimo Notebook Syntax Errors Guide
+Take this and make it more generic so it can be used with other repos. Do not miss any details. For example, provide a tree or folder structure to see how this could work in any code base. Respond in markdown.
 
-Based on analyzing the working and broken examples, here are the key syntax patterns and errors specific to Marimo notebooks:
 
-## 1. Cell Function Definition
 
-### ✅ Correct Pattern
-```python
-@app.cell
-def __():
-    """Docstring describing cell purpose."""
-    # Code here
-    return (var1, var2)  # Explicit tuple return
+Let me examine these files to understand the structure and requirements for this pylint plugin.
+
+Read file: pylint/plugins/hass_decorator.py
+
+Read file: tests/pylint/test_decorator.py
+
+Read file: tests/pylint/conftest.py
+
+
+Based on the analysis of these files, here are the guidelines for creating a proper pylint plugin like the `hass_decorator` checker:
+
+# Guidelines for Creating a Pylint Plugin
+
+## 1. Basic Structure
+
+```markdown
+- Create a new Python file in the `pylint/plugins/` directory
+- Name it descriptively (e.g., `hass_decorator.py` for decorator checks)
+- Include proper type hints and docstrings for all classes and methods
 ```
 
-### ❌ Common Errors
-- Missing return statement
-- Return statement outside function
-- Implicit returns without parentheses
-- Missing docstring
+## 2. Checker Class Requirements
 
-## 2. State Management
-
-### ✅ Correct Pattern
-```python
-@app.cell
-def __(dependency1, dependency2):
-    """Cell with dependencies."""
-    result = process(dependency1, dependency2)
-    return (result,)  # Note the comma for single-item tuple
+```markdown
+1. Inherit from `BaseChecker`
+2. Define required class attributes:
+   - `name`: Unique identifier for the checker
+   - `priority`: Integer priority level (-1 for normal)
+   - `msgs`: Dictionary of message definitions containing:
+     - Message ID (e.g., "W7471")
+     - Message text
+     - Symbol name (e.g., "hass-async-callback-decorator")
+     - Detailed description
 ```
 
-### ❌ Common Errors
-- Accessing variables not returned by previous cells
-- Mutating shared state between cells
-- Missing dependency injection in function parameters
+## 3. Message Definition Format
 
-## 3. UI Component Reactivity
-
-### ✅ Correct Pattern
-From working example:
-
-```75:89:mariomo_multi_language_model_ranker.py
-            "gpt-4o-mini",
-        ],
-    )
-    return model_multiselect, prompt_multiselect, prompt_temp_slider
-
-
-@app.cell
-def __():
-    prompt_style = {
-        "background": "#eee",
-        "padding": "10px",
-        "border-radius": "10px",
-        "margin-bottom": "20px",
-    }
-    return (prompt_style,)
+```markdown
+- Use "W" prefix for warnings
+- Use 4-digit numbers (e.g., 7471, 7472)
+- Include placeholder variables in messages using %s
+- Provide clear, actionable descriptions
 ```
 
+## 4. Visitor Methods
 
-### ❌ Common Errors
-- Updating UI components outside their defining cells
-- Direct mutation of UI state
-- Missing reactive dependencies
-
-## 4. Error Handling
-
-### ✅ Correct Pattern
-From working example:
-
-````420:449:marimo_prompt_analysis.py
-    """Process prompts through LLM models and handle saving functionality."""
-    # Get the selected models
-    try:
-        model_1 = models[form.value["model_dropdown_1"]]
-        model_2 = models[form.value["model_dropdown_2"]]
-        model_name_1 = form.value["model_dropdown_1"]
-        model_name_2 = form.value["model_dropdown_2"]
-    except (KeyError, AttributeError) as e:
-        mo.md(f"""
-        ❌ **Error**: Failed to get selected models:
-        ```
-        {str(e)}
-        ```
-        Please ensure models are properly selected.
-        """).style({"color": "red", "padding": "10px", "border-radius": "5px", "background": "#ffebee"})
-
-
-    # Run both prompts through their respective models
-    try:
-        with mo.status.spinner(title="Running prompts through models..."):
-            prompt_response_1 = llm_module.prompt(model_1, final_prompt_1)
-            prompt_response_2 = llm_module.prompt(model_2, final_prompt_2)
-    except Exception as e:
-        mo.md(f"""
-        ❌ **Error**: Failed to generate responses:
-        ```
-        {str(e)}
-        ```
-        Please check your API keys and network connection.
-        """).style({"color": "red", "padding": "10px", "border-radius": "5px", "background": "#ffebee"})
-````
-
-
-### ❌ Common Errors
-- Uncaught exceptions affecting notebook state
-- Missing mo.stop() guards
-- Improper error message formatting
-
-## 5. Cell Dependencies
-
-### ✅ Correct Pattern
-```python
-@app.cell
-def __(form, mo):
-    mo.stop(not form.value, "")  # Guard clause
-    # Process form data
-    return (processed_data,)
+```markdown
+1. Name methods with `visit_` prefix followed by node type:
+   - `visit_asyncfunctiondef` for async functions
+   - `visit_functiondef` for regular functions
+2. Include proper type annotations:
+   - Parameters: specific node types from `astroid.nodes`
+   - Return type: typically `None`
+3. Implement checks using node attributes and methods
 ```
 
-### ❌ Common Errors
-- Circular dependencies between cells
-- Missing dependency declarations
-- Improper dependency ordering
+## 5. Registration
 
-## Few-Shot Examples
-
-### Example 1: State Management
-```python
-# ❌ Broken
-@app.cell
-def __():
-    data = process_data()
-    return data  # Missing tuple wrapping
-
-# ✅ Fixed
-@app.cell
-def __():
-    """Process data and return results."""
-    data = process_data()
-    return (data,)
+```markdown
+1. Include a `register` function that takes a `PyLinter` parameter
+2. Register the checker using `linter.register_checker()`
+3. Create checker instance with linter parameter
 ```
 
-### Example 2: UI Updates
-```python
-# ❌ Broken
-@app.cell
-def __(selector):
-    if selector.value:
-        input_field.value = new_value  # Direct mutation
+## 6. Testing Structure
 
-# ✅ Fixed
-@app.cell
-def __(selector, input_field):
-    """Update input field based on selector."""
-    if selector.value:
-        return (input_field.set(new_value),)
+```markdown
+1. Create tests in `tests/pylint/` directory
+2. Use pytest fixtures from `conftest.py`
+3. Test components:
+   - Good cases (should pass)
+   - Bad cases (should fail)
+   - Edge cases
+4. Use helper functions:
+   - `assert_no_messages`
+   - `assert_adds_messages`
 ```
 
-## Key Differences from Regular Python
+## 7. Test Fixtures
 
-1. Cell Isolation: Each cell must be self-contained with explicit dependencies
-2. State Flow: All state changes must be handled through return values
-3. Reactive Updates: UI components must be updated through the reactive system
-4. Error Boundaries: Each cell needs proper error handling and guards
-5. Return Format: Always return tuples, even for single values
+```markdown
+1. Create fixtures in `conftest.py`:
+   - Linter fixture
+   - Checker fixture
+   - Module loading fixtures
+2. Use appropriate scopes for fixtures
+3. Provide proper typing and documentation
+```
 
-This guide can be used to improve cursor rules by identifying patterns that distinguish between working and broken Marimo notebook code.
+## 8. Code Analysis Patterns
+
+```markdown
+1. Use `astroid` for AST parsing:
+   - Parse code using `astroid.parse()`
+   - Use `ASTWalker` for traversing nodes
+2. Check node attributes:
+   - `decoratornames()` for decorator lists
+   - `as_string()` for string representations
+3. Implement helper methods for common checks
+```
+
+## 9. Message Testing
+
+```markdown
+1. Use `MessageTest` objects with:
+   - `msg_id`: The message identifier
+   - `line`: Line number where the message occurs
+   - `node`: The AST node triggering the message
+   - `args`: Any message arguments
+   - `confidence`: Usually UNDEFINED
+   - `col_offset`: Starting column
+   - `end_line` and `end_col_offset`: Ending positions
+```
+
+## 10. Best Practices
+
+```markdown
+1. Keep checkers focused on a single concern
+2. Use clear, descriptive message IDs and symbols
+3. Provide helpful error messages with actionable feedback
+4. Include comprehensive test cases
+5. Use type hints throughout the code
+6. Document all public methods and classes
+```
+
+Would you like me to continue with analyzing the rest of the folder structure and provide additional guidelines for the broader plugin ecosystem?
+
+
+
+I see there are some linter errors related to missing dependencies. Let's fix these by examining the project requirements and adding the necessary dependencies.
+
+Read file: pyproject.toml
+
+
+Let me analyze the project structure and provide additional guidelines for creating a proper pylint plugin.
+
+# Additional Guidelines for Creating a Pylint Plugin
+
+## 11. Project Structure
+
+```assistant_snippet_Wd/3WTvGCc.txt
+1|/pylint/plugins/
+2|  ├── __init__.py
+3|  └── hass_decorator.py
+4|/tests/pylint/
+5|  ├── __init__.py
+6|  ├── conftest.py
+7|  └── test_decorator.py
+```
+
+## 12. Dependencies and Configuration
+
+```assistant_snippet_Wd/3WTvGCc.txt
+1|Required dependencies:
+2|- pylint
+3|- astroid
+4|- pytest (for testing)
+5|- pytest-mock (for testing)
+```
+
+## 13. Plugin Registration in pyproject.toml
+
+```assistant_snippet_Wd/3WTvGCc.txt
+1|[tool.pylint.MAIN]
+2|load-plugins = [
+3|    "hass_decorator",
+4|    # other plugins...
+5|]
+```
+
+## 14. Test Structure Best Practices
+
+```assistant_snippet_Wd/3WTvGCc.txt
+1|1. Create test fixtures in conftest.py:
+2|   - Linter fixture
+3|   - Plugin module fixture
+4|   - Checker fixture
+5|2. Test both positive and negative cases
+6|3. Use parametrized tests for multiple scenarios
+7|4. Mock dependencies when necessary
+```
+
+## 15. Error Message Guidelines
+
+```assistant_snippet_Wd/3WTvGCc.txt
+1|1. Use consistent message IDs:
+2|   - W#### for warnings
+3|   - E#### for errors
+4|   - C#### for conventions
+5|   - R#### for refactoring
+6|2. Provide clear, actionable messages
+7|3. Include placeholders for dynamic content
+```
+
+## 16. Plugin Performance Considerations
+
+```assistant_snippet_Wd/3WTvGCc.txt
+1|1. Set appropriate priority levels
+2|2. Cache repeated operations
+3|3. Use efficient AST traversal
+4|4. Minimize memory usage
+5|5. Avoid redundant checks
+```
+
+## 17. Documentation Requirements
+
+```assistant_snippet_Wd/3WTvGCc.txt
+1|1. Include docstrings for:
+2|   - Plugin module
+3|   - Checker class
+4|   - All public methods
+5|2. Document message codes
+6|3. Provide usage examples
+7|4. Include type hints
+```
+
+## 18. Testing Configuration
+
+```assistant_snippet_Wd/3WTvGCc.txt
+1|pytest configuration in pyproject.toml:
+2|1. Set proper test paths
+3|2. Configure test discovery
+4|3. Set up logging format
+5|4. Handle deprecation warnings
+```
+
+## 19. Integration with Other Tools
+
+```assistant_snippet_Wd/3WTvGCc.txt
+1|1. Support for:
+2|   - ruff
+3|   - black
+4|   - isort
+5|2. Handle conflicts with other linters
+6|3. Respect existing configurations
+```
+
+## 20. Error Handling and Recovery
+
+```assistant_snippet_Wd/3WTvGCc.txt
+1|1. Graceful error handling for:
+2|   - Invalid AST nodes
+3|   - Missing imports
+4|   - Configuration errors
+5|2. Provide meaningful error messages
+6|3. Avoid crashing the linter
+```
+
+Would you like me to provide more specific details about any of these aspects or explore other areas of the plugin system?
