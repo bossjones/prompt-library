@@ -1,5 +1,6 @@
 """Tests for the Marimo imports validator."""
 
+# pyright: reportAttributeAccessIssue=false
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, cast
@@ -8,7 +9,6 @@ import astroid
 
 import pytest
 
-from prompt_library.pylint.plugins.marimo_imports_validator import MarimoImportsChecker
 from pylint.checkers import BaseChecker
 from pylint.testutils import CheckerTestCase, MessageTest
 
@@ -31,8 +31,6 @@ class TestMarimoImportsChecker(CheckerTestCase):
     2. No global state mutations
     3. All cells must return tuples
     """
-
-    CHECKER_CLASS = MarimoImportsChecker
 
     @pytest.mark.usefixtures("marimo_imports_checker")
     def test_import_not_in_first_cell(self, marimo_imports_checker: BaseChecker, mocker: MockerFixture) -> None:

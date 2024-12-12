@@ -1,5 +1,6 @@
 """Tests for the Marimo function validator."""
 
+# pyright: reportAttributeAccessIssue=false
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -8,7 +9,6 @@ import astroid
 
 import pytest
 
-from prompt_library.pylint.plugins.marimo_function_validator import MarimoFunctionChecker
 from pylint.checkers import BaseChecker
 from pylint.testutils import CheckerTestCase, MessageTest
 
@@ -25,8 +25,6 @@ if TYPE_CHECKING:
 @pytest.mark.pylint
 class TestMarimoFunctionChecker(CheckerTestCase):
     """Test class for the MarimoFunctionChecker."""
-
-    CHECKER_CLASS = MarimoFunctionChecker
 
     @pytest.mark.usefixtures("marimo_function_checker")
     def test_regular_function_in_notebook(self, marimo_function_checker: BaseChecker, mocker: MockerFixture) -> None:
