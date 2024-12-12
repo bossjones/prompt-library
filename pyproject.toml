@@ -118,7 +118,7 @@ extend-include = [
     "notebooks/*.ipynb",
     "notebooks/*.py",
     "*.py",
-    "*.pyi",
+    # "*.pyi",
     "**/pyproject.toml",
     "*.ipynb",
     "pyproject.toml",

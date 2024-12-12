@@ -885,14 +885,16 @@ copy-rules:
 
 # PYTHONPATH=. uv run pylint --load-plugins=marimo_cell_params_validator --disable=all --enable=marimo_cell_params_validator ../../mariomo_prompt_library.py
 
+pylint-plugin-debug:
+	PYTHONPATH=pylint/plugins/. {{UV_RUN}} pylint --load-plugins=marimo_cell_params_validator --disable=all --enable=marimo_cell_params_validator mariomo_prompt_library.py
+
+
 # run pylint with the marimo cell params validator plugin
 pylint-plugin-debug-bad:
-	#!/bin/bash
-	PYTHONPATH=. {{UV_RUN}} pylint --load-plugins=marimo_cell_params_validator --disable=all --enable=marimo_cell_params_validator marimo_prompt_analysis.py
+	PYTHONPATH=pylint/plugins/. {{UV_RUN}} pylint --verbose --load-plugins=marimo_cell_params_validator --disable=all --enable=marimo_cell_params_validator marimo_bad.py
 
 # run pylint with the marimo cell params validator plugin
 pylint-plugin-debug-good:
-	#!/bin/bash
-	PYTHONPATH=. {{UV_RUN}} pylint --load-plugins=marimo_cell_params_validator --disable=all --enable=marimo_cell_params_validator marimo_prompt_library.py
+	PYTHONPATH=pylint/plugins/. {{UV_RUN}} pylint --load-plugins=marimo_cell_params_validator --disable=all --enable=marimo_cell_params_validator marimo_prompt_library.py
 
 test-pylint-plugin: test pylint-plugin-debug-bad

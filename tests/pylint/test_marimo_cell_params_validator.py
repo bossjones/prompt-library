@@ -143,6 +143,9 @@ def test_bad_cell_params(
     logger.info(f"Line num: {line_num}")
     logger.info(f"Param name: {param_name}")
 
+    # import bpdb
+    # bpdb.set_trace()
+
     root_node: Module = astroid_parse(code, path)
     walker = ASTWalker(linter)
     walker.add_checker(marimo_cell_params_checker)

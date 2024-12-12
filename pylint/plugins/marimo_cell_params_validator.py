@@ -7,22 +7,69 @@ It ensures that cell parameters are actually used within the cell.
 # pyright: reportAttributeAccessIssue=false
 from __future__ import annotations
 
-from typing import Any, Set, cast
+import copy
+import fnmatch
+import linecache
+import re
+import tokenize
+
+
+# import pdb
+# pdb.set_trace()
+from typing import Any, Dict, Final, Generator, List, Optional, Pattern, Set, Tuple, TypedDict, cast
 
 import astroid
-
-# from loguru import logger
 import pysnooper
 
 from astroid import nodes
 from astroid.nodes import AssignName, Attribute, Name, NodeNG
+from loguru import logger
 
+from pylint import lint
+from pylint import utils as pylint_utils
 from pylint.checkers import BaseChecker
 from pylint.lint import PyLinter
 
 
-@pysnooper.snoop(thread_info=True, max_variable_length=None, depth=10)
-class MarimoCellParamsChecker(BaseChecker):
+# NOTE: borrowing from https://github.com/oppia/oppia/blob/develop/scripts/linters/pylint_extensions.py
+# List of punctuation symbols that can be used at the end of
+# comments and docstrings.
+ALLOWED_TERMINATING_PUNCTUATIONS: Final = ['.', '?', '}', ']', ')']
+
+# If any of these phrases are found inside a docstring or comment,
+# the punctuation and capital letter checks will be skipped for that
+# comment or docstring.
+EXCLUDED_PHRASES: Final = [
+    'coding:', 'pylint:', 'http://', 'https://', 'scripts/', 'extract_node'
+]
+
+ALLOWED_PRAGMAS_FOR_INLINE_COMMENTS: Final = [
+    'pylint:', 'isort:', 'type: ignore', 'pragma:', 'https:', 'docker:'
+]
+
+ALLOWED_LINES_OF_GAP_IN_COMMENT: Final = 15
+
+from pylint import checkers  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
+from pylint import interfaces  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
+from pylint.checkers import utils as checker_utils  # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
+from pylint.extensions import _check_docs_utils # isort:skip  pylint: disable=wrong-import-order, wrong-import-position
+
+
+def read_from_node(node: astroid.scoped_nodes.Module) -> list[str]:
+    """Returns the data read from the ast node in unicode form.
+
+    Args:
+        node: astroid.scoped_nodes.Module. Node to access module content.
+
+    Returns:
+        list(str). The data read from the ast node.
+    """
+    # Readlines returns bytes, thus we need to decode them to string.
+    return [line.decode('utf-8') for line in node.stream().readlines()]
+
+
+# @pysnooper.snoop(thread_info=True, max_variable_length=None, depth=10)
+class MarimoCellParamsChecker(BaseChecker):  # type: ignore[misc]
     """Checker for enforcing Marimo cell parameter usage standards.
 
     This checker ensures that:
@@ -37,9 +84,15 @@ class MarimoCellParamsChecker(BaseChecker):
         linter: The pylint linter instance
     """
 
+
     name = "marimo_cell_params_validator"
     priority = -1
     msgs = {
+        # Each message has a code, a message that the user will see,
+        # a unique symbol that identifies the message,
+        # and a detailed help message
+        # that will be included in the documentation.
+
         "W9301": (
             "Unused cell parameter '%s'",
             "unused-cell-parameter",
@@ -48,13 +101,31 @@ class MarimoCellParamsChecker(BaseChecker):
         ),
     }
 
-    def __init__(self, linter: PyLinter) -> None:
+    # This class variable declares the options
+    # that are configurable by the user.
+
+    options = (
+        # Each option definition has a name which is used on the command line
+        # and in config files, and a dictionary of arguments
+        # (similar to argparse.ArgumentParser.add_argument).
+        (
+            "ignore-marimo-unused-params",
+            {
+                "default": False,
+                "type": "yn",
+                "metavar": "<y or n>",
+                "help": "Force checking of unused parameters even in non-marimo files",
+            },
+        ),
+    )
+
+    def __init__(self, linter: Optional[PyLinter] = None) -> None:
         """Initialize the checker.
 
         Args:
             linter: The pylint linter instance
         """
-        super().__init__(linter)
+        super().__init__(linter if linter is not None else PyLinter())
         self._used_names: set[str] = set()
         self._current_cell_params: set[str] = set()
 
@@ -97,18 +168,22 @@ class MarimoCellParamsChecker(BaseChecker):
         except AttributeError:
             return False
 
-    @pysnooper.snoop(output='/Users/malcolm/dev/bossjones/prompt-library/pylint-debug.log', thread_info=True, max_variable_length=None, depth=10)
-    def visit_functiondef(self, node: nodes.FunctionDef) -> None:
+    # @pysnooper.snoop(output='/Users/malcolm/dev/bossjones/prompt-library/pylint-debug.log', thread_info=True, max_variable_length=None, depth=10)
+    def visit_functiondef(self, node: nodes.FunctionDef | nodes.AsyncFunctionDef) -> None:
         """Visit and check a function definition node.
 
         Args:
             node: The function definition node to visit.
         """
+
         if not self._is_marimo_notebook():
             return
 
         if not self._has_app_cell_decorator(node):
             return
+
+        # import bpdb
+        # bpdb.set_trace()
 
         # Reset state for new cell
         self._used_names = set()
