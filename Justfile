@@ -857,14 +857,14 @@ pyright-verify-types:
 
 	# Iterate through each package
 	for package in $packages; do
-	    echo "Checking package: $package"
-	    echo "----------------------------------------"
+			echo "Checking package: $package"
+			echo "----------------------------------------"
 
-	    # Run pyright and print the output
-	    # uv run pyright --verifytypes "$package" --verbose
-	    uv run pyright --verifytypes "$package" | tee -a pyright-verify-types.log
+			# Run pyright and print the output
+			# uv run pyright --verifytypes "$package" --verbose
+			uv run pyright --verifytypes "$package" | tee -a pyright-verify-types.log
 
-	    echo "----------------------------------------"
+			echo "----------------------------------------"
 	done
 
 	echo "Verification complete."
@@ -898,3 +898,16 @@ pylint-plugin-debug-good:
 	PYTHONPATH=pylint/plugins/. {{UV_RUN}} pylint --load-plugins=marimo_cell_params_validator --disable=all --enable=marimo_cell_params_validator marimo_prompt_library.py
 
 test-pylint-plugin: test pylint-plugin-debug-bad
+
+hass-files-to-prompt:
+	uv run files-to-prompt \
+	/Users/malcolm/dev/home-assistant/core/pyproject.toml \
+	/Users/malcolm/dev/home-assistant/core/pylint/plugins/hass_decorator.py \
+	/Users/malcolm/dev/home-assistant/core/pylint/ruff.toml \
+	/Users/malcolm/dev/home-assistant/core/tests/pylint/__init__.py \
+	/Users/malcolm/dev/home-assistant/core/tests/pylint/conftest.py \
+	/Users/malcolm/dev/home-assistant/core/tests/pylint/test_decorator.py \
+	--cxml \
+	-o \
+	/Users/malcolm/dev/bossjones/prompt-library/ai_docs/hass_example_pylint_plugin/hass_pylint_plugin_output.xml
+	bat --theme=Nord /Users/malcolm/dev/bossjones/prompt-library/ai_docs/hass_example_pylint_plugin/hass_pylint_plugin_output.xml
