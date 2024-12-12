@@ -4,6 +4,7 @@ This module provides a custom pylint checker for enforcing Marimo cell parameter
 It ensures that cell parameters are actually used within the cell.
 """
 
+# pyright: reportAttributeAccessIssue=false
 from __future__ import annotations
 
 from typing import Any, Set, cast

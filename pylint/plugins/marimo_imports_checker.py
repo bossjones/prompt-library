@@ -3,6 +3,7 @@
 This module provides a custom pylint checker for enforcing Marimo notebook import standards.
 It ensures imports are in the first cell, properly reloaded, and returned as tuples.
 """
+# pyright: reportAttributeAccessIssue=false
 
 from __future__ import annotations
 

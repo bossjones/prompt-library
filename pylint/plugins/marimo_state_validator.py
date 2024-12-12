@@ -3,6 +3,7 @@
 This module provides a custom pylint checker for enforcing Marimo state management standards.
 It ensures proper state handling, prevents mutations, and validates typing.
 """
+# pyright: reportAttributeAccessIssue=false
 
 from __future__ import annotations
 

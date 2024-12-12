@@ -3,6 +3,7 @@
 This module provides a custom pylint checker for enforcing Marimo function definition standards.
 It ensures that no functions are defined in marimo notebook files, as they should be imported from modules.
 """
+# pyright: reportAttributeAccessIssue=false
 
 from __future__ import annotations
 

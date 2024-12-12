@@ -71,130 +71,131 @@ def marimo_cell_validator_fixture() -> ModuleType:
     )
 
 
-@pytest.fixture(name="marimo_imports_validator", scope="package")
-def marimo_imports_validator_fixture() -> ModuleType:
-    """Fixture to provide the Marimo imports validator module.
+# @pytest.fixture(name="marimo_imports_validator", scope="package")
+# def marimo_imports_validator_fixture() -> ModuleType:
+#     """Fixture to provide the Marimo imports validator module.
 
-    Returns:
-        ModuleType: The loaded Marimo imports validator module
-    """
-    return _load_plugin_from_file(
-        "marimo_imports_validator",
-        "pylint/plugins/marimo_imports_validator.py",
-    )
-
-
-@pytest.fixture(name="marimo_function_validator", scope="package")
-def marimo_function_validator_fixture() -> ModuleType:
-    """Fixture to provide the Marimo function validator module.
-
-    Returns:
-        ModuleType: The loaded Marimo function validator module
-    """
-    return _load_plugin_from_file(
-        "marimo_function_validator",
-        "pylint/plugins/marimo_function_validator.py",
-    )
+#     Returns:
+#         ModuleType: The loaded Marimo imports validator module
+#     """
+#     return _load_plugin_from_file(
+#         "marimo_imports_validator",
+#         "pylint/plugins/marimo_imports_validator.py",
+#     )
 
 
-@pytest.fixture(name="marimo_cell_params_validator", scope="package")
-def marimo_cell_params_validator_fixture() -> ModuleType:
-    """Fixture to provide the Marimo cell parameters validator module.
+# @pytest.fixture(name="marimo_function_validator", scope="package")
+# def marimo_function_validator_fixture() -> ModuleType:
+#     """Fixture to provide the Marimo function validator module.
 
-    Returns:
-        ModuleType: The loaded Marimo cell parameters validator module
-    """
-    return _load_plugin_from_file(
-        "marimo_cell_params_validator",
-        "pylint/plugins/marimo_cell_params_validator.py",
-    )
-
-
-@pytest.fixture(name="marimo_checker")
-def marimo_checker_fixture(marimo_cell_validator: ModuleType, linter: UnittestLinter) -> BaseChecker:
-    """Fixture to provide a Marimo checker instance.
-
-    Args:
-        marimo_cell_validator: The Marimo cell validator module
-        linter: The pylint linter instance
-
-    Returns:
-        BaseChecker: An instance of the Marimo checker
-    """
-    marimo_checker = marimo_cell_validator.MarimoChecker(linter)
-    marimo_checker.module = "prompt_library.marimo_test"
-    return marimo_checker
+#     Returns:
+#         ModuleType: The loaded Marimo function validator module
+#     """
+#     return _load_plugin_from_file(
+#         "marimo_function_validator",
+#         "pylint/plugins/marimo_function_validator.py",
+#     )
 
 
-@pytest.fixture(name="marimo_imports_checker")
-def marimo_imports_checker_fixture(marimo_imports_validator: ModuleType, linter: UnittestLinter) -> BaseChecker:
-    """Fixture to provide a Marimo imports checker instance.
+# @pytest.fixture(name="marimo_cell_params_validator", scope="package")
+# def marimo_cell_params_validator_fixture() -> ModuleType:
+#     """Fixture to provide the Marimo cell parameters validator module.
 
-    Args:
-        marimo_imports_validator: The Marimo imports validator module
-        linter: The pylint linter instance
-
-    Returns:
-        BaseChecker: An instance of the Marimo imports checker
-    """
-    marimo_imports_checker = marimo_imports_validator.MarimoImportsChecker(linter)
-    marimo_imports_checker.module = "prompt_library.marimo_test"
-    return marimo_imports_checker
+#     Returns:
+#         ModuleType: The loaded Marimo cell parameters validator module
+#     """
+#     return _load_plugin_from_file(
+#         "marimo_cell_params_validator",
+#         "pylint/plugins/marimo_cell_params_validator.py",
+#     )
 
 
-@pytest.fixture(name="marimo_function_checker")
-def marimo_function_checker_fixture(marimo_function_validator: ModuleType, linter: UnittestLinter) -> BaseChecker:
-    """Fixture to provide a Marimo function checker instance.
+# @pytest.fixture(name="marimo_checker")
+# def marimo_checker_fixture() -> ModuleType:
+#     """Fixture to provide the Marimo cell validator module.
 
-    Args:
-        marimo_function_validator: The Marimo function validator module
-        linter: The pylint linter instance
-
-    Returns:
-        BaseChecker: An instance of the Marimo function checker
-    """
-    marimo_function_checker = marimo_function_validator.MarimoFunctionChecker(linter)
-    marimo_function_checker.module = "prompt_library.marimo_test"
-    return marimo_function_checker
+#     Returns:
+#         ModuleType: The loaded Marimo cell validator module
+#     """
+#     return _load_plugin_from_file(
+#         "marimo_cell_validator",
+#         "pylint/plugins/marimo_cell_validator.py",
+#     )
 
 
-@pytest.fixture(name="marimo_cell_params_checker")
-def marimo_cell_params_checker_fixture(marimo_cell_params_validator: ModuleType, linter: UnittestLinter) -> BaseChecker:
-    """Fixture to provide a Marimo cell parameters checker instance.
+# @pytest.fixture(name="marimo_imports_checker")
+# def marimo_imports_checker_fixture() -> ModuleType:
+#     """Fixture to provide the Marimo imports validator module.
 
-    Args:
-        marimo_cell_params_validator: The Marimo cell parameters validator module
-        linter: The pylint linter instance
-
-    Returns:
-        BaseChecker: An instance of the Marimo cell parameters checker
-    """
-    marimo_cell_params_checker = marimo_cell_params_validator.MarimoCellParamsChecker(linter)
-    marimo_cell_params_checker.module = "prompt_library.marimo_test"
-    return marimo_cell_params_checker
+#     Returns:
+#         ModuleType: The loaded Marimo imports validator module
+#     """
+#     return _load_plugin_from_file(
+#         "marimo_imports_validator",
+#         "pylint/plugins/marimo_imports_validator.py",
+#     )
 
 
-@pytest.fixture(name="linter")
-def linter_fixture() -> UnittestLinter:
-    """Fixture to provide a pylint linter instance.
+# @pytest.fixture(name="marimo_function_checker")
+# def marimo_function_checker_fixture() -> ModuleType:
+#     """Fixture to provide the Marimo function validator module.
 
-    Returns:
-        UnittestLinter: A configured pylint linter instance
-    """
-    return UnittestLinter()
+#     Returns:
+#         ModuleType: The loaded Marimo function validator module
+#     """
+#     return _load_plugin_from_file(
+#         "marimo_function_validator",
+#         "pylint/plugins/marimo_function_validator.py",
+#     )
 
 
-@pytest.fixture(name="type_hint_checker")
-def type_hint_checker_fixture(hass_enforce_type_hints: ModuleType, linter: UnittestLinter) -> BaseChecker:
-    """Fixture to provide a type hint checker instance.
+# @pytest.fixture(name="marimo_cell_params_checker")
+# def marimo_cell_params_checker_fixture() -> ModuleType:
+#     """Fixture to provide the Marimo cell parameters validator module.
 
-    Args:
-        hass_enforce_type_hints: The type hint checker module
-        linter: The pylint linter instance
+#     Returns:
+#         ModuleType: The loaded Marimo cell parameters validator module
+#     """
+#     return _load_plugin_from_file(
+#         "marimo_cell_params_validator",
+#         "pylint/plugins/marimo_cell_params_validator.py",
+#     )
 
-    Returns:
-        BaseChecker: An instance of the type hint checker
-    """
-    type_hint_checker = hass_enforce_type_hints.HassTypeHintChecker(linter)
-    type_hint_checker.module = "homeassistant.components.pylint_test"
-    return type_hint_checker
+
+# @pytest.fixture(name="linter")
+# def linter_fixture() -> UnittestLinter:
+#     """Fixture to provide a pylint linter instance.
+
+#     Returns:
+#         UnittestLinter: A configured pylint linter instance
+#     """
+#     return UnittestLinter()
+
+
+# @pytest.fixture(name="hass_enforce_type_hints", scope="package")
+# def hass_enforce_type_hints_fixture() -> ModuleType:
+#     """Fixture to provide the Home Assistant type hints checker module.
+
+#     Returns:
+#         ModuleType: The loaded type hints checker module
+#     """
+#     return _load_plugin_from_file(
+#         "hass_enforce_type_hints",
+#         "pylint/plugins/hass_enforce_type_hints.py",
+#     )
+
+
+# @pytest.fixture(name="type_hint_checker")
+# def type_hint_checker_fixture(hass_enforce_type_hints: ModuleType, linter: UnittestLinter) -> BaseChecker:
+#     """Fixture to provide a type hint checker instance.
+
+#     Args:
+#         hass_enforce_type_hints: The type hint checker module
+#         linter: The pylint linter instance
+
+#     Returns:
+#         BaseChecker: An instance of the type hint checker
+#     """
+#     checker = hass_enforce_type_hints.HassTypeHintChecker(linter)
+#     checker.module = "homeassistant.components.pylint_test"
+#     return checker

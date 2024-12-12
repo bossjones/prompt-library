@@ -3,6 +3,7 @@
 This module provides a custom pylint checker for enforcing Marimo notebook coding standards.
 It ensures proper cell decoration, function naming, and prevents nested function definitions.
 """
+# pyright: reportAttributeAccessIssue=false
 
 from __future__ import annotations
 
@@ -11,8 +12,6 @@ from typing import Any, Optional, cast
 from astroid import nodes
 
 from pylint.checkers import BaseChecker
-
-# from pylint.interfaces import IAstroidChecker
 from pylint.lint import PyLinter
 
 
