@@ -393,14 +393,16 @@ This tool helps you compare different prompts using different LLM models. You ca
 The saved comparisons will be stored in the `compare` directory with timestamps in EDT.
 
 ### Error Handling
+
 - The tool will display clear error messages if something goes wrong
 - Check the error messages for:
-  - API key issues
-  - Network connection problems
-  - File permission errors
-  - Invalid prompt selections
+- API key issues
+- Network connection problems
+- File permission errors
+- Invalid prompt selections
 
 ### File Naming
+
 Saved files will use the format: `YYYY-MM-DD-HH-MM-SS-EDT_comparison.md`""").style(styles["container"])  # type: ignore
     return (None,)
 
