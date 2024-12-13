@@ -14,9 +14,6 @@ import logging
 import re
 import tokenize
 
-
-# import pdb
-# pdb.set_trace()
 from typing import Any, Dict, Final, Generator, List, Optional, Pattern, Set, Tuple, TypedDict, cast
 
 import astroid
@@ -134,6 +131,14 @@ class MarimoCellParamsChecker(BaseChecker):  # type: ignore[misc]
 
 
     def _get_pytest_fixture_node(self, node: nodes.FunctionDef) -> nodes.Call | None:
+        """Get the pytest.fixture decorator node if it exists.
+
+        Args:
+            node: The function definition node to check.
+
+        Returns:
+            nodes.Call | None: The pytest.fixture decorator node if found, None otherwise.
+        """
         for decorator in node.decorators.nodes:
             if (
                 isinstance(decorator, nodes.Call)
@@ -146,6 +151,15 @@ class MarimoCellParamsChecker(BaseChecker):  # type: ignore[misc]
     def _get_pytest_fixture_node_keyword(
         self, decorator: nodes.Call, search_arg: str
     ) -> nodes.Keyword | None:
+        """Get a keyword argument from a pytest.fixture decorator.
+
+        Args:
+            decorator: The pytest.fixture decorator node.
+            search_arg: The name of the keyword argument to find.
+
+        Returns:
+            nodes.Keyword | None: The keyword node if found, None otherwise.
+        """
         for keyword in decorator.keywords:
             if keyword.arg == search_arg:
                 return keyword
@@ -155,6 +169,15 @@ class MarimoCellParamsChecker(BaseChecker):  # type: ignore[misc]
     def _check_pytest_fixture(
         self, node: nodes.FunctionDef, decoratornames: set[str]
     ) -> None:
+        """Check pytest fixture decorators for proper usage.
+
+        Args:
+            node: The function definition node to check.
+            decoratornames: Set of decorator names to check.
+
+        Returns:
+            None
+        """
         if (
             "_pytest.fixtures.FixtureFunctionMarker" not in decoratornames
             or not (root_name := node.root().name).startswith("tests.")
@@ -171,8 +194,8 @@ class MarimoCellParamsChecker(BaseChecker):  # type: ignore[misc]
 
         parts = root_name.split(".")
         test_component: str | None = None
-        if root_name.startswith("tests.components.") and parts[2] != "conftest":
-            test_component = parts[2]
+        if root_name.startswith("tests.components.") and parts[2] != "conftest": # type: ignore
+            test_component = parts[2] # type: ignore
 
         if scope == "session":
             if test_component:
@@ -200,7 +223,7 @@ class MarimoCellParamsChecker(BaseChecker):  # type: ignore[misc]
                 )
             return
 
-        test_module = parts[3] if len(parts) > 3 else ""
+        test_module = parts[3] if len(parts) > 3 else "" # type: ignore
 
         if test_component and scope == "package" and test_module != "conftest":
             self.add_message(
@@ -236,7 +259,7 @@ class MarimoCellParamsChecker(BaseChecker):  # type: ignore[misc]
             logger.debug(f"AttributeError while checking marimo notebook: {e!s}")
             return False
 
-    def _has_app_cell_decorator(self, node: nodes.FunctionDef | nodes.AsyncFunctionDef) -> bool:
+    def _has_app_cell_decorator(self, node: nodes.FunctionDef) -> bool:
         """Check if a function has the @app.cell decorator.
 
         Args:
@@ -263,7 +286,7 @@ class MarimoCellParamsChecker(BaseChecker):  # type: ignore[misc]
             logger.debug(f"AttributeError while checking decorators: {e!s}")
             return False
 
-    # @pysnooper.snoop(output='/Users/malcolm/dev/bossjones/prompt-library/pylint-debug.log', thread_info=True, max_variable_length=None, depth=10)
+    @pysnooper.snoop(output='/Users/malcolm/dev/bossjones/prompt-library/pylint-debug.log', thread_info=True, max_variable_length=None, depth=10, color=False)
     def visit_functiondef(self, node: nodes.FunctionDef) -> None:
         """Visit and check a function definition node.
 
@@ -416,19 +439,17 @@ if __name__ == "__main__":
     file_content = file_path.read_text()
 
     # Extract nodes from the file content
-    module: Module = astroid.parse(file_content, "marimo_bad.py")
+    module: Module = astroid.parse(file_content, module_name="marimo_bad.py", path=f"{file_path}")
     rich.inspect(module, all=True)
     rich.print(module.repr_tree())
     rich.print(module.as_string())
 
-    linter = MockLinter(
-        {"first-message": True, "second-message": False, "third-message": True}
-    )
+    linter = PyLinter()
     walker = ASTWalker(linter)
-    checker = MarimoCellParamsChecker()
-    walker.add_checker(MarimoCellParamsChecker)
+    checker = MarimoCellParamsChecker(linter)
+    walker.add_checker(checker)
 
-    bpdb.set_trace()
     walker.walk(module)
-    # walker.walk(astroid.parse(file_content, "marimo_bad.py"))
-    walker.walk(astroid.parse(file_content))
+    bpdb.set_trace()
+    rich.print(checker.messages)
+    # produces [MessageDefinition:unused-cell-parameter (W9301)]
