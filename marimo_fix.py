@@ -1,6 +1,10 @@
 # pragma: no cover
 from __future__ import annotations
 
+import re
+
+from typing import Any, Dict, List, Optional, Tuple, Union
+
 import marimo
 
 
@@ -117,7 +121,7 @@ def __(llm_module, QUESTIONS_DIR):
     llm_gpt_4o_latest, llm_gpt_4o_mini = llm_module.build_openai_latest_and_fastest()
 
     models = {
-        "gpt-4o-latest": llm_gpt_4o_latest,  # Move to top for default selectioonly n
+        "gpt-4o-latest": llm_gpt_4o_latest,  # Move to top for default selection
         "o1-mini": llm_o1_mini,
         "o1-preview": llm_o1_preview,
         "gpt-4o-mini": llm_gpt_4o_mini,
@@ -207,7 +211,7 @@ def __(map_prompt_library, mo, models, styles):
 
 
 @app.cell
-def __(form, map_prompt_library, mo, styles, prompt_dropdown_1, prompt_dropdown_2):
+def __(map_prompt_library, mo, styles, prompt_dropdown_1, prompt_dropdown_2):
     mo.stop(not prompt_dropdown_1.value or not prompt_dropdown_2.value, "Please select both prompts.")
 
     # Get first prompt
@@ -301,82 +305,104 @@ def __(filled_values, selected_prompt_1, selected_prompt_2):
     return final_prompt_1, final_prompt_2
 
 
-# @app.cell
-# def __(COMPARE_DIR, final_prompt_1, final_prompt_2, form, llm_module, mo, models, question_input, styles):
-#     # Get the selected models
-#     model_1 = models[form.value["model_dropdown_1"]]  # type: ignore
-#     model_2 = models[form.value["model_dropdown_2"]]  # type: ignore
-#     model_name_1 = form.value["model_dropdown_1"]  # type: ignore
-#     model_name_2 = form.value["model_dropdown_2"]  # type: ignore
+@app.cell
+def __(
+    COMPARE_DIR,
+    final_prompt_1,
+    final_prompt_2,
+    form,
+    llm_module,
+    mo,
+    models,
+    question_input,
+    styles,
+    prompt_library_module,
+):
+    # Get the selected models
+    model_1 = models[form.value["model_dropdown_1"]]  # type: ignore
+    model_2 = models[form.value["model_dropdown_2"]]  # type: ignore
+    model_name_1 = form.value["model_dropdown_1"]  # type: ignore
+    model_name_2 = form.value["model_dropdown_2"]  # type: ignore
 
-#     # Run both prompts through their respective models
-#     with mo.status.spinner(title="Running prompts through models..."):
-#         prompt_response_1 = llm_module.prompt(model_1, final_prompt_1)
-#         prompt_response_2 = llm_module.prompt(model_2, final_prompt_2)
+    # Run both prompts through their respective models
+    with mo.status.spinner(title="Running prompts through models..."):
+        prompt_response_1 = llm_module.prompt(model_1, final_prompt_1)
+        prompt_response_2 = llm_module.prompt(model_2, final_prompt_2)
 
-#     # Display responses side by side
-#     mo.hstack([
-#         mo.vstack([
-#             mo.md(f"# First Prompt Output ({model_name_1})\n\n{prompt_response_1}").style(styles["prompt_display"]),  # type: ignore
-#         ]),
-#         mo.vstack([
-#             mo.md(f"# Second Prompt Output ({model_name_2})\n\n{prompt_response_2}").style(styles["prompt_display"]),  # type: ignore
-#         ]),
-#     ]).style(styles["container"])  # type: ignore
+    # Display responses side by side
+    mo.hstack([
+        mo.vstack([
+            mo.md(f"# First Prompt Output ({model_name_1})\n\n{prompt_response_1}").style(styles["prompt_display"]),  # type: ignore
+        ]),
+        mo.vstack([
+            mo.md(f"# Second Prompt Output ({model_name_2})\n\n{prompt_response_2}").style(styles["prompt_display"]),  # type: ignore
+        ]),
+    ]).style(styles["container"])  # type: ignore
 
-#     # Create save button and preview
-#     question_input_form_value = question_input.value
-#     final_prompt_1_form_value = final_prompt_1
-#     prompt_response_1_form_value = prompt_response_1
-#     final_prompt_2_form_value = final_prompt_2
-#     prompt_response_2_form_value = prompt_response_2
-#     model_name_1_form_value = model_name_1
-#     model_name_2_form_value = model_name_2
-#     styles = styles
-#     COMPARE_DIR = COMPARE_DIR
+    # Create save button and preview
+    save_data = {
+        "question_input": question_input.value,
+        "final_prompt_1": final_prompt_1,
+        "prompt_response_1": prompt_response_1,
+        "final_prompt_2": final_prompt_2,
+        "prompt_response_2": prompt_response_2,
+        "model_name_1": model_name_1,
+        "model_name_2": model_name_2,
+        "styles": styles,
+        "COMPARE_DIR": COMPARE_DIR,
+    }
 
-#     save_data = {
-#         "question_input": question_input_form_value,
-#         "final_prompt_1": final_prompt_1_form_value,
-#         "prompt_response_1": prompt_response_1_form_value,
-#         "final_prompt_2": final_prompt_2_form_value,
-#         "prompt_response_2": prompt_response_2_form_value,
-#         "model_name_1": model_name_1_form_value,
-#         "model_name_2": model_name_2_form_value,
-#         "styles": styles,
-#         "COMPARE_DIR": COMPARE_DIR,
-#     }
+    preview = mo.md("")
+    save_button = mo.ui.button(
+        label="Save Comparison",
+        tooltip="Save the comparison to a markdown file with timestamp",
+        on_click=lambda: prompt_library_module.save_comparison(mo, save_data, preview, save_button),
+    )
 
-#     # preview = mo.md("")
-#     # save_button = mo.ui.button(on_click=lambda: prompt_library_module.save_comparison(mo, save_data, preview, save_button), label="Save Comparison", tooltip="Save the comparison to a markdown file with timestamp")
-#     # return (save_data, preview, save_button)
+    mo.vstack([mo.md("### Save Comparison"), save_button, preview]).style(styles["container"])  # type: ignore
 
-#     return (save_data,)
+    return (save_data, preview, save_button)
 
-# @app.cell
-# def __(mo, styles):
-#     mo.md("""# Prompt Analysis Tool
 
-# This tool helps you compare different prompts using different LLM models. You can:
-# 1. Select a predefined question or write your own
-# 2. Choose two different prompts and LLM models to compare
-# 3. Fill in any variables required by the prompts
-# 4. Generate and compare responses
-# 5. Save the comparison with timestamps for future reference
+# except Exception as e:
+#     error_message = f"""
+#     ❌ **Error**: An error occurred while processing the prompts:
+#     ```
+#     {str(e)}
+#     ```
+#     Please check:
+#     - API key configuration
+#     - Network connection
+#     - Model availability
+#     """
+#     mo.stop(True, mo.md(error_message).style(styles["error"]))  # type: ignore
+#     return None
 
-# The saved comparisons will be stored in the `compare` directory with timestamps in EDT.
 
-# ### Error Handling
-# - The tool will display clear error messages if something goes wrong
-# - Check the error messages for:
-#   - API key issues
-#   - Network connection problems
-#   - File permission errors
-#   - Invalid prompt selections
+@app.cell
+def __(mo, styles):
+    mo.md("""# Prompt Analysis Tool
 
-# ### File Naming
-# Saved files will use the format: `YYYY-MM-DD-HH-MM-SS-EDT_comparison.md`""").style(styles["container"]) # type: ignore
-#     return (None,)
+This tool helps you compare different prompts using different LLM models. You can:
+1. Select a predefined question or write your own
+2. Choose two different prompts and LLM models to compare
+3. Fill in any variables required by the prompts
+4. Generate and compare responses
+5. Save the comparison with timestamps for future reference
+
+The saved comparisons will be stored in the `compare` directory with timestamps in EDT.
+
+### Error Handling
+- The tool will display clear error messages if something goes wrong
+- Check the error messages for:
+  - API key issues
+  - Network connection problems
+  - File permission errors
+  - Invalid prompt selections
+
+### File Naming
+Saved files will use the format: `YYYY-MM-DD-HH-MM-SS-EDT_comparison.md`""").style(styles["container"])  # type: ignore
+    return (None,)
 
 
 if __name__ == "__main__":
