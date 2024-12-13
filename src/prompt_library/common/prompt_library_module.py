@@ -7,6 +7,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional, Union
 
+import pytz
+
 from dotenv import load_dotenv
 from loguru import logger
 
@@ -14,6 +16,65 @@ from prompt_library.common.typings import ModelRanking, MultiLLMPromptExecution
 
 
 load_dotenv()
+
+
+def save_comparison(mo, save_data, preview, save_button):
+    # Get current time in EDT
+    edt = pytz.timezone("America/New_York")
+    now = datetime.now(edt)
+    timestamp = now.strftime("%Y-%m-%d-%H-%M-%S-%Z")
+
+    # Generate markdown content
+    content = f"""# Prompt Comparison - {now.strftime("%Y-%m-%d %H:%M:%S %Z")}
+
+## Original Question
+```
+{save_data["question_input"]}
+```
+
+## First Prompt (Model: {save_data["model_name_1"]})
+```xml
+{save_data["final_prompt_1"]}
+```
+
+### Generated Response
+```
+{save_data["prompt_response_1"]}
+```
+
+## Second Prompt (Model: {save_data["model_name_2"]})
+```xml
+{save_data["final_prompt_2"]}
+```
+
+### Generated Response
+```
+{save_data["prompt_response_2"]}
+```
+"""
+
+    # Save file
+    filename = f"{timestamp}_comparison.md"
+    filepath = Path(save_data["COMPARE_DIR"]) / filename
+    filepath.write_text(content)
+
+    save_preview(mo, preview, save_data["styles"], filepath, content, save_button)
+
+    return save_button
+
+
+def save_preview(mo, preview, styles, filepath, content, save_button):
+    # Update preview
+    preview.value = f"""### Preview of file to be saved:
+```markdown
+{content}
+```"""
+    # Show success message
+    preview.value += f"\n\n✅ Saved to: {filepath}"
+    preview.style(styles["success"])  # type: ignore
+
+    mo.md("### Save Comparison")
+    mo.vstack([save_button, preview]).style(styles["container"])  # type: ignore
 
 
 # Function to read markdown file content

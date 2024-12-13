@@ -92,7 +92,11 @@ def __():
     COMPARE_DIR = "one-off-tasks/lore-writing/helldivers2/johnhelldiver/compare"
     PROMPT_DIRS = ["./src/prompt_library/data/prompt_lib", "./one-off-tasks"]
 
-    return COMPARE_DIR, QUESTIONS_DIR, PROMPT_DIRS
+    return (
+        COMPARE_DIR,
+        QUESTIONS_DIR,
+        PROMPT_DIRS,
+    )
 
 
 @app.cell
@@ -103,11 +107,11 @@ def __(mo, prompt_library_module, QUESTIONS_DIR, COMPARE_DIR, PROMPT_DIRS):
             directories=PROMPT_DIRS, file_type="xml"
         )
 
-    return COMPARE_DIR, QUESTIONS_DIR, map_prompt_library
+    return (COMPARE_DIR, QUESTIONS_DIR, map_prompt_library)
 
 
 @app.cell
-def __(llm_module):
+def __(llm_module, QUESTIONS_DIR):
     # Initialize LLM models
     llm_o1_mini, llm_o1_preview = llm_module.build_o1_series()
     llm_gpt_4o_latest, llm_gpt_4o_mini = llm_module.build_openai_latest_and_fastest()
@@ -118,7 +122,7 @@ def __(llm_module):
         "o1-preview": llm_o1_preview,
         "gpt-4o-mini": llm_gpt_4o_mini,
     }
-    return (models,)
+    return (models, QUESTIONS_DIR)
 
 
 @app.cell
@@ -202,36 +206,6 @@ def __(map_prompt_library, mo, models, styles):
     return form, model_dropdown_1, model_dropdown_2, prompt_dropdown_1, prompt_dropdown_2
 
 
-# @app.cell
-# def __(form, map_prompt_library, mo, styles):
-#     mo.stop(not form.value or not len(form.value), "")
-
-#     # Get first prompt
-#     selected_prompt_name_1 = form.value["prompt_dropdown_1"]  # type: ignore
-#     selected_prompt_1 = map_prompt_library[selected_prompt_name_1]  # type: ignore
-
-#     # Get second prompt
-#     selected_prompt_name_2 = form.value["prompt_dropdown_2"]  # type: ignore
-#     selected_prompt_2 = map_prompt_library[selected_prompt_name_2]  # type: ignore
-
-#     # Display prompts side by side
-#     mo.hstack([
-#         mo.vstack([
-#             mo.md("# First Selected Prompt"),
-#             mo.accordion({
-#                 "### Click to show": mo.md(f"```xml\n{selected_prompt_1}\n```").style(styles["prompt_display"])  # type: ignore
-#             }),
-#         ]),
-#         mo.vstack([
-#             mo.md("# Second Selected Prompt"),
-#             mo.accordion({
-#                 "### Click to show": mo.md(f"```xml\n{selected_prompt_2}\n```").style(styles["prompt_display"])  # type: ignore
-#             }),
-#         ]),
-#     ]).style(styles["container"])  # type: ignore
-#     return selected_prompt_1, selected_prompt_2, selected_prompt_name_1, selected_prompt_name_2
-
-
 @app.cell
 def __(form, map_prompt_library, mo, styles, prompt_dropdown_1, prompt_dropdown_2):
     mo.stop(not prompt_dropdown_1.value or not prompt_dropdown_2.value, "Please select both prompts.")
@@ -262,178 +236,147 @@ def __(form, map_prompt_library, mo, styles, prompt_dropdown_1, prompt_dropdown_
     return selected_prompt_1, selected_prompt_2, selected_prompt_name_1, selected_prompt_name_2
 
 
+@app.cell
+def __(mo, re, selected_prompt_1, selected_prompt_2, styles):
+    mo.stop(not selected_prompt_1 or not selected_prompt_2, "")
+
+    # Extract placeholders from both prompts
+    placeholders_1 = re.findall(r"\{\{(.*?)\}\}", selected_prompt_1)
+    placeholders_1 = list(set(placeholders_1))  # Remove duplicates
+
+    placeholders_2 = re.findall(r"\{\{(.*?)\}\}", selected_prompt_2)
+    placeholders_2 = list(set(placeholders_2))  # Remove duplicates
+
+    # Combine unique placeholders
+    all_placeholders = list(set(placeholders_1 + placeholders_2))
+
+    # Create text areas for all unique placeholders
+    placeholder_inputs = [
+        mo.ui.text_area(label=ph, placeholder=f"Enter {ph}", full_width=True) for ph in all_placeholders
+    ]
+
+    # Create an array of placeholder inputs
+    placeholder_array = mo.ui.array(
+        placeholder_inputs,
+        label="Fill in the Placeholders",
+    )
+
+    # Create a 'Generate' button
+    proceed_button = mo.ui.run_button(label="Generate Both Prompts")
+
+    # Display the placeholders and the 'Generate' button in a vertical stack
+    mo.vstack([mo.md("# Prompt Variables"), placeholder_array, proceed_button]).style(styles["container"])  # type: ignore
+    return all_placeholders, placeholder_array, proceed_button
+
+
+@app.cell
+def __(mo, placeholder_array, proceed_button, all_placeholders):
+    mo.stop(not placeholder_array.value or not len(placeholder_array.value), "")
+
+    # Check if any values are missing
+    if any(not value.strip() for value in placeholder_array.value):
+        mo.stop(True, mo.md("**Please fill in all placeholders.**"))
+
+    # Ensure the 'Generate' button has been pressed
+    mo.stop(
+        not proceed_button.value,
+        mo.md("**Please press the 'Generate Both Prompts' button to continue.**"),
+    )
+
+    # Map the placeholder names to the values
+    filled_values = dict(zip(all_placeholders, placeholder_array.value, strict=False))
+    return (filled_values,)
+
+
+@app.cell
+def __(filled_values, selected_prompt_1, selected_prompt_2):
+    # Replace placeholders in both prompts
+    final_prompt_1 = selected_prompt_1
+    final_prompt_2 = selected_prompt_2
+
+    for key, value in filled_values.items():
+        final_prompt_1 = final_prompt_1.replace(f"{{{{{key}}}}}", value)
+        final_prompt_2 = final_prompt_2.replace(f"{{{{{key}}}}}", value)
+
+    return final_prompt_1, final_prompt_2
+
+
 # @app.cell
-# def __(mo, re, selected_prompt_1, selected_prompt_2, styles):
-#     mo.stop(not selected_prompt_1 or not selected_prompt_2, "")
+# def __(COMPARE_DIR, final_prompt_1, final_prompt_2, form, llm_module, mo, models, question_input, styles):
+#     # Get the selected models
+#     model_1 = models[form.value["model_dropdown_1"]]  # type: ignore
+#     model_2 = models[form.value["model_dropdown_2"]]  # type: ignore
+#     model_name_1 = form.value["model_dropdown_1"]  # type: ignore
+#     model_name_2 = form.value["model_dropdown_2"]  # type: ignore
 
-#     # Extract placeholders from both prompts
-#     placeholders_1 = re.findall(r"\{\{(.*?)\}\}", selected_prompt_1)
-#     placeholders_1 = list(set(placeholders_1))  # Remove duplicates
+#     # Run both prompts through their respective models
+#     with mo.status.spinner(title="Running prompts through models..."):
+#         prompt_response_1 = llm_module.prompt(model_1, final_prompt_1)
+#         prompt_response_2 = llm_module.prompt(model_2, final_prompt_2)
 
-#     placeholders_2 = re.findall(r"\{\{(.*?)\}\}", selected_prompt_2)
-#     placeholders_2 = list(set(placeholders_2))  # Remove duplicates
+#     # Display responses side by side
+#     mo.hstack([
+#         mo.vstack([
+#             mo.md(f"# First Prompt Output ({model_name_1})\n\n{prompt_response_1}").style(styles["prompt_display"]),  # type: ignore
+#         ]),
+#         mo.vstack([
+#             mo.md(f"# Second Prompt Output ({model_name_2})\n\n{prompt_response_2}").style(styles["prompt_display"]),  # type: ignore
+#         ]),
+#     ]).style(styles["container"])  # type: ignore
 
-#     # Combine unique placeholders
-#     all_placeholders = list(set(placeholders_1 + placeholders_2))
+#     # Create save button and preview
+#     question_input_form_value = question_input.value
+#     final_prompt_1_form_value = final_prompt_1
+#     prompt_response_1_form_value = prompt_response_1
+#     final_prompt_2_form_value = final_prompt_2
+#     prompt_response_2_form_value = prompt_response_2
+#     model_name_1_form_value = model_name_1
+#     model_name_2_form_value = model_name_2
+#     styles = styles
+#     COMPARE_DIR = COMPARE_DIR
 
-#     # Create text areas for all unique placeholders
-#     placeholder_inputs = [
-#         mo.ui.text_area(label=ph, placeholder=f"Enter {ph}", full_width=True) for ph in all_placeholders
-#     ]
+#     save_data = {
+#         "question_input": question_input_form_value,
+#         "final_prompt_1": final_prompt_1_form_value,
+#         "prompt_response_1": prompt_response_1_form_value,
+#         "final_prompt_2": final_prompt_2_form_value,
+#         "prompt_response_2": prompt_response_2_form_value,
+#         "model_name_1": model_name_1_form_value,
+#         "model_name_2": model_name_2_form_value,
+#         "styles": styles,
+#         "COMPARE_DIR": COMPARE_DIR,
+#     }
 
-#     # Create an array of placeholder inputs
-#     placeholder_array = mo.ui.array(
-#         placeholder_inputs,
-#         label="Fill in the Placeholders",
-#     )
+#     # preview = mo.md("")
+#     # save_button = mo.ui.button(on_click=lambda: prompt_library_module.save_comparison(mo, save_data, preview, save_button), label="Save Comparison", tooltip="Save the comparison to a markdown file with timestamp")
+#     # return (save_data, preview, save_button)
 
-#     # Create a 'Generate' button
-#     proceed_button = mo.ui.run_button(label="Generate Both Prompts")
-
-#     # Display the placeholders and the 'Generate' button in a vertical stack
-#     mo.vstack([mo.md("# Prompt Variables"), placeholder_array, proceed_button]).style(styles["container"])
-#     return all_placeholders, placeholder_array, proceed_button
-
+#     return (save_data,)
 
 # @app.cell
-# def __(mo, placeholder_array, proceed_button, all_placeholders):
-#     mo.stop(not placeholder_array.value or not len(placeholder_array.value), "")
+# def __(mo, styles):
+#     mo.md("""# Prompt Analysis Tool
 
-#     # Check if any values are missing
-#     if any(not value.strip() for value in placeholder_array.value):
-#         mo.stop(True, mo.md("**Please fill in all placeholders.**"))
+# This tool helps you compare different prompts using different LLM models. You can:
+# 1. Select a predefined question or write your own
+# 2. Choose two different prompts and LLM models to compare
+# 3. Fill in any variables required by the prompts
+# 4. Generate and compare responses
+# 5. Save the comparison with timestamps for future reference
 
-#     # Ensure the 'Generate' button has been pressed
-#     mo.stop(
-#         not proceed_button.value,
-#         mo.md("**Please press the 'Generate Both Prompts' button to continue.**"),
-#     )
+# The saved comparisons will be stored in the `compare` directory with timestamps in EDT.
 
-#     # Map the placeholder names to the values
-#     filled_values = dict(zip(all_placeholders, placeholder_array.value, strict=False))
-#     return (filled_values,)
+# ### Error Handling
+# - The tool will display clear error messages if something goes wrong
+# - Check the error messages for:
+#   - API key issues
+#   - Network connection problems
+#   - File permission errors
+#   - Invalid prompt selections
 
-
-# @app.cell
-# def __(filled_values, selected_prompt_1, selected_prompt_2):
-#     # Replace placeholders in both prompts
-#     final_prompt_1 = selected_prompt_1
-#     final_prompt_2 = selected_prompt_2
-
-#     for key, value in filled_values.items():
-#         final_prompt_1 = final_prompt_1.replace(f"{{{{{key}}}}}", value)
-#         final_prompt_2 = final_prompt_2.replace(f"{{{{{key}}}}}", value)
-
-#     return final_prompt_1, final_prompt_2
-
-
-# # @app.cell
-# # def __(COMPARE_DIR, Path, datetime, final_prompt_1, final_prompt_2, form, llm_module, mo, models, pytz, question_input, styles):
-# #     # Get the selected models
-# #     model_1 = models[form.value["model_dropdown_1"]]
-# #     model_2 = models[form.value["model_dropdown_2"]]
-# #     model_name_1 = form.value["model_dropdown_1"]
-# #     model_name_2 = form.value["model_dropdown_2"]
-
-# #     # Run both prompts through their respective models
-# #     with mo.status.spinner(title="Running prompts through models..."):
-# #         prompt_response_1 = llm_module.prompt(model_1, final_prompt_1)
-# #         prompt_response_2 = llm_module.prompt(model_2, final_prompt_2)
-
-# #     # Display responses side by side
-# #     mo.hstack([
-# #         mo.vstack([
-# #             mo.md(f"# First Prompt Output ({model_name_1})\n\n{prompt_response_1}").style(styles["prompt_display"]),
-# #         ]),
-# #         mo.vstack([
-# #             mo.md(f"# Second Prompt Output ({model_name_2})\n\n{prompt_response_2}").style(styles["prompt_display"]),
-# #         ]),
-# #     ]).style(styles["container"])
-
-# #     # Create save button and preview
-# #     save_button = mo.ui.run_button("Save Comparison", tooltip="Save the comparison to a markdown file with timestamp")
-# #     preview = mo.md("")
-
-# #     @save_button.click
-# #     def save_comparison():
-# #         # Get current time in EDT
-# #         edt = pytz.timezone("America/New_York")
-# #         now = datetime.now(edt)
-# #         timestamp = now.strftime("%Y-%m-%d-%H-%M-%S-%Z")
-
-# #         # Generate markdown content
-# #         content = f"""# Prompt Comparison - {now.strftime("%Y-%m-%d %H:%M:%S %Z")}
-
-# # ## Original Question
-# # ```
-# # {question_input.value}
-# # ```
-
-# # ## First Prompt (Model: {model_name_1})
-# # ```xml
-# # {final_prompt_1}
-# # ```
-
-# # ### Generated Response
-# # ```
-# # {prompt_response_1}
-# # ```
-
-# # ## Second Prompt (Model: {model_name_2})
-# # ```xml
-# # {final_prompt_2}
-# # ```
-
-# # ### Generated Response
-# # ```
-# # {prompt_response_2}
-# # ```
-# # """
-
-# #         # Update preview
-# #         preview.value = f"""### Preview of file to be saved:
-# # ```markdown
-# # {content}
-# # ```"""
-
-# #         # Save file
-# #         filename = f"{timestamp}_comparison.md"
-# #         filepath = Path(COMPARE_DIR) / filename
-# #         filepath.write_text(content)
-
-# #         # Show success message
-# #         preview.value += f"\n\n✅ Saved to: {filepath}"
-# #         preview.style(styles["success"])
-
-# #     mo.md("### Save Comparison")
-# #     mo.vstack([save_button, preview]).style(styles["container"])
-# #     return save_button
-
-
-# # @app.cell
-# # def __(mo, styles):
-# #     mo.md("""# Prompt Analysis Tool
-
-# # This tool helps you compare different prompts using different LLM models. You can:
-# # 1. Select a predefined question or write your own
-# # 2. Choose two different prompts and LLM models to compare
-# # 3. Fill in any variables required by the prompts
-# # 4. Generate and compare responses
-# # 5. Save the comparison with timestamps for future reference
-
-# # The saved comparisons will be stored in the `compare` directory with timestamps in EDT.
-
-# # ### Error Handling
-# # - The tool will display clear error messages if something goes wrong
-# # - Check the error messages for:
-# #   - API key issues
-# #   - Network connection problems
-# #   - File permission errors
-# #   - Invalid prompt selections
-
-# # ### File Naming
-# # Saved files will use the format: `YYYY-MM-DD-HH-MM-SS-EDT_comparison.md`""").style(styles["container"])
-# #     return (None,)
+# ### File Naming
+# Saved files will use the format: `YYYY-MM-DD-HH-MM-SS-EDT_comparison.md`""").style(styles["container"]) # type: ignore
+#     return (None,)
 
 
 if __name__ == "__main__":
