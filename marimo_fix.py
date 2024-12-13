@@ -202,16 +202,46 @@ def __(map_prompt_library, mo, models, styles):
     return form, model_dropdown_1, model_dropdown_2, prompt_dropdown_1, prompt_dropdown_2
 
 
+# @app.cell
+# def __(form, map_prompt_library, mo, styles):
+#     mo.stop(not form.value or not len(form.value), "")
+
+#     # Get first prompt
+#     selected_prompt_name_1 = form.value["prompt_dropdown_1"]  # type: ignore
+#     selected_prompt_1 = map_prompt_library[selected_prompt_name_1]  # type: ignore
+
+#     # Get second prompt
+#     selected_prompt_name_2 = form.value["prompt_dropdown_2"]  # type: ignore
+#     selected_prompt_2 = map_prompt_library[selected_prompt_name_2]  # type: ignore
+
+#     # Display prompts side by side
+#     mo.hstack([
+#         mo.vstack([
+#             mo.md("# First Selected Prompt"),
+#             mo.accordion({
+#                 "### Click to show": mo.md(f"```xml\n{selected_prompt_1}\n```").style(styles["prompt_display"])  # type: ignore
+#             }),
+#         ]),
+#         mo.vstack([
+#             mo.md("# Second Selected Prompt"),
+#             mo.accordion({
+#                 "### Click to show": mo.md(f"```xml\n{selected_prompt_2}\n```").style(styles["prompt_display"])  # type: ignore
+#             }),
+#         ]),
+#     ]).style(styles["container"])  # type: ignore
+#     return selected_prompt_1, selected_prompt_2, selected_prompt_name_1, selected_prompt_name_2
+
+
 @app.cell
-def __(form, map_prompt_library, mo, styles):
-    mo.stop(not form.value or not len(form.value), "")
+def __(form, map_prompt_library, mo, styles, prompt_dropdown_1, prompt_dropdown_2):
+    mo.stop(not prompt_dropdown_1.value or not prompt_dropdown_2.value, "Please select both prompts.")
 
     # Get first prompt
-    selected_prompt_name_1 = form.value["prompt_dropdown_1"]  # type: ignore
+    selected_prompt_name_1 = prompt_dropdown_1.value  # type: ignore
     selected_prompt_1 = map_prompt_library[selected_prompt_name_1]  # type: ignore
 
     # Get second prompt
-    selected_prompt_name_2 = form.value["prompt_dropdown_2"]  # type: ignore
+    selected_prompt_name_2 = prompt_dropdown_2.value  # type: ignore
     selected_prompt_2 = map_prompt_library[selected_prompt_name_2]  # type: ignore
 
     # Display prompts side by side
