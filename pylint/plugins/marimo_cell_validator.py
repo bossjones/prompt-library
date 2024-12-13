@@ -15,7 +15,7 @@ from pylint.checkers import BaseChecker
 from pylint.lint import PyLinter
 
 
-class MarimoChecker(BaseChecker):
+class MarimoCellValidatorChecker(BaseChecker):
     """Checker for enforcing Marimo notebook coding standards.
 
     This checker ensures that:
@@ -141,4 +141,4 @@ def register(linter: PyLinter) -> None:
     Args:
         linter: The pylint linter instance to register the checker with.
     """
-    linter.register_checker(MarimoChecker(linter))
+    linter.register_checker(MarimoCellValidatorChecker(linter))

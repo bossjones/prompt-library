@@ -1,28 +1,41 @@
 """Tests for the Marimo cell parameters validator."""
+# pyright: reportAttributeAccessIssue=false
 
 from __future__ import annotations
 
 import logging
+import sys
 
+from pathlib import Path
 from types import ModuleType
 
 import astroid
+import bpdb
 import pysnooper
+import rich
 
 from _pytest.logging import LogCaptureFixture
-from astroid.builder import parse as astroid_parse
+from astroid import nodes
 from astroid.nodes import Module
 from loguru import logger
 
 import pytest
 
-from pylint.checkers import BaseChecker
+from prompt_library.bot_logger import get_logger, global_log_config
+from pylint.checkers.base_checker import BaseChecker
+from pylint.checkers.utils import only_required_for_messages
 from pylint.interfaces import UNDEFINED
 from pylint.testutils import MessageTest
 from pylint.testutils.unittest_linter import UnittestLinter
-from pylint.utils.ast_walker import ASTWalker
+from pylint.utils import ASTWalker
 
 from . import assert_adds_messages, assert_no_messages
+
+
+# from pylint.checkers import BaseChecker
+# from pylint.interfaces import UNDEFINED
+# from pylint.testutils import MessageTest
+# from pylint.utils.ast_walker import ASTWalker
 
 
 def test_good_cell_params(linter: UnittestLinter, marimo_cell_params_checker: ModuleType) -> None:
@@ -43,7 +56,7 @@ def test_good_cell_params(linter: UnittestLinter, marimo_cell_params_checker: Mo
         result = os.path.join(sys.path[0])
         return (result,)
     """
-    root_node = astroid_parse(code, "marimo_test.py")
+    root_node = astroid.parse(code, "marimo_test.py")
     walker = ASTWalker(linter)
     walker.add_checker(marimo_cell_params_checker)
 
@@ -123,7 +136,7 @@ def test_good_cell_params(linter: UnittestLinter, marimo_cell_params_checker: Mo
 )
 def test_bad_cell_params(
     linter: UnittestLinter,
-    marimo_cell_params_checker: ModuleType,
+    marimo_cell_params_checker: BaseChecker,
     code: str,
     param_name: str,
     line_num: int,
@@ -142,32 +155,31 @@ def test_bad_cell_params(
     """
     caplog.set_level(logging.DEBUG)
     logger.info(f"Running test_bad_cell_params with code: {code}")
-    logger.info(f"Path: {path}")
-    logger.info(f"Line num: {line_num}")
-    logger.info(f"Param name: {param_name}")
+    logger.info(f"Running test_bad_cell_params with Path: {path}")
+    logger.info(f"Running test_bad_cell_params with Line num: {line_num}")
+    logger.info(f"Running test_bad_cell_params with Param name: {param_name}")
 
-    # import bpdb
-    # bpdb.set_trace()
-
-    root_node: Module = astroid_parse(code, path)
+    root_node: Module = astroid.parse(code, module_name=path, path=path)  # type: ignore
     walker = ASTWalker(linter)
-    walker.add_checker(marimo_cell_params_checker)
+    checker: BaseChecker = marimo_cell_params_checker
+    walker.add_checker(checker)
 
     with assert_adds_messages(
         linter,
         MessageTest(
             msg_id="unused-cell-parameter",
             line=line_num,
-            node=next(
-                node
-                for node in root_node.body
-                if isinstance(node, astroid.nodes.FunctionDef)
-                and node.name == "__"
-                and any(
-                    isinstance(dec, (astroid.nodes.Name, astroid.nodes.Attribute)) and dec.as_string() == "app.cell"
-                    for dec in node.decorators.nodes
-                )
-            ),
+            # node=next(
+            #     node
+            #     for node in root_node.body
+            #     if isinstance(node, astroid.nodes.FunctionDef)
+            #     and node.name == "__"
+            #     and any(
+            #         isinstance(dec, (astroid.nodes.Name, astroid.nodes.Attribute)) and dec.as_string() == "app.cell"
+            #         for dec in node.decorators.nodes
+            #     )
+            # ),
+            node=root_node.body[1],  # type: ignore
             args=(param_name,),
             confidence=UNDEFINED,
             col_offset=0,
@@ -175,6 +187,7 @@ def test_bad_cell_params(
             end_col_offset=13,
         ),
     ):
+        bpdb.set_trace()
         walker.walk(root_node)
 
 
@@ -227,7 +240,7 @@ def test_non_cell_functions(
         code: The test code to analyze
         path: The file path to use for the test
     """
-    root_node = astroid_parse(code, path)
+    root_node = astroid.parse(code, path)
     walker = ASTWalker(linter)
     walker.add_checker(marimo_cell_params_checker)
 
@@ -280,7 +293,7 @@ def test_non_marimo_files_and_special_cases(
         code: The test code to analyze
         path: The file path to use for the test
     """
-    root_node = astroid_parse(code, path)
+    root_node = astroid.parse(code, path)
     walker = ASTWalker(linter)
     walker.add_checker(marimo_cell_params_checker)
 

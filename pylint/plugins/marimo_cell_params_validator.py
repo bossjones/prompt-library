@@ -450,6 +450,51 @@ if __name__ == "__main__":
     walker.add_checker(checker)
 
     walker.walk(module)
+    node=next(
+    node
+    for node in module.body
+    if isinstance(node, astroid.nodes.FunctionDef)
+    and node.name == "__"
+    and any(
+        isinstance(dec, (astroid.nodes.Name, astroid.nodes.Attribute)) and dec.as_string() == "app.cell"
+        for dec in node.decorators.nodes
+        )
+    )
     bpdb.set_trace()
     rich.print(checker.messages)
     # produces [MessageDefinition:unused-cell-parameter (W9301)]
+
+
+# nnotations__ = {'decorators': 'node_classes.Decorators | None', 'doc_node': 'Const | None', 'args': 'Arguments'}                                                           │
+# │                             args = <Arguments l.3 at 0x109b88e00>                                                                                                                              │
+# │           _assign_nodes_in_scope = []                                                                                                                                                          │
+# │                  _astroid_fields = ('decorators', 'args', 'returns', 'type_params', 'doc_node', 'body')                                                                                        │
+# │              blockstart_tolineno = 3                                                                                                                                                           │
+# │                             body = [<Import l.4 at 0x109b89dc0>, <Return l.5 at 0x109b89fd0>]                                                                                                  │
+# │                       col_offset = 0                                                                                                                                                           │
+# │                       decorators = <Decorators l.2 at 0x109b89100>                                                                                                                             │
+# │                         __dict__ = {                                                                                                                                                           │
+# │                                        'name': '__',                                                                                                                                           │
+# │                                        'locals': {'os': [<Import l.4 at 0x109b89dc0>]},                                                                                                        │
+# │                                        'body': [<Import l.4 at 0x109b89dc0>, <Return l.5 at 0x109b89fd0>],                                                                                     │
+# │                                        'type_params': [],                                                                                                                                      │
+# │                                        'instance_attrs': {},                                                                                                                                   │
+# │                                        'lineno': 2,                                                                                                                                            │
+# │                                        'col_offset': 0,                                                                                                                                        │
+# │                                        'parent': <Module.marimo_test.py l.0 at 0x109ad20f0>,                                                                                                   │
+# │                                        'end_lineno': 5,                                                                                                                                        │
+# │                                        'end_col_offset': 16,                                                                                                                                   │
+# │                                        'position': Position(lineno=3, col_offset=0, end_lineno=3, end_col_offset=6),                                                                           │
+# │                                        'args': <Arguments l.3 at 0x109b88e00>,                                                                                                                 │
+# │                                        'decorators': <Decorators l.2 at 0x109b89100>,                                                                                                          │
+# │                                        'returns': None,                                                                                                                                        │
+# │                                        'type_comment_returns': None,                                                                                                                           │
+# │                                        'type_comment_args': None,                                                                                                                              │
+# │                                        'doc_node': None,                                                                                                                                       │
+# │                                        'fromlineno': 3,                                                                                                                                        │
+# │                                        '_multi_line_blocks': ([<Import l.4 at 0x109b89dc0>, <Return l.5 at 0x109b89fd0>],),                                                                    │
+# │                                        '_assign_nodes_in_scope': [],                                                                                                                           │
+# │                                        'blockstart_tolineno': 3,                                                                                                                               │
+# │                                        'extra_decorators': [],                                                                                                                                 │
+# │                                        'tolineno': 5,                                                                                                                                          │
+# │                                        'ty

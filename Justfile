@@ -44,7 +44,7 @@ test-marimo:
 
 test-marimo-debug:
 	@echo "🚀 Testing code: Running pytest"
-	PYTHONPATH=pylint/plugins {{UV_RUN}} pytest -s -vv --diff-width=60 --diff-symbols --pdb --pdbcls bpdb:BPdb --showlocals --tb=short --cov-append --cov-report=term-missing --junitxml=junit/test-results.xml --cov-report=xml:cov.xml --cov-report=html:htmlcov --cov-report=annotate:cov_annotate --cov=. tests/pylint/test_marimo_cell_params_validator.py
+	PYTHONPATH=pylint/plugins {{UV_RUN}} pytest -s -vvvvv --diff-width=60 --diff-symbols --pdb --pdbcls bpdb:BPdb --showlocals --tb=short --cov-append --cov-report=term-missing --junitxml=junit/test-results.xml --cov-report=xml:cov.xml --cov-report=html:htmlcov --cov-report=annotate:cov_annotate --cov=. tests/pylint/test_marimo_cell_params_validator.py
 
 # Build wheel file
 build: clean-build

@@ -9,6 +9,8 @@ from pathlib import Path
 from types import ModuleType
 from typing import TYPE_CHECKING
 
+from loguru import logger
+
 import pytest
 
 from pylint.checkers import BaseChecker
@@ -45,16 +47,24 @@ def _load_plugin_from_file(module_name: str, file: str) -> ModuleType:
     if not full_path.exists():
         raise FileNotFoundError(f"Plugin file not found: {full_path}")
 
+    logger.debug(f"Loading plugin from full_path: {full_path}")
+    logger.debug(f"module_name: {module_name}")
+    logger.debug(f"file: {file}")
+
     spec = spec_from_file_location(
         module_name,
         str(full_path),
     )
+    logger.debug(f"spec: {spec}")
     if not spec or not spec.loader:
         raise ImportError(f"Could not load module {module_name} from {file}")
 
-    module = module_from_spec(spec)
+    module: ModuleType = module_from_spec(spec)
+    logger.debug(f"module: {module}")
     sys.modules[module_name] = module
+    # logger.debug(f"sys.modules: {sys.modules}")
     spec.loader.exec_module(module)
+    logger.debug(f"module: {module}")
     return module
 
 
@@ -69,6 +79,28 @@ def marimo_cell_validator_fixture() -> ModuleType:
         "marimo_cell_validator",
         "pylint/plugins/marimo_cell_validator.py",
     )
+
+
+@pytest.fixture(name="linter")
+def linter_fixture() -> UnittestLinter:
+    """Fixture to provide a pylint linter instance.
+
+    Returns:
+        UnittestLinter: A configured pylint linter instance
+    """
+    return UnittestLinter()
+
+
+@pytest.fixture(name="marimo_cell_validator_checker")
+def marimo_cell_validator_checker_fixture(marimo_cell_validator: ModuleType, linter: UnittestLinter) -> BaseChecker:
+    """Fixture to provide the Marimo cell validator module.
+
+    Returns:
+        BaseChecker: The loaded Marimo cell validator module
+    """
+    marimo_cell_checker = marimo_cell_validator.MarimoChecker(linter)
+    marimo_cell_checker.module = "prompt_library.pylint_test"
+    return marimo_cell_checker
 
 
 # @pytest.fixture(name="marimo_imports_validator", scope="package")
@@ -110,17 +142,16 @@ def marimo_cell_params_validator_fixture() -> ModuleType:
     )
 
 
-# @pytest.fixture(name="marimo_checker")
-# def marimo_checker_fixture() -> ModuleType:
-#     """Fixture to provide the Marimo cell validator module.
+@pytest.fixture(name="marimo_cell_params_checker")
+def marimo_cell_params_checker_fixture(marimo_cell_params_validator: ModuleType, linter: UnittestLinter) -> BaseChecker:
+    """Fixture to provide the Marimo cell parameters validator module.
 
-#     Returns:
-#         ModuleType: The loaded Marimo cell validator module
-#     """
-#     return _load_plugin_from_file(
-#         "marimo_cell_validator",
-#         "pylint/plugins/marimo_cell_validator.py",
-#     )
+    Returns:
+        ModuleType: The loaded Marimo cell parameters validator module
+    """
+    checker = marimo_cell_params_validator.MarimoCellParamsChecker(linter)
+    checker.module = "prompt_library.pylint_test"
+    return checker
 
 
 # @pytest.fixture(name="marimo_imports_checker")
@@ -147,29 +178,6 @@ def marimo_cell_params_validator_fixture() -> ModuleType:
 #         "marimo_function_validator",
 #         "pylint/plugins/marimo_function_validator.py",
 #     )
-
-
-@pytest.fixture(name="marimo_cell_params_checker")
-def marimo_cell_params_checker_fixture() -> ModuleType:
-    """Fixture to provide the Marimo cell parameters validator module.
-
-    Returns:
-        ModuleType: The loaded Marimo cell parameters validator module
-    """
-    return _load_plugin_from_file(
-        "marimo_cell_params_validator",
-        "pylint/plugins/marimo_cell_params_validator.py",
-    )
-
-
-@pytest.fixture(name="linter")
-def linter_fixture() -> UnittestLinter:
-    """Fixture to provide a pylint linter instance.
-
-    Returns:
-        UnittestLinter: A configured pylint linter instance
-    """
-    return UnittestLinter()
 
 
 # @pytest.fixture(name="hass_enforce_type_hints", scope="package")
