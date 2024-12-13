@@ -936,7 +936,5 @@ hass-files-to-prompt:
 functional-test:
 	{{UV_RUN}} python tests/test_functional.py -s -vv --diff-width=60 --diff-symbols --pdb --pdbcls bpdb:BPdb --showlocals --tb=short --cov-append --cov-report=term-missing --junitxml=junit/test-results.xml --cov-report=xml:cov.xml --cov-report=html:htmlcov --cov-report=annotate:cov_annotate --cov=.
 
-
-# ytest -s -vv --diff-width=60 --diff-symbols --pdb --pdbcls bpdb:BPdb --showlocals --tb=short --cov-append --cov-report=term-missing --junitxml=junit/test-results.xml --cov-report=xml:cov.xml --cov-report=html:htmlcov --cov-report=annotate:cov_annotate --cov=. tests/pylint/test_marimo_cell_params_validator.py
 pylint-smoke-test:
 	uv run python pylint/plugins/marimo_cell_params_validator.py
