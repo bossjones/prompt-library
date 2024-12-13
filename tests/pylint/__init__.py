@@ -28,9 +28,9 @@ def assert_adds_messages(linter: UnittestLinter, *messages):
     actually be substituted into the message string.
     """
     yield
-    import bpdb
+    # import bpdb
 
-    bpdb.set_trace()
+    # bpdb.set_trace()
     got = linter.release_messages()
     no_msg = "No message."
     expected = "\n".join(repr(m) for m in messages) or no_msg

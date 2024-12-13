@@ -13,7 +13,7 @@ from loguru import logger
 
 import pytest
 
-from pylint.checkers import BaseChecker
+from pylint.checkers.base_checker import BaseChecker
 from pylint.testutils.unittest_linter import UnittestLinter
 
 
@@ -103,32 +103,6 @@ def marimo_cell_validator_checker_fixture(marimo_cell_validator: ModuleType, lin
     return marimo_cell_checker
 
 
-# @pytest.fixture(name="marimo_imports_validator", scope="package")
-# def marimo_imports_validator_fixture() -> ModuleType:
-#     """Fixture to provide the Marimo imports validator module.
-
-#     Returns:
-#         ModuleType: The loaded Marimo imports validator module
-#     """
-#     return _load_plugin_from_file(
-#         "marimo_imports_validator",
-#         "pylint/plugins/marimo_imports_validator.py",
-#     )
-
-
-# @pytest.fixture(name="marimo_function_validator", scope="package")
-# def marimo_function_validator_fixture() -> ModuleType:
-#     """Fixture to provide the Marimo function validator module.
-
-#     Returns:
-#         ModuleType: The loaded Marimo function validator module
-#     """
-#     return _load_plugin_from_file(
-#         "marimo_function_validator",
-#         "pylint/plugins/marimo_function_validator.py",
-#     )
-
-
 @pytest.fixture(name="marimo_cell_params_validator", scope="package")
 def marimo_cell_params_validator_fixture() -> ModuleType:
     """Fixture to provide the Marimo cell parameters validator module.
@@ -153,6 +127,31 @@ def marimo_cell_params_checker_fixture(marimo_cell_params_validator: ModuleType,
     checker.module = "prompt_library.pylint_test"
     return checker
 
+
+# @pytest.fixture(name="marimo_imports_validator", scope="package")
+# def marimo_imports_validator_fixture() -> ModuleType:
+#     """Fixture to provide the Marimo imports validator module.
+
+#     Returns:
+#         ModuleType: The loaded Marimo imports validator module
+#     """
+#     return _load_plugin_from_file(
+#         "marimo_imports_validator",
+#         "pylint/plugins/marimo_imports_validator.py",
+#     )
+
+
+# @pytest.fixture(name="marimo_function_validator", scope="package")
+# def marimo_function_validator_fixture() -> ModuleType:
+#     """Fixture to provide the Marimo function validator module.
+
+#     Returns:
+#         ModuleType: The loaded Marimo function validator module
+#     """
+#     return _load_plugin_from_file(
+#         "marimo_function_validator",
+#         "pylint/plugins/marimo_function_validator.py",
+#     )
 
 # @pytest.fixture(name="marimo_imports_checker")
 # def marimo_imports_checker_fixture() -> ModuleType:

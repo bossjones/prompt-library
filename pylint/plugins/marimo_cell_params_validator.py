@@ -346,15 +346,6 @@ class MarimoCellParamsChecker(BaseChecker):  # type: ignore[misc]
                 logger.debug(f"Found usage of parameter: {node.name}")
                 self._used_names.add(node.name)
 
-    # def load_configuration(self, linter: PyLinter) -> None:
-
-    #     name_checker: NameChecker = linter.get_checker(NameChecker)
-    #     # We consider as good names of variables Hello and World
-    #     name_checker.config.good_names += ('Hello', 'World')
-
-    #     # We ignore bin directory
-    #     linter.config.black_list += ('bin',)
-
 
 def register(linter: PyLinter) -> None:
     """Register the MarimoCellParamsChecker with pylint.
@@ -378,7 +369,6 @@ if __name__ == "__main__":
     from astroid.nodes import Module
     from loguru import logger
 
-    from prompt_library.bot_logger import get_logger, global_log_config
     from pylint.checkers import BaseChecker
     from pylint.checkers.base_checker import BaseChecker
     from pylint.checkers.utils import only_required_for_messages
@@ -386,10 +376,11 @@ if __name__ == "__main__":
     from pylint.testutils import MessageTest
     from pylint.utils import ASTWalker
     # SOURCE: https://github.com/Delgan/loguru/blob/420704041797daf804b505e5220805528fe26408/docs/resources/recipes.rst#L1083
-    global_log_config(
-        log_level=logging.getLevelName("DEBUG"),
-        json=False,
-    )
+    # from prompt_library.bot_logger import get_logger, global_log_config
+    # global_log_config(
+    #     log_level=logging.getLevelName("DEBUG"),
+    #     json=False,
+    # )
 
     # """Decorator to store messages that are handled by a checker method as an
     # attribute of the function object.
@@ -435,7 +426,7 @@ if __name__ == "__main__":
             raise NotImplementedError
 
     # Read the file content
-    file_path = Path("marimo_bad.py")
+    file_path = Path("tests/functional/a/marimo_bad.py")
     file_content = file_path.read_text()
 
     # Extract nodes from the file content
@@ -449,6 +440,8 @@ if __name__ == "__main__":
     checker = MarimoCellParamsChecker(linter)
     walker.add_checker(checker)
 
+    rich.print(f"Before: checker.messages = {checker.messages}")
+
     walker.walk(module)
     node=next(
     node
@@ -460,8 +453,8 @@ if __name__ == "__main__":
         for dec in node.decorators.nodes
         )
     )
-    bpdb.set_trace()
-    rich.print(checker.messages)
+    # bpdb.set_trace()
+    rich.print(f"After: checker.messages = {checker.messages}")
     # produces [MessageDefinition:unused-cell-parameter (W9301)]
 
 

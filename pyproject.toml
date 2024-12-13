@@ -1053,7 +1053,8 @@ init-hook = """\
 load-plugins = [
     "pylint.extensions.code_style",
     "pylint.extensions.typing",
-    "marimo_cell_params_validator"
+    "marimo_cell_params_validator",
+    "marimo_cell_validator",
 ]
 persistent = false
 # ignore = "lib"
