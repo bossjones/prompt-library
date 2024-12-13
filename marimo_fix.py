@@ -364,21 +364,6 @@ def __(
     return (save_data, preview, save_button)
 
 
-# except Exception as e:
-#     error_message = f"""
-#     ❌ **Error**: An error occurred while processing the prompts:
-#     ```
-#     {str(e)}
-#     ```
-#     Please check:
-#     - API key configuration
-#     - Network connection
-#     - Model availability
-#     """
-#     mo.stop(True, mo.md(error_message).style(styles["error"]))  # type: ignore
-#     return None
-
-
 @app.cell
 def __(mo, styles):
     mo.md("""# Prompt Analysis Tool
