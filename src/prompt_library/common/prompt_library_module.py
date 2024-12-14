@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
 
 from datetime import datetime
@@ -12,8 +13,14 @@ import pytz
 from dotenv import load_dotenv
 from loguru import logger
 
+from prompt_library.bot_logger import get_logger, global_log_config
 from prompt_library.common.typings import ModelRanking, MultiLLMPromptExecution
 
+
+global_log_config(
+    log_level=logging.getLevelName("DEBUG"),
+    json=False,
+)
 
 load_dotenv()
 

@@ -3,12 +3,12 @@ from __future__ import annotations
 import marimo
 
 
-__generated_with = "0.9.34"
+__generated_with = "0.10.2"
 app = marimo.App()
 
 
 @app.cell
-def __():
+def _():
     styles = {
         "container": {
             "max-width": "800px",
@@ -53,7 +53,7 @@ def __():
 
 
 @app.cell
-def __():
+def _():
     import glob
     import importlib
     import os  # For path operations
@@ -65,6 +65,8 @@ def __():
     import marimo as mo
     import pytz
 
+    from loguru import logger
+
     from prompt_library.common import llm_module, prompt_library_module
 
     # Force reload of the module to get the latest version
@@ -75,6 +77,7 @@ def __():
         glob,
         importlib,
         llm_module,
+        logger,
         mo,
         os,
         prompt_library_module,
@@ -84,7 +87,7 @@ def __():
 
 
 @app.cell
-def __():
+def _():
     # Define the directories to search for prompts
     QUESTIONS_DIR = "one-off-tasks/lore-writing/helldivers2/johnhelldiver/questions"
     COMPARE_DIR = "one-off-tasks/lore-writing/helldivers2/johnhelldiver/compare"
@@ -93,7 +96,7 @@ def __():
 
 
 @app.cell
-def __(PROMPT_DIRS, mo, prompt_library_module):
+def _(PROMPT_DIRS, mo, prompt_library_module):
     # Convert to Path objects and load prompts from all directories, filtering for XML files
     with mo.status.spinner(title="Loading XML prompts from all directories..."):
         map_prompt_library = prompt_library_module.pull_in_multiple_prompt_libraries(
@@ -103,7 +106,7 @@ def __(PROMPT_DIRS, mo, prompt_library_module):
 
 
 @app.cell
-def __(llm_module):
+def _(llm_module):
     # Initialize LLM models
     llm_o1_mini, llm_o1_preview = llm_module.build_o1_series()
     llm_gpt_4o_latest, llm_gpt_4o_mini = llm_module.build_openai_latest_and_fastest()
@@ -124,7 +127,7 @@ def __(llm_module):
 
 
 @app.cell
-def __():
+def _():
     # def update_question_input(selection: mo.UIValue, index) -> None:
     #     if selection.value != "None":
     #         question_input.value = prompt_library_module.read_question_file(selection.value, QUESTIONS_DIR)
@@ -134,60 +137,74 @@ def __():
 
 
 @app.cell
-def __():
+def _(QUESTIONS_DIR):
+    QUESTIONS_DIR
+    return
+
+
+@app.cell
+def _():
+    # Let's modify the code to properly handle the state in marimo. Here's the corrected version:
+
+    # def update_question_input(selection: str) -> str:
+    #     if selection != "None":
+    #         return prompt_library_module.read_question_file(selection, QUESTIONS_DIR)
+    #     return ""
+
     # question_names = ["None"] + prompt_library_module.get_question_files(QUESTIONS_DIR)
 
-    # question_selector = mo.ui.dropdown(
-    #     options=question_names, value="None", label="Select a predefined question (or None to write your own)", on_change= lambda x: update_question_input(x)
-    # )
-
-    # question_input = mo.ui.text_area(value="", placeholder="Enter your question here...", label="Question")
-
-    # # if question_selector.value != "None":
-    # #     question_input =  mo.state(prompt_library_module.read_question_file(question_selector.value, QUESTIONS_DIR))
-
-    # mo.md("### Question Input")
-
-    # mo.hstack([question_selector, question_input], justify="center")
-    # # def update_question_input(selection: mo.UIValue, index) -> None:
-    # #     if selection.value != "None":
-    # #         question_input.value = prompt_library_module.read_question_file(selection.value, QUESTIONS_DIR)
-
-    # # question_selector.on_change(update_question_input)
+    # # Create state variables
+    # question_state = mo.state("")
 
     return
 
 
 @app.cell
-def __(QUESTIONS_DIR, mo, prompt_library_module):
-    def update_question_input(selection: mo.UIValue) -> None:
-        if selection.value != "None":
-            question_input.value = prompt_library_module.read_question_file(selection.value, QUESTIONS_DIR)
+def _(QUESTIONS_DIR, logger, mo, prompt_library_module):
+    # Here's the corrected version using mo.state() to handle the UI element value:
+
+    get_question, set_question = mo.state("None")
+    # question_state
+    logger.debug(f"QUESTIONS_DIR: {QUESTIONS_DIR}")
+
+    def update_question_input(selection: str) -> None:
+        if selection != "None":
+            new_value = prompt_library_module.read_question_file(selection, QUESTIONS_DIR)
+            print(new_value)
+            set_question(new_value)
 
     question_names = ["None"] + prompt_library_module.get_question_files(QUESTIONS_DIR)
 
     question_selector = mo.ui.dropdown(
         options=question_names,
-        value="None",
-        label="Select a predefined question/write one",
-        on_change=lambda v: update_question_input(v),
+        value=get_question(),
+        label="Select a predefined question",
         full_width=True,
+        on_change=lambda x: update_question_input(x),
     )
 
-    question_input = mo.ui.text_area(value="", placeholder="Enter your question here...", label="Question")
+    question_input = mo.ui.text_area(
+        value=get_question(),
+        placeholder="Enter your question here...",
+        label="Question",
+        full_width=True,
+        on_change=lambda x: update_question_input(x),
+    )
 
     mo.md("### Question Input")
     mo.hstack([question_selector, question_input], justify="space-between")
     return (
+        get_question,
         question_input,
         question_names,
         question_selector,
+        set_question,
         update_question_input,
     )
 
 
 @app.cell
-def __():
+def _():
     # if question_selector.value != "None":
     #     question_input =  mo.state(prompt_library_module.read_question_file(question_selector.value, QUESTIONS_DIR))
 
@@ -197,7 +214,7 @@ def __():
 
 
 @app.cell
-def __(map_prompt_library, mo, models, styles):
+def _(map_prompt_library, mo, models, styles):
     # Stop if no prompts were loaded
     mo.stop(
         not map_prompt_library,
@@ -261,7 +278,7 @@ def __(map_prompt_library, mo, models, styles):
 
 
 @app.cell
-def __(
+def _(
     map_prompt_library,
     mo,
     prompt_dropdown_1,
@@ -302,7 +319,7 @@ def __(
 
 
 @app.cell
-def __(mo, re, selected_prompt_1, selected_prompt_2, styles):
+def _(mo, re, selected_prompt_1, selected_prompt_2, styles):
     mo.stop(not selected_prompt_1 or not selected_prompt_2, "")
 
     # Extract placeholders from both prompts
@@ -342,7 +359,7 @@ def __(mo, re, selected_prompt_1, selected_prompt_2, styles):
 
 
 @app.cell
-def __(all_placeholders, mo, placeholder_array, proceed_button):
+def _(all_placeholders, mo, placeholder_array, proceed_button):
     mo.stop(not placeholder_array.value or not len(placeholder_array.value), "")
 
     # Check if any values are missing
@@ -361,7 +378,7 @@ def __(all_placeholders, mo, placeholder_array, proceed_button):
 
 
 @app.cell
-def __(filled_values, selected_prompt_1, selected_prompt_2):
+def _(filled_values, selected_prompt_1, selected_prompt_2):
     # Replace placeholders in both prompts
     final_prompt_1 = selected_prompt_1
     final_prompt_2 = selected_prompt_2
@@ -373,7 +390,7 @@ def __(filled_values, selected_prompt_1, selected_prompt_2):
 
 
 @app.cell
-def __(
+def _(
     COMPARE_DIR,
     final_prompt_1,
     final_prompt_2,
@@ -441,7 +458,7 @@ def __(
 
 
 @app.cell
-def __(mo, styles):
+def _(mo, styles):
     mo.md("""# Prompt Analysis Tool
 
     This tool helps you compare different prompts using different LLM models. You can:

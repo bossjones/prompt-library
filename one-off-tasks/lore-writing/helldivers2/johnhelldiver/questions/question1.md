@@ -1,0 +1,1 @@
+Write a story about how John Helldiver single handly held off a automaton attack to allow 3 helldivers to safely extract off planet. Make the setting, Malevelon Creek, also known as the Robo Vietnam planet
