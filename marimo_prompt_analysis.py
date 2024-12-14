@@ -170,7 +170,7 @@ def __(QUESTIONS_DIR, mo, prompt_library_module):
         options=question_names,
         value="None",
         label="Select a predefined question/write one",
-        on_change=update_question_input,
+        on_change=lambda v: update_question_input(v),
         full_width=True,
     )
 
