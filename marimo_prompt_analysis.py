@@ -59,13 +59,12 @@ def _():
     import os  # For path operations
     import re
 
+    # from loguru import logger
     from datetime import datetime
     from pathlib import Path
 
     import marimo as mo
     import pytz
-
-    from loguru import logger
 
     from prompt_library.common import llm_module, prompt_library_module
 
@@ -77,7 +76,6 @@ def _():
         glob,
         importlib,
         llm_module,
-        logger,
         mo,
         os,
         prompt_library_module,
@@ -144,67 +142,187 @@ def _(QUESTIONS_DIR):
 
 @app.cell
 def _():
-    # Let's modify the code to properly handle the state in marimo. Here's the corrected version:
+    # get_index, set_index = mo.state(0)
 
-    # def update_question_input(selection: str) -> str:
-    #     if selection != "None":
-    #         return prompt_library_module.read_question_file(selection, QUESTIONS_DIR)
-    #     return ""
+    # def increment_index():
+    #     set_index(lambda v: min(v + 1, NUMBER_OF_EXAMPLES - 1))
 
-    # question_names = ["None"] + prompt_library_module.get_question_files(QUESTIONS_DIR)
-
-    # # Create state variables
-    # question_state = mo.state("")
-
+    # def decrement_index() -> int:a
+    #     set_index(lambda v: max(0, v - 1))
     return
 
 
 @app.cell
-def _(QUESTIONS_DIR, logger, mo, prompt_library_module):
-    # Here's the corrected version using mo.state() to handle the UI element value:
+def _(mo):
+    # # Here's the corrected version that properly handles state management in marimo:
 
-    get_question, set_question = mo.state("None")
-    # question_state
-    logger.debug(f"QUESTIONS_DIR: {QUESTIONS_DIR}")
+    # get_question, set_question = mo.state("None", allow_self_loops=True)
+    # get_state, set_state = mo.state(None)
 
-    def update_question_input(selection: str) -> None:
-        if selection != "None":
-            new_value = prompt_library_module.read_question_file(selection, QUESTIONS_DIR)
-            print(new_value)
-            set_question(new_value)
+    # def update_from_selector(selection: str) -> None:
+    #     """Update question value when selector changes."""
+    #     if selection != "None":
+    #         new_value = prompt_library_module.read_question_file(selection, QUESTIONS_DIR)
+    #         set_question(new_value)
+    #     else:
+    #         set_question("")
 
+    # def update_from_input(text: str) -> None:
+    #     """Update question value when text input changes."""
+    #     set_question(text)
+
+    # question_names = ["None"] + prompt_library_module.get_question_files(QUESTIONS_DIR)
+
+    # question_selector = mo.ui.dropdown(
+    #     options=question_names,
+    #     value=question_name[get_state()],
+    #     label="Select a predefined question",
+    #     full_width=True,
+    #     on_change=lambda x: update_from_selector(x)
+    # )
+
+    # question_input = mo.ui.text_area(
+    #     value=get_question(),
+    #     placeholder="Enter your question here...",
+    #     label="Question",
+    #     full_width=True,
+    #     on_change=lambda x: update_from_input(x)
+    # )
+
+    # mo.md("### Question Input")
+    # mo.hstack(
+    #     [
+    #         question_selector,
+    #         question_input
+    #     ],
+    #     justify="space-between"
+    # )
+    # Initialize states
+    get_index, set_index = mo.state(0)
+    get_question_value, set_question_value = mo.state("")
+    return get_index, get_question_value, set_index, set_question_value
+
+
+@app.cell
+def _(
+    QUESTIONS_DIR,
+    get_index,
+    get_question_value,
+    mo,
+    prompt_library_module,
+    set_index,
+    set_question_value,
+):
+    def update_from_selector(selection: str) -> None:
+        """
+        Update index state when selector changes and update question value.
+
+        Args:
+            selection (str): Selected question name from dropdown
+        """
+
+        def handle(v):
+            # Find index of selection in question_names
+            new_index = question_names.index(selection)
+            set_index(new_index)
+
+            if selection != "None":
+                new_value = prompt_library_module.read_question_file(selection, QUESTIONS_DIR)
+                new_value
+                print(f"new_value: {new_value}")
+                set_question_value(new_value)
+            else:
+                set_question_value("")
+            return handle
+
+    def get_text_content() -> str:
+        """
+        Get text content of question input.
+
+        Returns:
+            str: Text content of question input
+        """
+        txt = get_question_value()
+        print(f"txt: {txt}")
+        return txt
+
+    # Get list of question names
     question_names = ["None"] + prompt_library_module.get_question_files(QUESTIONS_DIR)
 
+    # Create dropdown with current index-based selection
     question_selector = mo.ui.dropdown(
         options=question_names,
-        value=get_question(),
+        value=question_names[get_index()],
         label="Select a predefined question",
         full_width=True,
-        on_change=lambda x: update_question_input(x),
+        on_change=lambda x: update_from_selector(x),
     )
 
+    # Create text area with value based on current selection
     question_input = mo.ui.text_area(
-        value=get_question(),
-        placeholder="Enter your question here...",
-        label="Question",
-        full_width=True,
-        on_change=lambda x: update_question_input(x),
+        value=f"{get_text_content()}", placeholder="Enter your question here...", label="Question", full_width=True
     )
-
-    mo.md("### Question Input")
-    mo.hstack([question_selector, question_input], justify="space-between")
     return (
-        get_question,
+        get_text_content,
         question_input,
         question_names,
         question_selector,
-        set_question,
-        update_question_input,
+        update_from_selector,
     )
 
 
 @app.cell
+def _(mo, question_input, question_selector):
+    mo.md("### Question Input")
+    mo.hstack([question_selector, question_input], justify="space-between")
+    return
+
+
+@app.cell
 def _():
+    # # The error occurs because you're trying to access `question_input.value` in the `save_data` dictionary before it's properly initialized. Let's modify the code to handle this properly:
+
+    # save_data = {
+    #     "question_input": get_text_content(),  # Use the function instead of direct access
+    #     "final_prompt_1": final_prompt_1,
+    #     "prompt_response_1": prompt_response_1,
+    #     "final_prompt_2": final_prompt_2,
+    #     "prompt_response_2": prompt_response_2,
+    #     "model_name_1": model_name_1,
+    #     "model_name_2": model_name_2,
+    #     "styles": styles,
+    #     "COMPARE_DIR": COMPARE_DIR,
+    # }
+
+    # preview = mo.md("")
+    # save_button = mo.ui.button(
+    #     label="Save Comparison",
+    #     tooltip="Save the comparison to a markdown file with timestamp",
+    #     on_click=lambda: prompt_library_module.save_comparison(mo, save_data, preview, save_button),
+    # )
+
+    # mo.vstack([mo.md("### Save Comparison"), save_button, preview]).style(styles["container"])
+    return
+
+
+@app.cell
+def _(mo, question_input, question_selector):
+    # The error occurs because you're trying to use square brackets with mo.hstack which is a function, not a subscriptable object. Here's the corrected code:
+
+    mo.md("### Question Input")
+    mo.vstack([
+        mo.hstack([question_selector, mo.md(f"Has value: {question_selector.value}")]),
+        mo.hstack([question_input, mo.md(f"Has value: {question_input.value}")]),
+    ])
+
+    question_input
+    return
+
+
+@app.cell
+def _(get_index, question_names):
+    question_names[get_index()]
+
     # if question_selector.value != "None":
     #     question_input =  mo.state(prompt_library_module.read_question_file(question_selector.value, QUESTIONS_DIR))
 
@@ -394,19 +512,23 @@ def _(
     COMPARE_DIR,
     final_prompt_1,
     final_prompt_2,
-    form,
+    get_text_content,
     llm_module,
     mo,
+    model_dropdown_1,
+    model_dropdown_2,
     models,
     prompt_library_module,
-    question_input,
     styles,
 ):
+    # The error occurs because we're trying to access form.value as a dictionary, but in marimo forms don't work that way. Here's the corrected code:
+
+    # ```python
     # Get the selected models
-    model_1 = models[form.value["model_dropdown_1"]]  # type: ignore
-    model_2 = models[form.value["model_dropdown_2"]]  # type: ignore
-    model_name_1 = form.value["model_dropdown_1"]  # type: ignore
-    model_name_2 = form.value["model_dropdown_2"]  # type: ignore
+    model_1 = models[model_dropdown_1.value]
+    model_2 = models[model_dropdown_2.value]
+    model_name_1 = model_dropdown_1.value
+    model_name_2 = model_dropdown_2.value
 
     # Run both prompts through their respective models
     with mo.status.spinner(title="Running prompts through models..."):
@@ -416,16 +538,16 @@ def _(
     # Display responses side by side
     mo.hstack([
         mo.vstack([
-            mo.md(f"# First Prompt Output ({model_name_1})\n\n{prompt_response_1}").style(styles["prompt_display"]),  # type: ignore
+            mo.md(f"# First Prompt Output ({model_name_1})\n\n{prompt_response_1}").style(styles["prompt_display"]),
         ]),
         mo.vstack([
-            mo.md(f"# Second Prompt Output ({model_name_2})\n\n{prompt_response_2}").style(styles["prompt_display"]),  # type: ignore
+            mo.md(f"# Second Prompt Output ({model_name_2})\n\n{prompt_response_2}").style(styles["prompt_display"]),
         ]),
-    ]).style(styles["container"])  # type: ignore
+    ]).style(styles["container"])
 
     # Create save button and preview
-    save_data = {
-        "question_input": question_input.value,
+    _save_data = {
+        "question_input": get_text_content(),
         "final_prompt_1": final_prompt_1,
         "prompt_response_1": prompt_response_1,
         "final_prompt_2": final_prompt_2,
@@ -436,24 +558,27 @@ def _(
         "COMPARE_DIR": COMPARE_DIR,
     }
 
-    preview = mo.md("")
-    save_button = mo.ui.button(
+    _preview = mo.md("")
+    _save_button = mo.ui.button(
         label="Save Comparison",
         tooltip="Save the comparison to a markdown file with timestamp",
-        on_click=lambda: prompt_library_module.save_comparison(mo, save_data, preview, save_button),
+        on_click=lambda: prompt_library_module.save_comparison(mo, _save_data, _preview, _save_button),
     )
 
-    mo.vstack([mo.md("### Save Comparison"), save_button, preview]).style(styles["container"])  # type: ignore
+    mo.vstack([mo.md("### Save Comparison"), _save_button, _preview]).style(styles["container"])
+    # ```
+
+    # The main changes are:
+    # 1. Accessing the dropdown values directly through `.value` instead of using form.value
+    # 2. Using get_text_content() for the question input value
+    # 3. Removed unnecessary type ignores
     return (
         model_1,
         model_2,
         model_name_1,
         model_name_2,
-        preview,
         prompt_response_1,
         prompt_response_2,
-        save_button,
-        save_data,
     )
 
 

@@ -13,14 +13,14 @@ import pytz
 from dotenv import load_dotenv
 from loguru import logger
 
-from prompt_library.bot_logger import get_logger, global_log_config
 from prompt_library.common.typings import ModelRanking, MultiLLMPromptExecution
 
 
-global_log_config(
-    log_level=logging.getLevelName("DEBUG"),
-    json=False,
-)
+# from prompt_library.bot_logger import get_logger, global_log_config
+# global_log_config(
+#     log_level=logging.getLevelName("DEBUG"),
+#     json=False,
+# )
 
 load_dotenv()
 
@@ -86,11 +86,15 @@ def save_preview(mo, preview, styles, filepath, content, save_button):
 
 # Function to read markdown file content
 def read_question_file(filename: str, questions_dir: str) -> str:
+    logger.debug(f"Reading question file: {filename}")
     if filename == "None":
         return ""
     file_path = os.path.join(questions_dir, filename)
-    with open(file_path) as f:
-        return f.read().strip()
+    file_contents = ""
+    with open(file_path, encoding="utf-8") as f:
+        file_contents = f.read().strip()
+    logger.debug(f"File contents: {file_contents}")
+    return file_contents
 
 
 def pull_in_dir_recursively(directory: str) -> dict[str, str]:
